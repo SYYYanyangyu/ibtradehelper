@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============ 克制中性令牌 ============ */
+:root {
+  --bg: 248 249 250;
+  --bg-2: 242 244 246;
+  --surface: 255 255 255;
+  --surface-2: 245 246 248;
+  --border: 228 231 235;
+  --foreground: 28 32 38;
+  --muted: 100 110 122;
+  --muted-2: 148 156 166;
+  --primary: 55 65 81;
+  --primary-soft: 229 231 235;
+  --up: 22 140 100;
+  --down: 185 55 55;
+}
+
+.dark {
+  --bg: 14 16 20;
+  --bg-2: 18 20 24;
+  --surface: 22 25 30;
+  --surface-2: 28 32 38;
+  --border: 48 54 64;
+  --foreground: 230 233 238;
+  --muted: 148 156 166;
+  --muted-2: 110 118 128;
+  --primary: 180 188 198;
+  --primary-soft: 40 46 56;
+  --up: 72 180 130;
+  --down: 210 110 110;
+}
+
+* {
+  border-color: rgb(var(--border));
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-bg text-foreground antialiased font-sans;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overscroll-behavior-y: none;
+}
+
+/* 移动端可滚动区域：避免嵌套滚动抢手势 */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+@layer components {
+  .glass {
+    @apply border border-border/60 bg-surface/80 backdrop-blur-md;
+  }
+  .card {
+    @apply rounded-xl border border-border bg-surface shadow-soft;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--muted-2) / 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--muted-2) / 0.5);
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(var(--foreground) / 0.03), transparent);
+  animation: shimmer 1.8s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

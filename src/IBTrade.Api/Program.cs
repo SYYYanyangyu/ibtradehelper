@@ -1,0 +1,114 @@
+using IBTrade.Application;
+using IBTrade.Infrastructure;
+using IBTrade.Api.Auth;
+using IBTrade.Api.HostedServices;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 本地密钥（gitignored）：复制 appsettings.Example.json → appsettings.Secrets.json
+builder.Configuration.AddJsonFile("appsettings.Secrets.json", optional: true, reloadOnChange: true);
+
+// ---- 服务注册（Composition Root）----
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks();
+
+// 各层通过扩展方法自组装，Api 保持清爽
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHttpContextAccessor(); // 供控制器提取来源 IP，用于操作审计
+
+// TWS 实时接入配置（appsettings 的 TWS 段或环境变量 TWS__*）
+var twsOptions = new IBTrade.Application.IBKR.TwsOptions
+{
+    Host = builder.Configuration["TWS:Host"] ?? "127.0.0.1",
+    Port = int.TryParse(builder.Configuration["TWS:Port"], out var p) ? p : 7497,
+    Ports = builder.Configuration.GetSection("TWS:Ports").Get<int[]>() is { Length: > 0 } cfgPorts
+        ? cfgPorts
+        : (int.TryParse(builder.Configuration["TWS:Port"], out var pp) && pp > 0
+            ? new[] { pp }
+            : new[] { 7497, 7496, 4002, 4001 }),
+    ClientId = int.TryParse(builder.Configuration["TWS:ClientId"], out var c) ? c : 1,
+    OrderClientId = int.TryParse(builder.Configuration["TWS:OrderClientId"], out var oc) ? oc : 5,
+    Mode = (builder.Configuration["TWS:Mode"] ?? "Paper").Equals("Live", StringComparison.OrdinalIgnoreCase)
+        ? IBTrade.Domain.Enums.TradingMode.Live : IBTrade.Domain.Enums.TradingMode.Paper,
+    Enabled = (builder.Configuration["TWS:Enabled"] ?? "false").Equals("true", StringComparison.OrdinalIgnoreCase),
+    RefreshMinutes = int.TryParse(builder.Configuration["TWS:RefreshMinutes"], out var r) ? r : 2
+};
+builder.Services.AddSingleton(twsOptions);
+
+// 每日净值快照后台服务：默认关闭，需环境变量 DAILY_SNAPSHOT__ENABLED=true 才启用
+if ((builder.Configuration["DAILY_SNAPSHOT__ENABLED"] ?? "false").Equals("true", StringComparison.OrdinalIgnoreCase))
+    builder.Services.AddHostedService<DailySnapshotHostedService>();
+
+// TWS 实时同步后台服务：需 TWS__ENABLED=true 才启用
+if (twsOptions.Enabled)
+    builder.Services.AddHostedService<TwsSyncHostedService>();
+
+// 跨域：开发环境为本地联调便利放开；生产环境必须显式配置 AllowedOrigins，否则默认拒绝跨域（安全优先）。
+// 配置方式（appsettings 或环境变量）：AllowedOrigins = "https://a.example.com,https://b.example.com"
+var allowedOrigins = builder.Configuration["AllowedOrigins"]?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(p =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        }
+        else if (allowedOrigins is { Length: > 0 })
+        {
+            p.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+        }
+        else
+        {
+            // 生产环境未配置来源时拒绝任何跨域请求
+            p.WithOrigins().AllowAnyHeader().AllowAnyMethod();
+        }
+    }));
+
+var app = builder.Build();
+
+// 启动时应用 EF 迁移（含 orders 表），避免手工 update 遗漏
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<IBTrade.Infrastructure.Persistence.AppDbContext>();
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "数据库迁移失败，API 可能无法读写订单/持仓。");
+    }
+}
+
+// 启动期安全自检：未配置 ApiKey 时明确告警（开发放行，生产拒绝匿名写操作）
+if (string.IsNullOrWhiteSpace(builder.Configuration["ApiKey"]) &&
+    string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("IBTRADE_API_KEY")))
+{
+    app.Logger.LogWarning(
+        "⚠️ 交易引擎未配置 ApiKey：开发环境放行全部请求；生产环境将拒绝匿名写操作（下单/启停/改配置）。" +
+        "建议通过 appsettings.ApiKey 或环境变量 IBTRADE_API_KEY 配置，并在前端设置 VITE_IBTRADE_API_KEY。");
+}
+
+// ---- 中间件管道 ----
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseCors();
+app.UseMiddleware<ApiKeyAuthMiddleware>();
+app.UseAuthorization();
+
+app.MapControllers();
+app.MapHealthChecks("/health");
+app.MapGet("/", () => Results.Ok(new { service = "IBTrade", status = "ok" }));
+
+app.Run();
