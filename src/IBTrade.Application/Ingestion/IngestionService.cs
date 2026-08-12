@@ -5,6 +5,7 @@ using IBTrade.Domain.Entities;
 using IBTrade.Domain.Enums;
 using IBTrade.Domain.Repositories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace IBTrade.Application.Ingestion;
 
@@ -24,7 +25,9 @@ public class IngestionService(
     IPositionDailySnapshotRepository positionSnapshotRepo,
     ISnapshotService snapshotService,
     IDataFeedStatusRepository feedStatusRepo,
-    IConfiguration configuration) : IIngestionService
+    ITwsSyncService twsSync,
+    IConfiguration configuration,
+    ILogger<IngestionService>? logger = null) : IIngestionService
 {
     public async Task IngestAsync(TradeEnv env, string? queryId = null, CancellationToken ct = default)
     {
@@ -61,10 +64,12 @@ public class IngestionService(
 
         // 2) 持仓：快照型数据，按账户幂等替换。
         //    必须覆盖报表内全部账户（含空仓），否则旧 OpenPosition 残留会把「空仓」显示成数万市值。
+        //    但若 Flex 报表未带 Open Positions 段（positions=0），禁止清空已有持仓——否则会把 Gateway 结构清掉。
         var positionAccountIds = snap.Accounts.Select(a => a.AccountId)
             .Concat(snap.Positions.Select(p => p.AccountId))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
+        var flexHasAnyPositions = snap.Positions.Any(p => p.Quantity != 0m);
         foreach (var acctId in positionAccountIds)
         {
             var rows = snap.Positions
@@ -82,6 +87,8 @@ public class IngestionService(
                     Source = DataSources.Flex,
                     PriceSource = DataSources.Flex
                 }).ToList();
+            if (rows.Count == 0 && !flexHasAnyPositions)
+                continue;
             await positionRepo.ReplaceByAccountAsync(acctId, rows, ct);
         }
         await positionRepo.SaveChangesAsync(ct);
@@ -177,10 +184,22 @@ public class IngestionService(
                 foreach (var nav in snap.DailyNavsOrEmpty.Where(n => n.AccountId == acctId)
                                                         .OrderBy(n => n.DateUtc))
                 {
+                    var day = DateTime.SpecifyKind(nav.DateUtc.Date, DateTimeKind.Utc);
+                    // Flex 有时只回现金/保证金、PositionsMv=0（尤其当日未收盘），会把 NAV 写成巨额负值。
+                    if (nav.PositionsMv == 0m && nav.Total < 0m)
+                    {
+                        var prev = await snapshotRepo.GetByDateAsync(acctId, day.AddDays(-1), ct)
+                                   ?? await snapshotRepo.GetByDateAsync(acctId, day.AddDays(-2), ct);
+                        if (prev is not null && prev.NetLiquidation > 10_000m)
+                            continue;
+                    }
+                    if (nav.PositionsMv == 0m && day == DateTime.UtcNow.Date)
+                        continue;
+
                     await snapshotRepo.UpsertAsync(new DailySnapshot
                     {
                         AccountId = acctId,
-                        DateUtc = DateTime.SpecifyKind(nav.DateUtc.Date, DateTimeKind.Utc),
+                        DateUtc = day,
                         TotalMarketValue = nav.PositionsMv,
                         CashBalance = nav.Total - nav.PositionsMv,
                         TotalUnrealizedPnl = 0m,
@@ -245,11 +264,24 @@ public class IngestionService(
         // 仅当 Flex 未覆盖“今天”（报表尚未含今日，如盘中摄入）时才补一条实时快照。
         var latestFlexDate = snap.DailyNavsOrEmpty.Any() ? snap.DailyNavsOrEmpty.Max(n => n.DateUtc.Date) : (DateTime?)null;
         var todayTrading = TradingCalendar.LatestTradingDay(DateTime.UtcNow);
-        if (latestFlexDate is null || latestFlexDate < todayTrading)
+        // Flex 未带持仓时 CaptureToday 会用空持仓 + 旧现金估算 NAV，反而制造 -99% 假暴跌；跳过。
+        if ((latestFlexDate is null || latestFlexDate < todayTrading) && flexHasAnyPositions)
         {
             foreach (var a in snap.Accounts)
                 await snapshotService.CaptureTodayAsync(a.AccountId, null, null, ct);
             await snapshotService.CaptureTodayAsync(null, null, null, ct);
+        }
+
+        // Flex 常缺 Open Positions / 当日 NAV 只有现金 → 摄入后自动 Gateway 修补（无需每天手工点同步）
+        try
+        {
+            await twsSync.SyncAsync(ct);
+            logger?.LogInformation("Flex（{Env}）摄入后已自动 Gateway 同步修补持仓/当日快照", env);
+        }
+        catch (Exception ex)
+        {
+            logger?.LogWarning(ex,
+                "Flex（{Env}）摄入后 Gateway 自动同步失败（Gateway 未开时不影响历史成交/净值）", env);
         }
 
         await feedStatusRepo.UpsertAsync(new DataFeedStatus
@@ -292,7 +324,7 @@ public class IngestionService(
                     ?? throw new InvalidOperationException(
                         $"缺少 Flex Token：请设置环境变量 IBKR_FLEX_TOKEN_{suffix}" +
                         (env == TradeEnv.Live ? "（或 IBKR_FLEX_TOKEN）" : "") +
-                        $"，或在 appsettings.json 配置 IBKR:Flex:{section}:Token。");
+                        $"，或在 appsettings.Secrets.json / appsettings.json 配置 IBKR:Flex:{section}:Token。");
 
         var baseUrl = Environment.GetEnvironmentVariable($"IBKR_FLEX_BASE_URL_{suffix}")
                       ?? Environment.GetEnvironmentVariable("IBKR_FLEX_BASE_URL")

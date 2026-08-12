@@ -44,6 +44,25 @@ public class DailyPnlService(
             .OrderBy(s => s.DateUtc)
             .ToList();
 
+        // 丢弃明显污染的 NAV（仅现金为负、无持仓市值，与前日相差过大）
+        if (snaps.Count > 1)
+        {
+            var cleaned = new List<Domain.Entities.DailySnapshot> { snaps[0] };
+            for (var i = 1; i < snaps.Count; i++)
+            {
+                var s = snaps[i];
+                var prev = cleaned[^1];
+                var nav = s.NetLiquidation;
+                var prevNav = prev.NetLiquidation;
+                if (s.TotalMarketValue == 0m && nav < 0m && prevNav > 10_000m)
+                    continue;
+                if (prevNav > 10_000m && nav < prevNav * 0.05m)
+                    continue;
+                cleaned.Add(s);
+            }
+            snaps = cleaned;
+        }
+
         if (snaps.Count == 0)
             return Array.Empty<DailyPnlPointDto>();
 

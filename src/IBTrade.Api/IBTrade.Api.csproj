@@ -19,4 +19,9 @@
     <ProjectReference Include="..\IBTrade.Infrastructure\IBTrade.Infrastructure.csproj" />
   </ItemGroup>
 
+  <!-- 本地密钥：编译进输出目录，绝不随 Publish 发布 -->
+  <ItemGroup>
+    <Content Update="appsettings.Secrets.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" Condition="Exists('appsettings.Secrets.json')" />
+  </ItemGroup>
+
 </Project>

@@ -16,10 +16,10 @@ import type { TradeEnvSelection, DataFeedStatusItem } from '../lib/api'
 export type AppView = 'dashboard' | 'backtest' | 'orders' | 'autotrade'
 
 const NAV: { id: AppView; label: string }[] = [
-  { id: 'dashboard', label: '看板' },
-  { id: 'backtest', label: '回测' },
-  { id: 'orders', label: '交易' },
-  { id: 'autotrade', label: '量化' }
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'backtest', label: 'Backtest' },
+  { id: 'orders', label: 'Trading' },
+  { id: 'autotrade', label: 'Quant' }
 ]
 
 const ENV: { id: TradeEnvSelection; label: string }[] = [
@@ -105,7 +105,7 @@ function AccountSelect({
         }}
         className="h-8 w-full appearance-none truncate rounded-lg border-0 bg-surface py-0 pl-2.5 pr-7 text-[12px] font-medium tabular text-foreground outline-none ring-1 ring-border/70 focus:ring-foreground/25"
       >
-        <option value="__all__">全部账户（{accounts.length}）</option>
+        <option value="__all__">All accounts ({accounts.length})</option>
         {accounts.map((id) => (
           <option key={id} value={id}>
             {id}
@@ -148,7 +148,7 @@ function AccountChips({
             : 'text-muted hover:text-foreground'
         )}
       >
-        全部
+        All
       </button>
       {accounts.map((id) => (
         <button
@@ -239,7 +239,7 @@ export function AppHeader({
                 value={query}
                 onChange={(e) => onQueryChange(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit()}
-                placeholder="账户号"
+                placeholder="Account"
                 className="h-8 w-[7.25rem] rounded-lg border-0 bg-bg py-0 pl-8 pr-2.5 text-xs outline-none ring-1 ring-border/80 transition placeholder:text-muted-2 focus:ring-foreground/25 lg:w-36"
               />
             </div>

@@ -66,10 +66,10 @@ public class DailySnapshotRepository(AppDbContext db) : IDailySnapshotRepository
             return;
         }
 
-        // 仅显式 Flex 官方 NAV 不可被 Gateway / 估算覆盖（空 Source 允许盘中覆盖）
+        // 历史 Flex 不可被 Gateway 覆盖；当日 Flex 若只有现金段（PositionsMv=0），允许 Gateway 盘中修正。
         var existingFlex = string.Equals(existing.Source, DataSources.Flex, StringComparison.OrdinalIgnoreCase);
         var incomingFlex = string.Equals(snapshot.Source, DataSources.Flex, StringComparison.OrdinalIgnoreCase);
-        if (existingFlex && !incomingFlex)
+        if (existingFlex && !incomingFlex && day < DateTime.UtcNow.Date)
             return;
 
         existing.TotalMarketValue = snapshot.TotalMarketValue;

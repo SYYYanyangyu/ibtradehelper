@@ -61,8 +61,8 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-muted-2">
             <Calendar size={18} />
           </div>
-          <p className="text-sm text-muted">运行几天后展示每日盈亏</p>
-          <p className="text-xs text-muted-2">同步 Flex 后将自动填充日净值数据</p>
+          <p className="text-sm text-muted">Daily P&L appears after a few sessions</p>
+          <p className="text-xs text-muted-2">Sync Flex to fill official NAV</p>
         </CardContent>
       </Card>
     )
@@ -78,8 +78,8 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
         <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-4 sm:px-6">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-2">Daily P&L · Flex</p>
-            <h3 className="mt-0.5 text-base font-semibold tracking-tight">每日盈亏</h3>
-            <p className="mt-0.5 text-[11px] text-muted-2">净值来自 Flex 官方报表（Gateway 不覆盖）</p>
+            <h3 className="mt-0.5 text-base font-semibold tracking-tight">Daily P&L</h3>
+            <p className="mt-0.5 text-[11px] text-muted-2">Official Flex NAV (Gateway does not overwrite)</p>
           </div>
           <MonthNav months={months} month={safeMonth} onChange={setMonth} />
         </div>
@@ -114,11 +114,11 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
           {monthDays.length > 0 && (
             <div className="mt-6">
               <div className="mb-2 flex items-center justify-between text-[11px] text-muted-2">
-                <span>本月交易日</span>
+                <span>Sessions this month</span>
                 <span className="flex items-center gap-1">
                   <button
                     type="button"
-                    aria-label="上一日"
+                    aria-label="Previous day"
                     disabled={selectedIdx <= 0}
                     onClick={() => selectedIdx > 0 && setSelectedDate(monthDays[selectedIdx - 1].date)}
                     className="grid h-6 w-6 place-items-center rounded transition hover:bg-surface-2 disabled:opacity-25"
@@ -127,7 +127,7 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
                   </button>
                   <button
                     type="button"
-                    aria-label="下一日"
+                    aria-label="Next day"
                     disabled={selectedIdx < 0 || selectedIdx >= monthDays.length - 1}
                     onClick={() =>
                       selectedIdx >= 0 &&
@@ -181,8 +181,8 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
           <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(260px,0.9fr)] lg:gap-10">
             <div className="min-w-0">
               <div className="mb-3 flex items-baseline justify-between">
-                <p className="text-xs text-muted-2">净值变动</p>
-                <p className="text-[11px] text-muted-2/80">点击柱状切换</p>
+                <p className="text-xs text-muted-2">NAV change</p>
+                <p className="text-[11px] text-muted-2/80">Click bar to select</p>
               </div>
               <div className="h-52 w-full sm:h-60">
                 <DailyPnlChart
@@ -198,7 +198,7 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
               <SelectedDay d={selected} currency={currency} env={env} accountId={accountId} />
             ) : (
               <div className="flex min-h-[200px] items-center justify-center text-sm text-muted-2">
-                选择交易日
+                Pick a session
               </div>
             )}
           </div>
@@ -233,15 +233,15 @@ function SelectedDay({
           {fmtPct(d.dailyPnlPct, false)}
         </span>
         <span className="mx-2 text-border">·</span>
-        净值{' '}
+        NAV{' '}
         <span className="font-medium tabular text-foreground">{fmtMoney(d.netLiquidation, currency)}</span>
       </p>
 
       <dl className="mt-6 space-y-3 border-t border-border pt-5">
-        <Row label="纯交易盈亏" value={d.tradingPnl} currency={currency} />
-        <Row label="外部现金流" value={d.externalCashFlow} currency={currency} quiet={d.externalCashFlow === 0} />
-        <Row label="累计净值变动" value={d.cumulativePnl} currency={currency} />
-        <Row label="累计纯交易" value={d.cumulativeTradingPnl} currency={currency} />
+        <Row label="Trading P&L" value={d.tradingPnl} currency={currency} />
+        <Row label="External cash" value={d.externalCashFlow} currency={currency} quiet={d.externalCashFlow === 0} />
+        <Row label="Cum. NAV change" value={d.cumulativePnl} currency={currency} />
+        <Row label="Cum. trading" value={d.cumulativeTradingPnl} currency={currency} />
       </dl>
 
       <div className="mt-6 border-t border-border pt-5">

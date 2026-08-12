@@ -478,10 +478,10 @@ export default function App() {
                   env={tradeEnv || undefined}
                   emptyHint={
                     tradeEnv === 'Live'
-                      ? '该范围暂无逐日持仓贡献'
+                      ? 'No daily contribution in this scope'
                       : tradeEnv === ''
-                        ? 'All 范围暂无逐日持仓贡献'
-                        : '该日无持仓记录'
+                        ? 'No daily contribution for All'
+                        : 'No position records for this day'
                   }
                 />
               }
@@ -492,53 +492,53 @@ export default function App() {
                 <>
                   <StatCard
                     index={0}
-                    label="官方净值"
+                    label="NAV"
                     value={navStats.nav}
                     currency={currency}
                     icon={<Wallet size={20} />}
-                    sub={`截至 ${navStats.asOf} · 空仓`}
+                    sub={`As of ${navStats.asOf} · Flat`}
                   />
                   <StatCard
                     index={1}
-                    label="较峰值（总回撤）"
+                    label="vs Peak"
                     value={navStats.vsPeak}
                     currency={currency}
                     icon={<TrendingUp size={20} />}
                     pnl
-                    sub={`峰值日 ${navStats.peakDate}`}
+                    sub={`Peak ${navStats.peakDate}`}
                   />
                   <StatCard
                     index={2}
-                    label="较首日净值"
+                    label="vs First NAV"
                     value={navStats.vsFirst}
                     currency={currency}
                     icon={<Coins size={20} />}
                     pnl
-                    sub={`自 ${navStats.firstDate}`}
+                    sub={`Since ${navStats.firstDate}`}
                   />
                   <StatCard
                     index={3}
-                    label="交易已实现(FIFO)"
+                    label="Realized (FIFO)"
                     value={data.totalRealizedPnl}
                     currency={currency}
                     icon={<LayoutDashboard size={20} />}
                     pnl
-                    sub="Flex 未给 fifo · 由成交估算"
+                    sub="Estimated from trades"
                   />
                 </>
               ) : (
                 <>
                   <StatCard
                     index={0}
-                    label="总市值"
+                    label="Market Value"
                     value={data.totalMarketValue}
                     currency={currency}
                     icon={<LayoutDashboard size={20} />}
-                    sub={`${data.positionCount} 个标的`}
+                    sub={`${data.positionCount} symbols`}
                   />
                   <StatCard
                     index={1}
-                    label="未实现盈亏"
+                    label="Unrealized"
                     value={data.totalUnrealizedPnl}
                     currency={currency}
                     icon={<TrendingUp size={20} />}
@@ -547,7 +547,7 @@ export default function App() {
                   />
                   <StatCard
                     index={2}
-                    label="已实现盈亏"
+                    label="Realized"
                     value={data.totalRealizedPnl}
                     currency={currency}
                     icon={<Coins size={20} />}
@@ -556,13 +556,13 @@ export default function App() {
                   />
                   <StatCard
                     index={3}
-                    label="总盈亏"
+                    label="Total P&L"
                     value={data.totalPnl}
                     currency={currency}
                     icon={<Wallet size={20} />}
                     pnl
                     pct={pctTotal}
-                    sub="未实现 + 已实现"
+                    sub="Unrealized + Realized"
                   />
                 </>
               )}
@@ -571,31 +571,31 @@ export default function App() {
             <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <Card className="animate-fade-up">
                 <CardHeader>
-                  <CardTitle>市值分布</CardTitle>
-                  <span className="text-xs text-muted-2">按标的占比</span>
+                  <CardTitle>Allocation</CardTitle>
+                  <span className="text-xs text-muted-2">By symbol</span>
                 </CardHeader>
                 <CardContent>
                   {allocation.length ? (
                     <AllocationChart key={`alloc-${scopeKey}`} data={allocation} />
                   ) : (
-                    <EmptyHint text="暂无持仓数据" />
+                    <EmptyHint text="No positions" />
                   )}
                 </CardContent>
               </Card>
 
               <Card className="animate-fade-up">
                 <CardHeader>
-                  <CardTitle>各标的盈亏</CardTitle>
+                  <CardTitle>P&L by Symbol</CardTitle>
                   <div className="flex items-center gap-3 text-xs">
-                    <Legend color={CHART_COLORS.up} label="未实现" />
-                    <Legend color={CHART_COLORS.primary} label="已实现" />
+                    <Legend color={CHART_COLORS.up} label="Unrealized" />
+                    <Legend color={CHART_COLORS.primary} label="Realized" />
                   </div>
                 </CardHeader>
                 <CardContent>
                   {pnl.length ? (
                     <PnlBarChart key={`pnlbar-${scopeKey}`} data={pnl} />
                   ) : (
-                    <EmptyHint text="暂无持仓数据" />
+                    <EmptyHint text="No positions" />
                   )}
                 </CardContent>
               </Card>
@@ -623,9 +623,11 @@ export default function App() {
             />
 
             <p className="text-center text-xs text-muted-2">
-              账户：
-              <span className="font-medium text-muted">{data.accountId}</span> · 持仓数：
-              {data.positionCount} · 更新于 {new Date(data.asOfUtc).toLocaleString('zh-CN')}
+              Account{' '}
+              <span className="font-medium text-muted">{data.accountId}</span>
+              {' · '}
+              {data.positionCount} positions · Updated{' '}
+              {new Date(data.asOfUtc).toLocaleString('en-US')}
             </p>
           </>
         )}

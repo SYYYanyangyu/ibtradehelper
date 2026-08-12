@@ -30,7 +30,7 @@ export function PositionContribution({
   accountId,
   env,
   enabled = true,
-  emptyHint = '该日无持仓记录',
+  emptyHint = 'No position records for this day',
   currency = 'USD',
   compact,
   embed
@@ -98,7 +98,7 @@ export function PositionContribution({
     <div className="flex items-center justify-between gap-2">
       <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.12em] text-muted-2">
         <PieChart size={12} />
-        {date ? '个股贡献' : '今日个股贡献'}
+        {date ? 'Contribution' : 'Day Contribution'}
       </span>
       {points.length > 0 && (
         <span className={cn('text-sm font-medium tabular', gainClass(total))}>
@@ -114,12 +114,12 @@ export function PositionContribution({
       {loading && (
         <div className="flex items-center justify-center gap-2 py-6">
           <Loader2 size={14} className="animate-spin text-muted-2" />
-          <span className="text-sm text-muted-2">加载中…</span>
+          <span className="text-sm text-muted-2">Loading…</span>
         </div>
       )}
       {error && (
         <div className="flex flex-col items-center gap-1 py-6 text-center">
-          <p className="text-sm text-muted-2">贡献数据暂不可用</p>
+          <p className="text-sm text-muted-2">Contribution unavailable</p>
         </div>
       )}
       {!loading && !error && points.length === 0 && (
@@ -143,7 +143,7 @@ export function PositionContribution({
   return (
     <Card className={cn('animate-fade-up', compact && 'border-border/60 shadow-none')}>
       <CardHeader>
-        <CardTitle className="sr-only">个股贡献</CardTitle>
+        <CardTitle className="sr-only">Contribution</CardTitle>
         {title}
       </CardHeader>
       <CardContent>{body}</CardContent>

@@ -80,15 +80,15 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
     return (
       <Card className="animate-fade-up">
         <CardHeader>
-          <CardTitle>成交汇总</CardTitle>
-          <span className="text-xs text-muted-2">按买 / 卖统计份额与金额</span>
+          <CardTitle>Trades</CardTitle>
+          <span className="text-xs text-muted-2">Buy / sell shares & notional</span>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center gap-2 py-12 text-center">
             <div className="grid h-12 w-12 place-items-center rounded-2xl bg-surface-2 text-muted-2">
               <Receipt size={22} />
             </div>
-            <p className="text-sm text-muted">该账户暂无成交记录</p>
+            <p className="text-sm text-muted">No trades for this account</p>
           </div>
         </CardContent>
       </Card>
@@ -100,39 +100,39 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
       <CardHeader className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Receipt size={18} className="text-primary" />
-          <CardTitle>成交汇总</CardTitle>
+          <CardTitle>Trades</CardTitle>
         </div>
         <span className="text-xs text-muted-2">
-          Flex 报表
-          {envLabel ? ` · ${envLabel}` : ''} · 共 {trades.length} 笔 · 点击标的或日期可筛选明细
+          Flex
+          {envLabel ? ` · ${envLabel}` : ''} · {trades.length} fills · click symbol/date to filter
         </span>
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-border bg-surface-2/40 p-4">
             <div className="flex items-center gap-1.5 text-sm font-medium text-up">
-              <ArrowUpRight size={15} /> 买入
-              <span className="ml-auto text-xs text-muted-2">{buys.length} 笔</span>
+              <ArrowUpRight size={15} /> Buy
+              <span className="ml-auto text-xs text-muted-2">{buys.length}</span>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <Metric label="总份额" value={fmtNum(buyShares)} tone="up" />
-              <Metric label="买入成交额" value={fmtMoney(buyGross, currency)} tone="up" />
+              <Metric label="Shares" value={fmtNum(buyShares)} tone="up" />
+              <Metric label="Notional" value={fmtMoney(buyGross, currency)} tone="up" />
             </div>
           </div>
           <div className="rounded-xl border border-border bg-surface-2/40 p-4">
             <div className="flex items-center gap-1.5 text-sm font-medium text-down">
-              <ArrowDownRight size={15} /> 卖出
-              <span className="ml-auto text-xs text-muted-2">{sells.length} 笔</span>
+              <ArrowDownRight size={15} /> Sell
+              <span className="ml-auto text-xs text-muted-2">{sells.length}</span>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <Metric label="总份额" value={fmtNum(sellShares)} tone="down" />
-              <Metric label="卖出成交额" value={fmtMoney(sellGross, currency)} tone="down" />
+              <Metric label="Shares" value={fmtNum(sellShares)} tone="down" />
+              <Metric label="Notional" value={fmtMoney(sellGross, currency)} tone="down" />
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-between rounded-xl bg-surface-2/60 px-4 py-2.5 text-sm">
-          <span className="text-muted">净现金占用（买入净额 − 卖出净额）</span>
+          <span className="text-muted">Net cash (buy − sell)</span>
           <span className={cn('font-semibold tabular-nums', gainClass(netCash))}>
             {fmtMoney(netCash, currency)}
           </span>
@@ -142,7 +142,7 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
         {bySymbol.length > 0 && (
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-medium text-muted">按标的成交额</p>
+              <p className="text-xs font-medium text-muted">Notional by symbol</p>
               {filterSymbol && (
                 <button
                   type="button"
@@ -255,14 +255,14 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
           <table className="w-full text-sm">
             <thead className="sticky top-0 z-10 bg-bg/95 backdrop-blur">
               <tr className="border-y border-border bg-surface-2/50 text-left">
-                <th className={cn(thCls, 'pr-3')}>时间</th>
-                <th className={cn(thCls, 'px-2')}>标的</th>
-                <th className={cn(thCls, 'px-2')}>方向</th>
-                <th className={cn(thCls, 'px-2 text-right')}>份额</th>
-                <th className={cn(thCls, 'px-2 text-right')}>单价</th>
-                <th className={cn(thCls, 'px-2 text-right')}>成交额</th>
-                <th className={cn(thCls, 'px-2 text-right')}>佣金</th>
-                <th className={cn(thCls, 'pl-2 text-right')}>净额</th>
+                <th className={cn(thCls, 'pr-3')}>Time</th>
+                <th className={cn(thCls, 'px-2')}>Symbol</th>
+                <th className={cn(thCls, 'px-2')}>Side</th>
+                <th className={cn(thCls, 'px-2 text-right')}>Qty</th>
+                <th className={cn(thCls, 'px-2 text-right')}>Price</th>
+                <th className={cn(thCls, 'px-2 text-right')}>Notional</th>
+                <th className={cn(thCls, 'px-2 text-right')}>Comm</th>
+                <th className={cn(thCls, 'pl-2 text-right')}>Net</th>
               </tr>
             </thead>
             <tbody>
@@ -281,7 +281,7 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
                           isBuy ? 'bg-up/10 text-up' : 'bg-down/10 text-down'
                         )}
                       >
-                        {isBuy ? '买入' : '卖出'}
+                        {isBuy ? 'Buy' : 'Sell'}
                       </span>
                     </td>
                     <td className="py-2 px-2 text-right tabular-nums">{fmtNum(t.quantity)}</td>

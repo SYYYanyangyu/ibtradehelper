@@ -85,11 +85,11 @@ export function TodayPnlHero({
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <TrendingUp size={14} className="text-muted-2" />
-              <span className="text-sm font-medium text-muted">今日盈亏</span>
+              <span className="text-sm font-medium text-muted">Day P&L</span>
               {today?.date && (
                 <span className="rounded-md bg-surface-2 px-2 py-0.5 text-xs text-muted-2">
                   {today.date}
-                  {isStale ? ' · 最近交易日' : ''}
+                  {isStale ? ' · Last session' : ''}
                 </span>
               )}
             </div>
@@ -112,30 +112,30 @@ export function TodayPnlHero({
 
             <p className="mt-2 text-xs text-muted-2">
               {noBaseline
-                ? '暂无前日快照 · 需至少 2 天净值才能算今日盈亏'
+                ? 'Need 2+ NAV days to compute day P&L'
                 : flat
-                  ? '今日休市 · 账户无变动'
-                  : '按官方日净值'}
+                  ? 'Market closed · No change'
+                  : 'Official daily NAV'}
             </p>
 
             <div className="mt-4 grid grid-cols-1 gap-3 border-t border-border/60 pt-4 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-border/60">
               <Metric
-                label="持仓市值"
+                label="Position MV"
                 value={fmtMoney(positionMv, currency)}
                 hint={
                   officialNav != null
-                    ? `官方净值 ${fmtMoney(officialNav, currency)}`
-                    : '开仓标记合计'
+                    ? `NAV ${fmtMoney(officialNav, currency)}`
+                    : 'Open marks'
                 }
               />
               <Metric
-                label="未实现浮盈"
+                label="Unrealized"
                 value={`${unrealized > 0 ? '+' : ''}${fmtMoney(unrealized, currency)}`}
                 valueClass={gainClass(unrealized)}
-                hint="当前开仓 · Flex"
+                hint="Open · Flex"
               />
               <Metric
-                label="较峰值"
+                label="vs Peak"
                 value={
                   navVsPeak == null
                     ? '—'
@@ -144,23 +144,23 @@ export function TodayPnlHero({
                 valueClass={navVsPeak == null ? 'text-muted' : gainClass(navVsPeak)}
                 hint={
                   peakNav == null
-                    ? '暂无净值曲线'
-                    : `峰值 ${fmtMoney(peakNav, currency)}${peakDate ? ` · ${peakDate}` : ''}`
+                    ? 'No NAV history'
+                    : `Peak ${fmtMoney(peakNav, currency)}${peakDate ? ` · ${peakDate}` : ''}`
                 }
               />
             </div>
 
             {navVsBaseline != null && baselineNav != null && (
               <p className="mt-3 text-xs text-muted-2">
-                较首日净值{' '}
+                vs First NAV{' '}
                 <span className={cn('tabular font-medium', gainClass(navVsBaseline))}>
                   {navVsBaseline > 0 ? '+' : ''}
                   {fmtMoney(navVsBaseline, currency)}
                 </span>
                 <span className="text-muted-2/80">
                   {' '}
-                  · 自 {fmtMoney(baselineNav, currency)}
-                  {baselineDate ? `（${baselineDate}）` : ''}
+                  · from {fmtMoney(baselineNav, currency)}
+                  {baselineDate ? ` (${baselineDate})` : ''}
                 </span>
               </p>
             )}
@@ -187,11 +187,11 @@ export function TodayPnlHero({
         >
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-              <span className="text-sm font-medium text-foreground">持仓</span>
+              <span className="text-sm font-medium text-foreground">Positions</span>
               <span className="text-xs tabular text-muted-2">
                 {holdings.length === 0
-                  ? '空仓'
-                  : `${holdings.length} 标的 · ${fmtMoney(positionMv, currency)}`}
+                  ? 'Flat'
+                  : `${holdings.length} symbols · ${fmtMoney(positionMv, currency)}`}
               </span>
               {holdings.length > 0 && (
                 <span className={cn('text-xs tabular font-medium', gainClass(unrealized))}>

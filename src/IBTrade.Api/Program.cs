@@ -7,7 +7,14 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // 本地密钥（gitignored）：复制 appsettings.Example.json → appsettings.Secrets.json
-builder.Configuration.AddJsonFile("appsettings.Secrets.json", optional: true, reloadOnChange: true);
+// 同时尝试 ContentRoot 与输出目录，避免 cwd/--no-build 导致读不到。
+foreach (var dir in new[] { builder.Environment.ContentRootPath, AppContext.BaseDirectory })
+{
+    var secretsPath = Path.Combine(dir, "appsettings.Secrets.json");
+    if (!File.Exists(secretsPath)) continue;
+    builder.Configuration.AddJsonFile(secretsPath, optional: false, reloadOnChange: true);
+    break;
+}
 
 // ---- 服务注册（Composition Root）----
 builder.Services.AddControllers()
@@ -35,16 +42,25 @@ var twsOptions = new IBTrade.Application.IBKR.TwsOptions
     OrderClientId = int.TryParse(builder.Configuration["TWS:OrderClientId"], out var oc) ? oc : 5,
     Mode = (builder.Configuration["TWS:Mode"] ?? "Paper").Equals("Live", StringComparison.OrdinalIgnoreCase)
         ? IBTrade.Domain.Enums.TradingMode.Live : IBTrade.Domain.Enums.TradingMode.Paper,
-    Enabled = (builder.Configuration["TWS:Enabled"] ?? "false").Equals("true", StringComparison.OrdinalIgnoreCase),
+    Enabled = ResolveTwsEnabled(builder.Environment, builder.Configuration),
     RefreshMinutes = int.TryParse(builder.Configuration["TWS:RefreshMinutes"], out var r) ? r : 2
 };
 builder.Services.AddSingleton(twsOptions);
+
+static bool ResolveTwsEnabled(IHostEnvironment env, ConfigurationManager config)
+{
+    var raw = config["TWS:Enabled"];
+    if (string.Equals(raw, "true", StringComparison.OrdinalIgnoreCase) || raw == "1") return true;
+    if (string.Equals(raw, "false", StringComparison.OrdinalIgnoreCase) || raw == "0") return false;
+    // 开发环境默认每 RefreshMinutes 分钟自动 Gateway 同步，避免 Flex 缺段后看板每天变假数据
+    return env.IsDevelopment();
+}
 
 // 每日净值快照后台服务：默认关闭，需环境变量 DAILY_SNAPSHOT__ENABLED=true 才启用
 if ((builder.Configuration["DAILY_SNAPSHOT__ENABLED"] ?? "false").Equals("true", StringComparison.OrdinalIgnoreCase))
     builder.Services.AddHostedService<DailySnapshotHostedService>();
 
-// TWS 实时同步后台服务：需 TWS__ENABLED=true 才启用
+// TWS 实时同步后台服务：Development 默认开启；生产需 TWS__ENABLED=true
 if (twsOptions.Enabled)
     builder.Services.AddHostedService<TwsSyncHostedService>();
 
