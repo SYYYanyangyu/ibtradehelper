@@ -13,13 +13,14 @@ import { cn } from '../lib/utils'
 import { DataSourceBar } from './DataSourceBar'
 import type { TradeEnvSelection, DataFeedStatusItem } from '../lib/api'
 
-export type AppView = 'dashboard' | 'backtest' | 'orders' | 'autotrade'
+export type AppView = 'dashboard' | 'backtest' | 'orders' | 'autotrade' | 'options'
 
 const NAV: { id: AppView; label: string }[] = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'backtest', label: 'Backtest' },
   { id: 'orders', label: 'Trading' },
-  { id: 'autotrade', label: 'Quant' }
+  { id: 'autotrade', label: 'Quant' },
+  { id: 'options', label: 'Options' }
 ]
 
 const ENV: { id: TradeEnvSelection; label: string }[] = [
@@ -45,7 +46,7 @@ interface Props {
   onToggleLive: () => void
   tradeEnv: TradeEnvSelection
   onEnvChange: (env: TradeEnvSelection) => void
-  accounts: string[]
+  accounts: { id: string; label: string }[]
   selected: string
   onSelectAccount: (label: string) => void
   feedStatuses: DataFeedStatusItem[]
@@ -89,7 +90,7 @@ function AccountSelect({
   onSelectAccount,
   className
 }: {
-  accounts: string[]
+  accounts: { id: string; label: string }[]
   selected: string
   onSelectAccount: (label: string) => void
   className?: string
@@ -106,9 +107,9 @@ function AccountSelect({
         className="h-8 w-full appearance-none truncate rounded-lg border-0 bg-surface py-0 pl-2.5 pr-7 text-[12px] font-medium tabular text-foreground outline-none ring-1 ring-border/70 focus:ring-foreground/25"
       >
         <option value="__all__">All accounts ({accounts.length})</option>
-        {accounts.map((id) => (
-          <option key={id} value={id}>
-            {id}
+        {accounts.map((a) => (
+          <option key={a.id} value={a.id}>
+            {a.label}
           </option>
         ))}
       </select>
@@ -126,7 +127,7 @@ function AccountChips({
   onSelectAccount,
   className
 }: {
-  accounts: string[]
+  accounts: { id: string; label: string }[]
   selected: string
   onSelectAccount: (label: string) => void
   className?: string
@@ -150,20 +151,20 @@ function AccountChips({
       >
         All
       </button>
-      {accounts.map((id) => (
+      {accounts.map((a) => (
         <button
-          key={id}
+          key={a.id}
           type="button"
-          onClick={() => onSelectAccount(id)}
+          onClick={() => onSelectAccount(a.id)}
           className={cn(
             'shrink-0 rounded-lg px-2.5 py-1 text-[12px] font-medium tabular transition',
-            selected === id
+            selected === a.id
               ? 'bg-foreground text-bg'
               : 'text-muted hover:text-foreground'
           )}
-          title={id}
+          title={a.id}
         >
-          {id}
+          {a.label}
         </button>
       ))}
     </div>
@@ -205,7 +206,7 @@ export function AppHeader({
         {/* 移动端：四等分保证全显示；桌面：原先横排导航 */}
         <nav
           aria-label="页面"
-          className="grid min-w-0 flex-1 grid-cols-4 items-stretch md:flex md:items-stretch md:gap-0.5"
+          className="grid min-w-0 flex-1 grid-cols-5 items-stretch md:flex md:items-stretch md:gap-0.5"
         >
           {NAV.map((item) => {
             const active = view === item.id

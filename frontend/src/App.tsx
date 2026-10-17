@@ -42,11 +42,12 @@ import { Card, CardContent, CardHeader, CardTitle } from './components/ui/Card'
 import { BacktestPage } from './pages/BacktestPage'
 import { OrdersPage } from './pages/OrdersPage'
 import { AutoTradePage } from './pages/AutoTradePage'
+import { OptionsIntelPage } from './pages/OptionsIntelPage'
 
 export default function App() {
   const { theme, toggle } = useTheme()
   const [selected, setSelected] = useState('') // '' = 当前环境下全部账户
-  /** 默认 Paper（真实数据）；嘉信 Mock 仅在切到 Live 且开启 ibtrade-mock 时生效。 */
+  /** 默认 Paper；Live / All 只显示 Flex 入库的真实 IB 账户。 */
   const [tradeEnv, setTradeEnv] = useState<TradeEnvSelection>('Paper')
   const [query, setQuery] = useState('')
   const [data, setData] = useState<PortfolioSummary | null>(null)
@@ -73,7 +74,7 @@ export default function App() {
   const [liveData, setLiveData] = useState<TwsLiveSnapshot | null>(null)
   const [liveError, setLiveError] = useState<string | null>(null)
   const [togglingLive, setTogglingLive] = useState(false)
-  const [view, setView] = useState<'dashboard' | 'backtest' | 'orders' | 'autotrade'>('dashboard')
+  const [view, setView] = useState<'dashboard' | 'backtest' | 'orders' | 'autotrade' | 'options'>('dashboard')
 
   /** 防止 Paper↔Live 快速切换时旧请求后返回，把看板写回上一环境。 */
   const loadSeq = useRef(0)
@@ -180,7 +181,10 @@ export default function App() {
     const list = tradeEnv
       ? accountInfos.filter((a) => a.environment === tradeEnv)
       : accountInfos
-    return list.map((a) => a.accountId)
+    return list.map((a) => ({
+      id: a.accountId,
+      label: a.alias ? `${a.alias} · ${a.accountId}` : a.accountId
+    }))
   }, [accountInfos, tradeEnv])
 
   function selectChip(acc: string) {
@@ -337,7 +341,9 @@ export default function App() {
       />
 
       <main className="mx-auto max-w-7xl space-y-3 px-3 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:space-y-4 sm:px-6 sm:py-4">
-        {view === 'autotrade' ? (
+        {view === 'options' ? (
+          <OptionsIntelPage />
+        ) : view === 'autotrade' ? (
           <AutoTradePage />
         ) : view === 'orders' ? (
           <OrdersPage />

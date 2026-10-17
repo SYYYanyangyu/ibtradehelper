@@ -17,10 +17,7 @@ interface Props {
 
 /** 每日盈亏：克制排版 + 主从联动（日条 / 图 / 详情）。 */
 export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
-  const months = useMemo(() => {
-    const set = new Set(data.map((d) => d.date.slice(0, 7)))
-    return [...set].sort()
-  }, [data])
+  const months = useMemo(() => monthsBetween(data), [data])
 
   const [month, setMonth] = useState(() => months[months.length - 1] ?? '')
   const safeMonth = months.includes(month) ? month : (months[months.length - 1] ?? '')
@@ -110,72 +107,13 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
             </p>
           </div>
 
-          {/* 日选择：整月网格铺开，禁止横向滚动 */}
-          {monthDays.length > 0 && (
-            <div className="mt-6">
-              <div className="mb-2 flex items-center justify-between text-[11px] text-muted-2">
-                <span>Sessions this month</span>
-                <span className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    aria-label="Previous day"
-                    disabled={selectedIdx <= 0}
-                    onClick={() => selectedIdx > 0 && setSelectedDate(monthDays[selectedIdx - 1].date)}
-                    className="grid h-6 w-6 place-items-center rounded transition hover:bg-surface-2 disabled:opacity-25"
-                  >
-                    <ChevronLeft size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Next day"
-                    disabled={selectedIdx < 0 || selectedIdx >= monthDays.length - 1}
-                    onClick={() =>
-                      selectedIdx >= 0 &&
-                      selectedIdx < monthDays.length - 1 &&
-                      setSelectedDate(monthDays[selectedIdx + 1].date)
-                    }
-                    className="grid h-6 w-6 place-items-center rounded transition hover:bg-surface-2 disabled:opacity-25"
-                  >
-                    <ChevronRight size={14} />
-                  </button>
-                </span>
-              </div>
-              <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-7 md:grid-cols-8 lg:grid-cols-10">
-                {monthDays.map((d) => {
-                  const active = d.date === selectedDate
-                  return (
-                    <button
-                      key={d.date}
-                      type="button"
-                      onClick={() => setSelectedDate(d.date)}
-                      className={cn(
-                        'flex flex-col items-center rounded-lg px-1 py-2 transition',
-                        active
-                          ? 'bg-surface-2 ring-1 ring-border'
-                          : 'hover:bg-surface-2/60'
-                      )}
-                    >
-                      <span className="text-[11px] text-muted-2">
-                        {d.date.slice(8)}
-                        <span className="ml-0.5 opacity-70">{weekdayShort(d.date)}</span>
-                      </span>
-                      <span className={cn('mt-1 text-xs font-semibold tabular', gainClass(d.dailyPnl))}>
-                        {compactPnl(d.dailyPnl)}
-                      </span>
-                      {active && (
-                        <span
-                          className={cn(
-                            'mt-1.5 h-0.5 w-4 rounded-full',
-                            d.dailyPnl > 0 ? 'bg-up' : d.dailyPnl < 0 ? 'bg-down' : 'bg-foreground'
-                          )}
-                        />
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
+          <MonthCalendar
+            month={safeMonth}
+            points={monthDays}
+            selectedDate={selectedDate}
+            selectedIdx={selectedIdx}
+            onSelect={setSelectedDate}
+          />
 
           {/* 主体：图与详情，无套娃边框 */}
           <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(260px,0.9fr)] lg:gap-10">
@@ -287,9 +225,154 @@ function weekdayLabel(iso: string): string {
   ]
 }
 
-function weekdayShort(iso: string): string {
-  const [y, m, d] = iso.split('-').map(Number)
-  return ['日', '一', '二', '三', '四', '五', '六'][new Date(Date.UTC(y, m - 1, d)).getUTCDay()]
+const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'] as const
+
+function monthsBetween(data: DailyPnlPoint[]): string[] {
+  if (!data.length) return []
+  const dates = data.map((d) => d.date).sort()
+  const start = dates[0].slice(0, 7)
+  const end = dates[dates.length - 1].slice(0, 7)
+  const out: string[] = []
+  let [y, m] = start.split('-').map(Number)
+  const [ey, em] = end.split('-').map(Number)
+  while (y < ey || (y === ey && m <= em)) {
+    out.push(`${y}-${String(m).padStart(2, '0')}`)
+    m += 1
+    if (m > 12) {
+      m = 1
+      y += 1
+    }
+  }
+  return out
+}
+
+function isoDate(y: number, m: number, d: number): string {
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+}
+
+function buildMonthCells(month: string, points: DailyPnlPoint[]) {
+  if (!month) return []
+  const y = Number(month.slice(0, 4))
+  const m = Number(month.slice(5, 7))
+  const last = new Date(Date.UTC(y, m, 0)).getUTCDate()
+  const firstDow = new Date(Date.UTC(y, m - 1, 1)).getUTCDay()
+  const offset = (firstDow + 6) % 7
+  const byDate = new Map(points.map((p) => [p.date, p]))
+  const cells: { key: string; date: string | null; day: number | null; point?: DailyPnlPoint }[] = []
+  for (let i = 0; i < offset; i++) {
+    cells.push({ key: `pad-pre-${i}`, date: null, day: null })
+  }
+  for (let d = 1; d <= last; d++) {
+    const date = isoDate(y, m, d)
+    cells.push({ key: date, date, day: d, point: byDate.get(date) })
+  }
+  while (cells.length % 7 !== 0) {
+    cells.push({ key: `pad-post-${cells.length}`, date: null, day: null })
+  }
+  return cells
+}
+
+function MonthCalendar({
+  month,
+  points,
+  selectedDate,
+  selectedIdx,
+  onSelect
+}: {
+  month: string
+  points: DailyPnlPoint[]
+  selectedDate: string | null
+  selectedIdx: number
+  onSelect: (date: string) => void
+}) {
+  const cells = useMemo(() => buildMonthCells(month, points), [month, points])
+  return (
+    <div className="mt-6">
+      <div className="mb-2 flex items-center justify-between text-[11px] text-muted-2">
+        <span>本月日历</span>
+        <span className="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="Previous day"
+            disabled={selectedIdx <= 0}
+            onClick={() => selectedIdx > 0 && onSelect(points[selectedIdx - 1].date)}
+            className="grid h-6 w-6 place-items-center rounded transition hover:bg-surface-2 disabled:opacity-25"
+          >
+            <ChevronLeft size={14} />
+          </button>
+          <button
+            type="button"
+            aria-label="Next day"
+            disabled={selectedIdx < 0 || selectedIdx >= points.length - 1}
+            onClick={() =>
+              selectedIdx >= 0 && selectedIdx < points.length - 1 && onSelect(points[selectedIdx + 1].date)
+            }
+            className="grid h-6 w-6 place-items-center rounded transition hover:bg-surface-2 disabled:opacity-25"
+          >
+            <ChevronRight size={14} />
+          </button>
+        </span>
+      </div>
+      <div className="grid grid-cols-7 gap-1">
+        {WEEKDAYS.map((w) => (
+          <div
+            key={w}
+            className={cn(
+              'pb-1 text-center text-[10px] font-medium uppercase tracking-wide',
+              w === '六' || w === '日' ? 'text-muted-2/70' : 'text-muted-2'
+            )}
+          >
+            {w}
+          </div>
+        ))}
+        {cells.map((cell, i) => {
+          if (!cell.date || cell.day == null) {
+            return <div key={cell.key} className="min-h-[3.25rem] rounded-lg" />
+          }
+          const point = cell.point
+          const active = cell.date === selectedDate
+          const weekend = i % 7 >= 5
+          if (!point) {
+            return (
+              <div
+                key={cell.key}
+                className={cn(
+                  'flex min-h-[3.25rem] flex-col items-center rounded-lg px-1 py-1.5',
+                  weekend ? 'text-muted-2/50' : 'text-muted-2/70'
+                )}
+              >
+                <span className="text-[11px] tabular">{cell.day}</span>
+              </div>
+            )
+          }
+          return (
+            <button
+              key={cell.key}
+              type="button"
+              onClick={() => onSelect(point.date)}
+              className={cn(
+                'flex min-h-[3.25rem] flex-col items-center rounded-lg px-1 py-1.5 transition',
+                active ? 'bg-surface-2 ring-1 ring-border' : 'hover:bg-surface-2/60'
+              )}
+            >
+              <span className="text-[11px] tabular text-muted-2">{cell.day}</span>
+              <span className={cn('mt-0.5 text-xs font-semibold tabular', gainClass(point.dailyPnl))}>
+                {compactPnl(point.dailyPnl)}
+              </span>
+              {active && (
+                <span
+                  className={cn(
+                    'mt-1 h-0.5 w-4 rounded-full',
+                    point.dailyPnl > 0 ? 'bg-up' : point.dailyPnl < 0 ? 'bg-down' : 'bg-foreground'
+                  )}
+                />
+              )}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 function compactPnl(v: number): string {

@@ -13,18 +13,6 @@ import type {
   AutoTradeSymbolConfig,
   AutoTradeSettings
 } from '../types'
-import {
-  isMockEnabled,
-  shouldUseLiveMock,
-  mockAccounts,
-  mockDailyPnl,
-  mockPortfolio,
-  mockPositionDailyPnl,
-  mockPositionsLite,
-  mockTrades
-} from '../mock'
-
-export { isMockEnabled, shouldUseLiveMock }
 
 const API_BASE: string =
   (import.meta.env.VITE_API_BASE as string | undefined) ?? 'http://localhost:8090'
@@ -111,46 +99,26 @@ export interface AccountInfo {
   baseCurrency?: string
 }
 
-/** 组合看板汇总。env=Paper|Live 可隔离模拟/真实；不传则全部混算。Mock 只替换 Live。 */
+/** 组合看板汇总。env=Paper|Live 可隔离模拟/真实；不传则全部混算。 */
 export function getPortfolio(accountId?: string, env?: TradeEnvFilter): Promise<PortfolioSummary> {
-  if (shouldUseLiveMock(env)) return Promise.resolve(mockPortfolio())
   const url = new URL('/api/portfolio/summary', API_BASE)
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
   return getJson<PortfolioSummary>(url.toString())
 }
 
-/** 账户列表：Paper 始终来自 API；Mock 开启时附加/替换 Live 账户。 */
-export async function getAccounts(): Promise<AccountInfo[]> {
-  let real: AccountInfo[] = []
-  try {
-    real = await getJson<AccountInfo[]>(new URL('/api/portfolio/accounts', API_BASE).toString())
-  } catch (e) {
-    if (!isMockEnabled()) throw e
-  }
-  if (!isMockEnabled()) return real
-  const mock = mockAccounts() as AccountInfo[]
-  const nonLive = real.filter((a) => a.environment !== 'Live')
-  return [...nonLive, ...mock]
+/** 账户列表：Flex 入库的真实 IB 账户。 */
+export function getAccounts(): Promise<AccountInfo[]> {
+  return getJson<AccountInfo[]>(new URL('/api/portfolio/accounts', API_BASE).toString())
 }
 
 /** 全部持仓（用于派生账户列表）。 */
-export async function getPositions(): Promise<PositionLite[]> {
-  let real: PositionLite[] = []
-  try {
-    real = await getJson<PositionLite[]>(new URL('/api/positions', API_BASE).toString())
-  } catch (e) {
-    if (!isMockEnabled()) throw e
-  }
-  if (!isMockEnabled()) return real
-  const liveIds = new Set(mockAccounts().map((a) => a.accountId.toUpperCase()))
-  const kept = real.filter((p) => !liveIds.has(p.accountId.toUpperCase()))
-  return [...kept, ...mockPositionsLite()]
+export function getPositions(): Promise<PositionLite[]> {
+  return getJson<PositionLite[]>(new URL('/api/positions', API_BASE).toString())
 }
 
 /** 每日盈亏曲线（最近 days 天）。env 用于 Paper/Live「全部」按环境汇总，避免串盘。 */
 export function getDailyPnl(accountId?: string, days = 30, env?: TradeEnvFilter): Promise<DailyPnlPoint[]> {
-  if (shouldUseLiveMock(env)) return Promise.resolve(mockDailyPnl(days))
   const url = new URL('/api/portfolio/daily-pnl', API_BASE)
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
@@ -172,7 +140,6 @@ export function getPositionDailyPnl(
   accountId?: string,
   env?: TradeEnvFilter
 ): Promise<PositionDailyPnl> {
-  if (shouldUseLiveMock(env)) return Promise.resolve(mockPositionDailyPnl())
   const url = new URL('/api/portfolio/position-daily-pnl', API_BASE)
   if (date) url.searchParams.set('date', date)
   if (accountId) url.searchParams.set('accountId', accountId)
@@ -186,7 +153,6 @@ export function getTrades(
   days = 365,
   env?: TradeEnvFilter
 ): Promise<TradeRecord[]> {
-  if (shouldUseLiveMock(env)) return Promise.resolve(mockTrades())
   const url = new URL('/api/portfolio/trades', API_BASE)
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)

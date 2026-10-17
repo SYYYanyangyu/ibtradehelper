@@ -1,10 +1,12 @@
 using IBTrade.Application.Ai;
 using IBTrade.Application.IBKR;
+using IBTrade.Application.OptionsIntel;
 using IBTrade.Application.Orders;
 using IBTrade.Domain.Repositories;
 using IBTrade.Infrastructure.Ai;
 using IBTrade.Infrastructure.IBKR;
 using IBTrade.Infrastructure.IBKR.Tws;
+using IBTrade.Infrastructure.OptionsIntel;
 using IBTrade.Infrastructure.Orders;
 using IBTrade.Infrastructure.Persistence;
 using IBTrade.Infrastructure.Persistence.Repositories;
@@ -99,6 +101,36 @@ public static class DependencyInjection
         });
         services.AddSingleton<ILlmProviderCatalog, LlmProviderCatalog>();
         services.AddSingleton<IAiStrategyAdvisor, MultiProviderLlmAdvisor>();
+
+        var intelProxy = configuration["IBKR:Flex:Proxy"]
+                         ?? Environment.GetEnvironmentVariable("HTTPS_PROXY")
+                         ?? Environment.GetEnvironmentVariable("ALL_PROXY")
+                         ?? Environment.GetEnvironmentVariable("HTTP_PROXY");
+        services.AddHttpClient("ibtrade-intel", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(12);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "Mozilla/5.0 (compatible; IBTrade/1.0; +OptionsIntel)");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler();
+                if (!string.IsNullOrWhiteSpace(intelProxy))
+                {
+                    handler.Proxy = new System.Net.WebProxy(intelProxy);
+                    handler.UseProxy = true;
+                }
+                return handler;
+            });
+        services.AddScoped<IHotOptionsUniverse, NasdaqHotNamesClient>();
+        services.AddScoped<IOptionsChainClient, NasdaqOptionsChainClient>();
+        services.AddScoped<ICompanyFundamentalsClient, NasdaqCompanyClient>();
+        services.AddScoped<IMacroDataClient, MacroDataClient>();
+        services.AddScoped<INewsFeedClient, NewsFeedClient>();
+        services.AddScoped<PolymarketClient>();
+        services.AddScoped<ManifoldClient>();
+        services.AddScoped<IPredictionMarketClient, CompositePredictionClient>();
+        services.AddScoped<IOptionsAiAdvisor, OptionsAiAdvisor>();
 
         return services;
     }

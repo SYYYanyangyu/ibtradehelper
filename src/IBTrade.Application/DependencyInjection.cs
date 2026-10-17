@@ -5,6 +5,8 @@ using IBTrade.Application.Backtest.Strategies;
 using IBTrade.Application.IBKR;
 using IBTrade.Application.Ingestion;
 using IBTrade.Application.MarketData;
+using IBTrade.Application.OptionsIntel;
+using IBTrade.Application.OptionsIntel.OptionsPaper;
 using IBTrade.Application.Portfolio;
 using IBTrade.Application.Positions;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +44,9 @@ public static class DependencyInjection
         services.AddSingleton<TwsLiveFeed>();
         // 自动交易引擎（单例后台循环；依赖下单服务与策略工厂，二者均为单例）
         services.AddSingleton<IAutoTrader, AutoTrader>();
+        services.AddScoped<IOptionsIntelService, OptionsIntelService>();
+        services.AddSingleton<PredictionSnapshotStore>();
+        services.AddSingleton<IOptionsPaperEngine, OptionsPaperEngine>();
         return services;
     }
 }

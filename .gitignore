@@ -19,6 +19,9 @@
 frontend/src/mock/**/*.json
 frontend/src/mock/data/**
 
+# Options Paper local state (fills / settings written at runtime)
+**/options-paper.json
+
 # IDE / OS
 .idea/
 *.DotSettings.user
