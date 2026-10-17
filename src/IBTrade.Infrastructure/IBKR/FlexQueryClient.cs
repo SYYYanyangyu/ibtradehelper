@@ -322,22 +322,19 @@ public class FlexQueryClient(HttpClient httpClient, ILogger<FlexQueryClient>? lo
         var avgPremium = DecAny(e, "costBasisPrice", "avgPrice", "averageCost", "averagePrice");
         var costMoney = DecAny(e, "costBasisMoney", "costBasis");
 
-        decimal mark;
-        if (qty != 0m && posVal != 0m)
-            mark = posVal / qty;
-        else
-            mark = markPremium * mult;
+        // 一律存每股权利金；市值 = qty × premium × multiplier
+        decimal mark = markPremium;
+        if (mark == 0m && qty != 0m && posVal != 0m)
+            mark = posVal / (qty * mult);
 
-        decimal avg;
-        if (qty != 0m && costMoney != 0m)
-            avg = costMoney / Math.Abs(qty);
-        else
-            avg = avgPremium * mult;
+        decimal avg = avgPremium;
+        if (avg == 0m && qty != 0m && costMoney != 0m)
+            avg = costMoney / (Math.Abs(qty) * mult);
 
         positions.Add(new FlexPositionDto(
             Acct(e, stmtAccountId), symbol, MapAssetType(Attr(e, "assetCategory")),
             Attr(e, "currency", "USD"),
-            qty, avg, mark));
+            qty, avg, mark, mult));
     }
 
     private static string Attr(XElement e, string name, string fallback = "") =>

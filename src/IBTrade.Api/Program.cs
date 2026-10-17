@@ -32,12 +32,16 @@ builder.Services.AddHttpContextAccessor(); // 供控制器提取来源 IP，用�
 var twsOptions = new IBTrade.Application.IBKR.TwsOptions
 {
     Host = builder.Configuration["TWS:Host"] ?? "127.0.0.1",
-    Port = int.TryParse(builder.Configuration["TWS:Port"], out var p) ? p : 7497,
-    Ports = builder.Configuration.GetSection("TWS:Ports").Get<int[]>() is { Length: > 0 } cfgPorts
-        ? cfgPorts
-        : (int.TryParse(builder.Configuration["TWS:Port"], out var pp) && pp > 0
-            ? new[] { pp }
-            : new[] { 7497, 7496, 4002, 4001 }),
+    Port = int.TryParse(builder.Configuration["TWS:Port"], out var p) ? p : 4002,
+    PaperPorts = builder.Configuration.GetSection("TWS:PaperPorts").Get<int[]>() is { Length: > 0 } paperPorts
+        ? paperPorts
+        : new[] { 4002, 7497 },
+    LivePorts = builder.Configuration.GetSection("TWS:LivePorts").Get<int[]>() is { Length: > 0 } livePorts
+        ? livePorts
+        : new[] { 4001, 7496 },
+    Ports = builder.Configuration.GetSection("TWS:PaperPorts").Get<int[]>() is { Length: > 0 } legacy
+        ? legacy
+        : new[] { 4002, 7497 },
     ClientId = int.TryParse(builder.Configuration["TWS:ClientId"], out var c) ? c : 1,
     OrderClientId = int.TryParse(builder.Configuration["TWS:OrderClientId"], out var oc) ? oc : 5,
     Mode = (builder.Configuration["TWS:Mode"] ?? "Paper").Equals("Live", StringComparison.OrdinalIgnoreCase)

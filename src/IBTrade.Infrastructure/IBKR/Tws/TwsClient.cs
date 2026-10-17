@@ -178,8 +178,9 @@ public class TwsClient : DefaultEWrapper, ITwsClient
             var positions = _positions.Values.Select(dto =>
             {
                 var last = _liveLast.TryGetValue(dto.Symbol, out var l) && l != 0 ? l : dto.MarketPrice;
-                var mv = dto.Quantity * last;
-                var un = (last - dto.AvgCost) * dto.Quantity;
+                var mult = dto.Multiplier > 0 ? dto.Multiplier : 1m;
+                var mv = dto.Quantity * last * mult;
+                var un = (last - dto.AvgCost) * dto.Quantity * mult;
                 var change = dto.MarketPrice != 0 ? last - dto.MarketPrice : 0;
                 return new TwsLivePosition
                 {
@@ -347,14 +348,18 @@ public class TwsClient : DefaultEWrapper, ITwsClient
         Contract contract, double position, double marketPrice, double marketValue,
         double averageCost, double unrealizedPNL, double realizedPNL, string accountName)
     {
+        var asset = MapAssetType(contract.SecType);
+        var mult = ParseMultiplier(contract.Multiplier, asset);
+        var local = string.IsNullOrWhiteSpace(contract.LocalSymbol) ? contract.Symbol : contract.LocalSymbol;
         var dto = new TwsPositionDto
         {
-            Symbol = contract.Symbol,
-            AssetType = MapAssetType(contract.SecType),
+            Symbol = local,
+            AssetType = asset,
             Currency = contract.Currency ?? "USD",
             Quantity = (decimal)position,
             AvgCost = (decimal)averageCost,
             MarketPrice = (decimal)marketPrice,
+            Multiplier = mult,
             MarketValue = (decimal)marketValue,
             UnrealizedPnl = (decimal)unrealizedPNL,
             RealizedPnl = (decimal)realizedPNL
@@ -362,7 +367,7 @@ public class TwsClient : DefaultEWrapper, ITwsClient
         lock (_lock)
         {
             _positions[PositionKey(contract)] = dto;
-            _positionContracts[contract.Symbol] = contract; // 供实时行情订阅复用
+            _positionContracts[local] = contract;
         }
     }
 
@@ -451,6 +456,14 @@ public class TwsClient : DefaultEWrapper, ITwsClient
         {
             htcs.TrySetException(new InvalidOperationException($"TWS 返回错误 {errorCode}: {errorMsg}"));
         }
+    }
+
+    private static decimal ParseMultiplier(string? raw, AssetType asset)
+    {
+        if (decimal.TryParse(raw, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var m) && m > 0)
+            return m;
+        return asset == AssetType.Option ? 100m : 1m;
     }
 
     private static string PositionKey(Contract c) =>

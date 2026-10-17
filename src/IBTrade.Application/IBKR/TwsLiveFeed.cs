@@ -28,7 +28,7 @@ public class TwsLiveFeed(
     public async Task<TwsSnapshot> StartAsync(CancellationToken ct = default)
     {
         Exception? lastError = null;
-        foreach (var port in options.Ports)
+        foreach (var port in options.PortsFor(options.Mode))
         {
             try
             {
@@ -55,7 +55,7 @@ public class TwsLiveFeed(
 
         LastError = lastError?.Message;
         throw new InvalidOperationException(
-            $"实时推送无法连接到任何端口（{string.Join(", ", options.Ports)}）。请确认 TWS 或 IB Gateway 已启动并开启 API 连接，且 Trusted IP 含 127.0.0.1。",
+            $"实时推送无法连接到 {options.Mode} 端口（{string.Join(", ", options.PortsFor(options.Mode))}）。Paper 只连模拟口。",
             lastError);
     }
 
@@ -127,7 +127,7 @@ public class TwsLiveFeed(
     private async Task<TwsSnapshot> ReconnectAsync(CancellationToken ct)
     {
         Exception? lastError = null;
-        foreach (var port in options.Ports)
+        foreach (var port in options.PortsFor(options.Mode))
         {
             try
             {
@@ -147,7 +147,7 @@ public class TwsLiveFeed(
             }
         }
         throw new InvalidOperationException(
-            $"自动重连失败（{string.Join(", ", options.Ports)}）。", lastError);
+            $"自动重连失败（{string.Join(", ", options.PortsFor(options.Mode))}）。", lastError);
     }
 
     public void Dispose() => Stop();

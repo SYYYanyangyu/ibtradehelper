@@ -86,9 +86,9 @@ public static class DependencyInjection
         services.AddSingleton<ITwsClientFactory, TwsClientFactory>();
 
         // 下单执行层（独立连接 / 单例）：下单客户端 + 订单持久化 + 风控 + 下单服务 + 对账
+        services.AddSingleton<IRiskGuard, RiskGuard>();
         services.AddSingleton<TwsOrderClient>();
         services.AddSingleton<IOrderStore, EfOrderStore>();
-        services.AddSingleton<IRiskGuard, RiskGuard>();
         services.AddSingleton<IOrderService, OrderService>();
         services.AddSingleton<IOrderReconcileService, OrderReconcileService>();
 

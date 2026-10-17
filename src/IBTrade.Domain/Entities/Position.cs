@@ -26,8 +26,11 @@ public class Position : Entity
     /// <summary>平均成本价</summary>
     public decimal AvgCost { get; set; }
 
-    /// <summary>最新市场价</summary>
+    /// <summary>最新市场价（每股/每单位权利金，不含乘数）</summary>
     public decimal MarketPrice { get; set; }
+
+    /// <summary>合约乘数：正股 1，美股期权通常 100。</summary>
+    public decimal Multiplier { get; set; } = 1m;
 
     /// <summary>
     /// 仓位结构来源（数量/均价）：Flex = 报表权威；Gateway = 仅网关会话写入的仓位。
@@ -38,9 +41,11 @@ public class Position : Entity
     /// <summary>市价最近一次由谁刷新：Flex 或 Gateway。</summary>
     public string PriceSource { get; set; } = DataSources.Flex;
 
-    /// <summary>市值 = 数量 × 市场价</summary>
-    public decimal MarketValue => Quantity * MarketPrice;
+    public decimal EffectiveMultiplier => Multiplier > 0 ? Multiplier : 1m;
 
-    /// <summary>未实现盈亏 = (市场价 − 成本价) × 数量</summary>
-    public decimal UnrealizedPnl => (MarketPrice - AvgCost) * Quantity;
+    /// <summary>市值 = 数量 × 市场价 × 乘数</summary>
+    public decimal MarketValue => Quantity * MarketPrice * EffectiveMultiplier;
+
+    /// <summary>未实现盈亏 = (市场价 − 成本价) × 数量 × 乘数</summary>
+    public decimal UnrealizedPnl => (MarketPrice - AvgCost) * Quantity * EffectiveMultiplier;
 }

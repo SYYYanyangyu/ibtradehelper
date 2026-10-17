@@ -9,7 +9,7 @@ public record FlexAccountDto(string AccountId, string BaseCurrency, string? Alia
 /// <summary>解析后的持仓行。</summary>
 public record FlexPositionDto(
     string AccountId, string Symbol, AssetType AssetType, string Currency,
-    decimal Quantity, decimal AvgCost, decimal MarketPrice);
+    decimal Quantity, decimal AvgCost, decimal MarketPrice, decimal Multiplier);
 
 /// <summary>解析后的成交行。</summary>
 public record FlexTradeDto(

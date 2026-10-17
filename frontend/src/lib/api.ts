@@ -538,8 +538,14 @@ export interface PlaceOrderRequest {
   type: OrderType
   quantity: number
   limitPrice?: number | null
+  estimatedPrice?: number | null
   strategy?: string | null
   note?: string | null
+  secType?: 'STK' | 'OPT'
+  expiry?: string | null
+  strike?: number | null
+  right?: 'C' | 'P' | null
+  multiplier?: number | null
 }
 
 /** 列出全部订单（状态为实时合并，已持久化）。 */

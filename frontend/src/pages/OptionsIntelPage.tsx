@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   Activity,
   AlertTriangle,
@@ -26,6 +26,7 @@ import {
   stopOptionsPaper,
   tickOptionsPaper,
   updateOptionsPaperSettings,
+  type HotName,
   type HotUniverse,
   type OptionsAnalyzeResult,
   type OptionsContext,
@@ -33,14 +34,12 @@ import {
   type PredictionMarket
 } from '../lib/optionsIntel'
 
-const DEFAULT_SYMBOL = 'AAPL'
-
 export function OptionsIntelPage() {
-  const [symbol, setSymbol] = useState(DEFAULT_SYMBOL)
-  const [draft, setDraft] = useState(DEFAULT_SYMBOL)
+  const [symbol, setSymbol] = useState('')
+  const [draft, setDraft] = useState('')
   const [expiry, setExpiry] = useState<string>('')
   const [ctx, setCtx] = useState<OptionsContext | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [prompt, setPrompt] = useState('结合财报、美联储和下周期权链，偏看波动还是方向？')
   const [ai, setAi] = useState<OptionsAnalyzeResult | null>(null)
@@ -49,35 +48,70 @@ export function OptionsIntelPage() {
   const [paper, setPaper] = useState<OptionsPaperStatus | null>(null)
   const [paperBusy, setPaperBusy] = useState(false)
   const [paperError, setPaperError] = useState<string | null>(null)
-  const [qtyDraft, setQtyDraft] = useState('10')
+  const [qtyDraft, setQtyDraft] = useState('1')
   const [moveDraft, setMoveDraft] = useState('3')
-  const [gatewayDraft, setGatewayDraft] = useState(true)
   const [hot, setHot] = useState<HotUniverse | null>(null)
+  const [hotLoading, setHotLoading] = useState(true)
+  const [hotError, setHotError] = useState<string | null>(null)
 
+  const pickSymbol = useCallback((next: string) => {
+    const sym = next.trim().toUpperCase()
+    if (!sym) return
+    setDraft(sym)
+    setExpiry('')
+    setAi(null)
+    setSymbol(sym)
+  }, [])
+
+  const loadGen = useRef(0)
   const load = useCallback(async (sym: string, exp?: string) => {
+    const gen = ++loadGen.current
     setLoading(true)
     setError(null)
     try {
       const data = await getOptionsContext(sym, exp || undefined)
+      if (gen !== loadGen.current) return
       setCtx(data)
       if (data.selectedExpiry && !exp) setExpiry(data.selectedExpiry)
     } catch (e) {
+      if (gen !== loadGen.current) return
       setError(e instanceof Error ? e.message : '加载失败')
       setCtx(null)
     } finally {
-      setLoading(false)
+      if (gen === loadGen.current) setLoading(false)
+    }
+  }, [])
+
+  const loadHot = useCallback(async () => {
+    setHotLoading(true)
+    setHotError(null)
+    try {
+      const data = await getHotOptions()
+      setHot(data)
+      if (!data.names.length) setHotError(data.source?.message || '热门榜为空')
+    } catch (e) {
+      setHot(null)
+      setHotError(e instanceof Error ? e.message : '热门榜失败')
+    } finally {
+      setHotLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    void load(symbol, expiry || undefined)
-  }, [symbol, expiry, load])
+    void loadHot()
+  }, [loadHot])
 
   useEffect(() => {
-    void getHotOptions(symbol)
-      .then(setHot)
-      .catch(() => setHot(null))
-  }, [symbol])
+    if (symbol || !hot?.names[0]) return
+    const first = hot.names[0].symbol
+    setDraft(first)
+    setSymbol(first)
+  }, [hot, symbol])
+
+  useEffect(() => {
+    if (!symbol) return
+    void load(symbol, expiry || undefined)
+  }, [symbol, expiry, load])
 
   const refreshPaper = useCallback(async (syncDrafts = false) => {
     try {
@@ -86,7 +120,6 @@ export function OptionsIntelPage() {
       if (syncDrafts) {
         setQtyDraft(String(st.settings.quantity))
         setMoveDraft(String(Math.round(st.settings.minProbMove * 100)))
-        setGatewayDraft(st.settings.sendToGateway)
       }
       setPaperError(st.lastError ?? null)
     } catch (e) {
@@ -110,10 +143,10 @@ export function OptionsIntelPage() {
     try {
       await updateOptionsPaperSettings({
         symbol,
-        quantity: Number(qtyDraft) || 10,
+        quantity: Number(qtyDraft) || 1,
         pollSeconds: 90,
         minProbMove: (Number(moveDraft) || 3) / 100,
-        sendToGateway: gatewayDraft
+        sendToGateway: true
       })
       setPaper(await startOptionsPaper())
       window.setTimeout(() => void refreshPaper(false), 2500)
@@ -141,10 +174,10 @@ export function OptionsIntelPage() {
     try {
       await updateOptionsPaperSettings({
         symbol,
-        quantity: Number(qtyDraft) || 10,
+        quantity: Number(qtyDraft) || 1,
         pollSeconds: 90,
         minProbMove: (Number(moveDraft) || 3) / 100,
-        sendToGateway: gatewayDraft
+        sendToGateway: true
       })
       setPaper(await tickOptionsPaper())
     } catch (e) {
@@ -155,12 +188,12 @@ export function OptionsIntelPage() {
   }
 
   function submitSymbol() {
-    const next = draft.trim().toUpperCase()
-    if (!next) return
-    setExpiry('')
-    setAi(null)
-    setSymbol(next)
+    pickSymbol(draft)
   }
+
+  const currentIsHot = !!symbol && (hot?.names.some((n) => n.symbol === symbol) ?? false)
+  const dollarNames = (hot?.names ?? []).filter((n) => (n.bucket ?? 'dollar') === 'dollar')
+  const n100Names = (hot?.names ?? []).filter((n) => n.bucket === 'n100')
 
   async function runAi() {
     setAiLoading(true)
@@ -196,70 +229,63 @@ export function OptionsIntelPage() {
           <div>
             <CardTitle>期权情报</CardTitle>
             <p className="mt-0.5 text-xs text-muted-2">
-              只做热门期权：Nasdaq 成交额活跃榜。延迟报价看结构，预测涨跌驱动 Paper。
+              先点今日热门，不必手输代码。Nasdaq 官方成交额 + 纳指100异动，点选即加载期权链。
             </p>
           </div>
           <button
             type="button"
-            onClick={() => void load(symbol, expiry || undefined)}
+            onClick={() => {
+              void loadHot()
+              if (symbol) void load(symbol, expiry || undefined)
+            }}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted transition hover:bg-surface-2 hover:text-foreground"
           >
-            <RefreshCw size={13} className={loading ? 'animate-spin' : undefined} />
+            <RefreshCw size={13} className={loading || hotLoading ? 'animate-spin' : undefined} />
             刷新
           </button>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {hot?.names.length ? (
-            <div>
-              <p className="mb-1.5 text-[11px] uppercase tracking-wider text-muted-2">
-                今日成交额活跃 · {hot.asOf || 'Nasdaq'}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {hot.names.map((n) => (
-                  <button
-                    key={n.symbol}
-                    type="button"
-                    onClick={() => {
-                      setDraft(n.symbol)
-                      setExpiry('')
-                      setAi(null)
-                      setSymbol(n.symbol)
-                    }}
-                    className={cn(
-                      'rounded-full border px-2.5 py-1 text-[11px]',
-                      symbol === n.symbol
-                        ? 'border-foreground bg-foreground text-bg'
-                        : 'border-border text-muted hover:text-foreground'
-                    )}
-                    title={n.name ?? n.symbol}
-                  >
-                    #{n.rank} {n.symbol}
-                    {n.kind === 'etf' ? ' ETF' : ''}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
-          {hot && !hot.currentIsHot && hot.names.length > 0 && (
+        <CardContent className="space-y-4">
+          <HotBoard
+            title="成交额最活跃"
+            hint={hot?.asOf || 'Nasdaq Most Active by Dollar Volume'}
+            names={dollarNames}
+            loading={hotLoading}
+            error={hotError}
+            selected={symbol}
+            onPick={pickSymbol}
+            onRetry={() => void loadHot()}
+          />
+          {n100Names.length > 0 && (
+            <HotBoard
+              title="纳指100异动"
+              hint="Nasdaq-100 Movers"
+              names={n100Names}
+              selected={symbol}
+              onPick={pickSymbol}
+            />
+          )}
+          {symbol && hot && hot.names.length > 0 && !currentIsHot && (
             <p className="text-xs text-down">
-              {symbol} 不在今日成交额榜，Paper 不会下单。请点上面的热门代码。
+              {symbol} 不在今日官方热门榜，Paper 不会下单。请点上面的卡片。
             </p>
           )}
           <div className="flex flex-wrap items-end gap-2">
             <label className="min-w-[140px] flex-1">
-              <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted-2">标的</span>
+              <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted-2">
+                自己搜（可选）
+              </span>
               <input
                 value={draft}
                 onChange={(e) => setDraft(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === 'Enter' && submitSymbol()}
                 className={inputCls}
-                placeholder="AAPL"
+                placeholder="例如 MU"
               />
             </label>
             <button
               type="button"
               onClick={submitSymbol}
-              className="rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-bg"
+              className="rounded-lg border border-border px-4 py-2 text-sm text-muted hover:text-foreground"
             >
               加载期权链
             </button>
@@ -316,7 +342,7 @@ export function OptionsIntelPage() {
           <div>
             <CardTitle>Paper 自动模拟</CardTitle>
             <p className="mt-0.5 text-xs text-muted-2">
-              只走 Paper · 预测概率变动触发买卖 · 周末或 Gateway 拒单则按最新官方现价记账
+              只连 Gateway Paper 4002/7497 · ATM Call 真实 OPT · 不成交不记账
             </p>
           </div>
           <Badge tone={paper?.running ? 'up' : 'neutral'}>{paper?.running ? '运行中' : '已停止'}</Badge>
@@ -334,24 +360,16 @@ export function OptionsIntelPage() {
           </div>
           <div className="flex flex-wrap items-end gap-2">
             <label className="w-24">
-              <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted-2">股数</span>
+              <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted-2">张数</span>
               <input value={qtyDraft} onChange={(e) => setQtyDraft(e.target.value)} className={inputCls} />
             </label>
             <label className="w-28">
               <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted-2">阈值 %</span>
               <input value={moveDraft} onChange={(e) => setMoveDraft(e.target.value)} className={inputCls} />
             </label>
-            <label className="flex items-center gap-2 pb-2 text-xs text-muted">
-              <input
-                type="checkbox"
-                checked={gatewayDraft}
-                onChange={(e) => setGatewayDraft(e.target.checked)}
-              />
-              尝试 Gateway Paper
-            </label>
             <button
               type="button"
-              disabled={paperBusy || (hot != null && hot.names.length > 0 && !hot.currentIsHot)}
+              disabled={paperBusy || (hot != null && hot.names.length > 0 && !currentIsHot)}
               onClick={() => void paperStart()}
               className="inline-flex items-center gap-1.5 rounded-lg bg-foreground px-3 py-2 text-xs font-medium text-bg disabled:opacity-40"
             >
@@ -446,8 +464,8 @@ export function OptionsIntelPage() {
           </span>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          {loading && !ctx ? (
-            <p className="py-8 text-center text-sm text-muted">加载期权链…</p>
+          {loading ? (
+            <p className="py-8 text-center text-sm text-muted">加载 {symbol || '期权链'}…</p>
           ) : ctx?.chain.length ? (
             <table className="w-full min-w-[720px] text-sm">
               <thead>
@@ -667,6 +685,94 @@ export function OptionsIntelPage() {
           ))}
         </div>
       ) : null}
+    </div>
+  )
+}
+
+function HotBoard({
+  title,
+  hint,
+  names,
+  loading,
+  error,
+  selected,
+  onPick,
+  onRetry
+}: {
+  title: string
+  hint: string
+  names: HotName[]
+  loading?: boolean
+  error?: string | null
+  selected: string
+  onPick: (symbol: string) => void
+  onRetry?: () => void
+}) {
+  return (
+    <div>
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-2">{title}</p>
+          <p className="text-[11px] text-muted-2/80">{hint}</p>
+        </div>
+        {error && onRetry && (
+          <button type="button" onClick={onRetry} className="text-[11px] text-down hover:underline">
+            重试
+          </button>
+        )}
+      </div>
+      {loading && !names.length ? (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          {Array.from({ length: 10 }, (_, i) => (
+            <div key={i} className="h-[72px] animate-pulse rounded-xl bg-surface-2" />
+          ))}
+        </div>
+      ) : names.length ? (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          {names.map((n) => {
+            const active = n.symbol === selected
+            return (
+              <button
+                key={`${n.bucket ?? 'hot'}-${n.symbol}`}
+                type="button"
+                onClick={() => onPick(n.symbol)}
+                className={cn(
+                  'flex flex-col items-start rounded-xl border px-3 py-2.5 text-left transition',
+                  active
+                    ? 'border-foreground bg-foreground text-bg'
+                    : 'border-border hover:bg-surface-2'
+                )}
+              >
+                <div className="flex w-full items-baseline justify-between gap-2">
+                  <span className="text-sm font-semibold tracking-tight">{n.symbol}</span>
+                  <span
+                    className={cn(
+                      'text-[11px] tabular-nums',
+                      active ? 'text-bg/75' : gainClass(n.changePct ?? 0)
+                    )}
+                  >
+                    {n.changePct != null ? fmtPct(n.changePct, false) : '—'}
+                  </span>
+                </div>
+                <span className={cn('mt-0.5 line-clamp-1 text-[11px]', active ? 'text-bg/65' : 'text-muted-2')}>
+                  {n.name || (n.kind === 'etf' ? 'ETF' : '股票')}
+                </span>
+                <span className={cn('mt-1 text-xs tabular-nums', active ? 'text-bg/80' : 'text-muted')}>
+                  {n.last != null ? fmtMoney(n.last) : '—'}
+                  <span className={cn('ml-1.5', active ? 'text-bg/50' : 'text-muted-2')}>
+                    #{n.rank}
+                    {n.kind === 'etf' ? ' ETF' : ''}
+                  </span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      ) : (
+        <p className="rounded-xl border border-dashed border-border px-3 py-6 text-center text-sm text-muted">
+          {error || '热门榜暂时没有数据'}
+        </p>
+      )}
     </div>
   )
 }

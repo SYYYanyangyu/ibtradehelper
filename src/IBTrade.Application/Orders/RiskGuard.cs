@@ -42,6 +42,13 @@ public class RiskGuard : IRiskGuard
 {
     private readonly object _gate = new();
     private RiskSettings _settings = new();
+    private readonly string _path;
+
+    public RiskGuard()
+    {
+        _path = ResolvePath();
+        Load();
+    }
 
     public RiskSettings Settings
     {
@@ -50,7 +57,49 @@ public class RiskGuard : IRiskGuard
 
     public void Update(RiskSettings settings)
     {
-        lock (_gate) _settings = settings;
+        lock (_gate)
+        {
+            _settings = settings;
+            Save();
+        }
+    }
+
+    private void Load()
+    {
+        try
+        {
+            if (!File.Exists(_path)) return;
+            var json = File.ReadAllText(_path);
+            var loaded = System.Text.Json.JsonSerializer.Deserialize<RiskSettings>(json);
+            if (loaded is not null) _settings = loaded;
+        }
+        catch
+        {
+            // 坏文件不阻断启动，回默认 Paper
+        }
+    }
+
+    private void Save()
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
+            File.WriteAllText(_path, System.Text.Json.JsonSerializer.Serialize(_settings, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true
+            }));
+        }
+        catch
+        {
+            // 持久化失败不阻断下单检查
+        }
+    }
+
+    private static string ResolvePath()
+    {
+        var dir = Environment.GetEnvironmentVariable("IBTRADE_DATA_DIR");
+        var baseDir = string.IsNullOrWhiteSpace(dir) ? AppContext.BaseDirectory : dir!;
+        return Path.Combine(baseDir, "risk-settings.json");
     }
 
     public (bool Ok, string? Reason) Check(
@@ -76,7 +125,10 @@ public class RiskGuard : IRiskGuard
             // 失败-关闭：缺少可估算价格时，绝不让市价单绕过金额上限（S-3）。
             if (!estimatedPrice.HasValue)
                 return (false, "无法估算成交金额，单笔金额上限无法校验。市价单请传入 EstimatedPrice（如最新市价）或改用限价单。");
-            var amount = estimatedPrice.Value * req.Quantity;
+            var mult = req.Multiplier > 0
+                ? req.Multiplier
+                : (string.Equals(req.SecType, "OPT", StringComparison.OrdinalIgnoreCase) ? 100m : 1m);
+            var amount = estimatedPrice.Value * req.Quantity * mult;
             if (amount > s.MaxOrderAmount)
                 return (false, $"单笔金额 ${amount:F2} 超出上限 ${s.MaxOrderAmount:F2}");
         }

@@ -35,7 +35,7 @@ public class HistoricalDataService(TwsOptions options, ITwsClientFactory clientF
             clientId = Math.Max(options.ClientId + 2, options.OrderClientId + 1); // 极端兜底：池耗尽时退化（不应发生，因信号量已限流）
         try
         {
-            foreach (var port in options.Ports)
+            foreach (var port in options.PortsFor(options.Mode))
             {
                 try
                 {
@@ -62,6 +62,6 @@ public class HistoricalDataService(TwsOptions options, ITwsClientFactory clientF
         var report = meaningful ?? lastError;
         var reason = report is null ? "" : $" 原因：{report.Message}";
         throw new InvalidOperationException(
-            $"无法连接到任何端口（{string.Join(", ", options.Ports)}）拉取历史数据。请确认 IB Gateway 已启动并开启 API 连接（Trusted IP 含 127.0.0.1）。{reason}");
+            $"无法连接到 {options.Mode} 端口（{string.Join(", ", options.PortsFor(options.Mode))}）拉取历史数据。Paper 只连模拟口。{reason}");
     }
 }

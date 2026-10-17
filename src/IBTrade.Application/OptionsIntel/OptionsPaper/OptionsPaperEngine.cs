@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using IBTrade.Application.OptionsIntel;
 using IBTrade.Application.OptionsIntel.Dtos;
 using IBTrade.Application.Orders;
 using IBTrade.Application.Orders.Dtos;
@@ -11,7 +12,7 @@ namespace IBTrade.Application.OptionsIntel.OptionsPaper;
 
 /// <summary>
 /// Paper 期权情报模拟盘：用预测市场涨跌 + 期权结构做信号，只允许 Paper。
-/// 交易日优先发 Gateway Paper 单；连不上或休市则按最新官方现价本地记账，方便看效果。
+/// 只向 Gateway Paper 发真实 OPT 合约；失败不记账。
 /// </summary>
 public class OptionsPaperEngine : IOptionsPaperEngine
 {
@@ -59,12 +60,12 @@ public class OptionsPaperEngine : IOptionsPaperEngine
     {
         lock (_gate)
         {
-            var unreal = _netQty != 0 && _mark is { } m ? (m - _avgPrice) * _netQty : 0m;
+            var unreal = _netQty != 0 && _mark is { } m ? (m - _avgPrice) * _netQty * 100m : 0m;
             return new OptionsPaperStatus
             {
                 Running = _running,
                 Settings = Clone(_settings),
-                AccountHint = "Paper · Gateway 4002 / 本地记账",
+                AccountHint = "Paper · Gateway 4002/7497 · 真实 OPT，不成交不记账",
                 RiskMode = orders.Risk.Settings.Mode.ToString(),
                 NetQty = _netQty,
                 AvgPrice = _avgPrice,
@@ -88,10 +89,11 @@ public class OptionsPaperEngine : IOptionsPaperEngine
     {
         if (string.IsNullOrWhiteSpace(settings.Symbol))
             throw new ArgumentException("Symbol 必填");
-        if (settings.Quantity <= 0 || settings.Quantity > 1000)
-            throw new ArgumentException("Paper 数量须在 0–1000");
+        if (settings.Quantity <= 0 || settings.Quantity > 20)
+            throw new ArgumentException("Paper 期权张数须在 1–20");
         if (settings.PollSeconds < 30) settings.PollSeconds = 30;
         if (settings.MinProbMove < 0.005m) settings.MinProbMove = 0.005m;
+        settings.SendToGateway = true;
         settings.Symbol = OptionsIntelService.NormalizeSymbol(settings.Symbol);
         lock (_gate) _settings = settings;
         Save();
@@ -178,14 +180,19 @@ public class OptionsPaperEngine : IOptionsPaperEngine
 
             var markets = (await predTask).Markets;
             var quote = (await quoteTask).Quote;
-            var stats = (await chainTask).Stats;
+            var chainSnap = await chainTask;
+            var stats = chainSnap.Stats;
             var spot = quote?.Last;
             var pcr = stats?.PutCallOiRatio;
+            var atmRow = stats?.AtmStrike is { } atm
+                ? chainSnap.Rows.FirstOrDefault(r => r.Strike == atm)
+                : null;
+            var optionMid = atmRow is null ? null : Mid(atmRow.Call);
 
             lock (_gate)
             {
                 _markets = markets;
-                _mark = spot;
+                _mark = optionMid ?? (_netQty != 0 ? _mark : spot);
                 _lastTick = DateTime.UtcNow;
                 _lastError = null;
             }
@@ -199,7 +206,7 @@ public class OptionsPaperEngine : IOptionsPaperEngine
             }
 
             if (signal.Bias is "buy" or "sell")
-                await ExecuteAsync(s, signal, spot, ct);
+                await ExecuteAsync(s, signal, chainSnap, ct);
 
             Save();
         }
@@ -340,82 +347,132 @@ public class OptionsPaperEngine : IOptionsPaperEngine
         };
     }
 
-    private async Task ExecuteAsync(OptionsPaperSettings s, OptionsPaperSignal signal, decimal? spot, CancellationToken ct)
+    private async Task ExecuteAsync(
+        OptionsPaperSettings s, OptionsPaperSignal signal, OptionsChainSnapshot? chain, CancellationToken ct)
     {
         var side = signal.Bias == "buy" ? OrderSide.Buy : OrderSide.Sell;
         decimal qty;
-        lock (_gate) qty = side == OrderSide.Sell ? _netQty : s.Quantity;
-        if (qty <= 0 || spot is null or <= 0) return;
+        lock (_gate) qty = side == OrderSide.Sell ? _netQty : Math.Max(1, s.Quantity);
+        if (qty <= 0) return;
 
-        string venue = "paper-sim";
-        string? brokerId = null;
-        string? err = null;
-        var px = spot.Value;
-
-        if (s.SendToGateway)
+        if (!s.SendToGateway)
         {
-            try
-            {
-                var dto = await orders.PlaceAsync(new PlaceOrderRequest
-                {
-                    Symbol = s.Symbol,
-                    Side = side,
-                    Type = OrderType.Market,
-                    Quantity = qty,
-                    EstimatedPrice = px,
-                    Strategy = "options-paper-poly",
-                    Note = signal.Reason
-                }, ct, px);
-                brokerId = dto.BrokerOrderId?.ToString();
-                if (dto.AvgFillPrice > 0) px = dto.AvgFillPrice;
-                if (dto.Status is OrderStatus.Rejected or OrderStatus.Failed)
-                {
-                    err = dto.LastError ?? dto.Status.ToString();
-                    venue = "paper-sim";
-                }
-                else
-                {
-                    venue = "gateway-paper";
-                    if (dto.Status is not OrderStatus.Filled and not OrderStatus.PartiallyFilled)
-                        err = $"Gateway {dto.Status}，按最新官方现价记账";
-                }
-            }
-            catch (Exception ex)
-            {
-                err = ex.GetBaseException().Message;
-                venue = "paper-sim";
-                logger?.LogWarning(ex, "Gateway Paper 下单失败，改本地记账");
-            }
+            RecordRejected(s.Symbol, side, qty, 0, "必须走 Gateway Paper 下真实期权，已禁止本地假成交。", signal.Reason);
+            return;
         }
 
-        lock (_gate)
+        var atm = chain?.Stats.AtmStrike;
+        var expiry = chain?.SelectedExpiry;
+        var row = atm is null
+            ? null
+            : chain!.Rows.FirstOrDefault(r => r.Strike == atm);
+        if (row is null || string.IsNullOrWhiteSpace(expiry))
         {
-            if (side == OrderSide.Buy)
-            {
-                var cost = _avgPrice * _netQty + px * qty;
-                _netQty += qty;
-                _avgPrice = _netQty == 0 ? 0 : cost / _netQty;
-            }
-            else
-            {
-                _realized += (px - _avgPrice) * qty;
-                _netQty -= qty;
-                if (_netQty == 0) _avgPrice = 0;
-            }
-            _lastAction = DateTime.UtcNow;
-            _fills.Add(new OptionsPaperFill
+            RecordRejected(s.Symbol, side, qty, 0, "没有官方 ATM 期权合约，拒绝下单。", signal.Reason);
+            return;
+        }
+
+        var right = "C";
+        var sideQuote = row.Call;
+        var px = Mid(sideQuote);
+        if (px is null or <= 0)
+        {
+            RecordRejected(s.Symbol, side, qty, 0, "ATM Call 没有官方买卖价，拒绝下单。", signal.Reason);
+            return;
+        }
+
+        try
+        {
+            var dto = await orders.PlaceAsync(new PlaceOrderRequest
             {
                 Symbol = s.Symbol,
                 Side = side,
+                Type = OrderType.Market,
+                Quantity = qty,
+                EstimatedPrice = px,
+                SecType = "OPT",
+                Expiry = expiry,
+                Strike = row.Strike,
+                Right = right,
+                Multiplier = 100,
+                Strategy = "options-paper-opt",
+                Note = signal.Reason
+            }, ct, px);
+
+            var filled = dto.Status is OrderStatus.Filled or OrderStatus.PartiallyFilled;
+            var working = dto.Status is OrderStatus.Submitted or OrderStatus.PreSubmitted
+                or OrderStatus.PendingSubmit or OrderStatus.ApiPending;
+            var fillPx = dto.AvgFillPrice > 0 ? dto.AvgFillPrice : px.Value;
+            lock (_gate)
+            {
+                if (filled)
+                {
+                    if (side == OrderSide.Buy)
+                    {
+                        var cost = _avgPrice * _netQty + fillPx * qty;
+                        _netQty += qty;
+                        _avgPrice = _netQty == 0 ? 0 : cost / _netQty;
+                    }
+                    else
+                    {
+                        _realized += (fillPx - _avgPrice) * qty * 100m;
+                        _netQty -= qty;
+                        if (_netQty == 0) _avgPrice = 0;
+                    }
+                    _lastAction = DateTime.UtcNow;
+                    _mark = fillPx;
+                }
+                _fills.Add(new OptionsPaperFill
+                {
+                    Symbol = $"{s.Symbol} {expiry} {row.Strike}C",
+                    Side = side,
+                    Quantity = qty,
+                    Price = fillPx,
+                    Venue = filled ? "gateway-paper-opt" : (working ? "gateway-working" : "rejected"),
+                    BrokerOrderId = dto.BrokerOrderId?.ToString(),
+                    Reason = signal.Reason,
+                    Error = filled ? null : (dto.LastError ?? dto.Status.ToString())
+                });
+                if (_fills.Count > 200) _fills.RemoveRange(0, _fills.Count - 200);
+                if (!filled)
+                    _lastError = working
+                        ? $"已提交 Gateway Paper（{dto.Status}），等待成交，未记账"
+                        : (dto.LastError ?? $"期权单未成交：{dto.Status}");
+            }
+        }
+        catch (Exception ex)
+        {
+            RecordRejected(s.Symbol, side, qty, px.Value, ex.GetBaseException().Message, signal.Reason);
+            logger?.LogWarning(ex, "Gateway Paper 期权下单失败，已拒绝本地记账");
+        }
+    }
+
+    private void RecordRejected(string symbol, OrderSide side, decimal qty, decimal px, string err, string reason)
+    {
+        lock (_gate)
+        {
+            _lastError = err;
+            _fills.Add(new OptionsPaperFill
+            {
+                Symbol = symbol,
+                Side = side,
                 Quantity = qty,
                 Price = px,
-                Venue = venue,
-                BrokerOrderId = brokerId,
-                Reason = signal.Reason,
+                Venue = "rejected",
+                Reason = reason,
                 Error = err
             });
             if (_fills.Count > 200) _fills.RemoveRange(0, _fills.Count - 200);
         }
+    }
+
+    private static decimal? Mid(OptionSideDto q)
+    {
+        if (q.Bid is > 0 && q.Ask is > 0) return (q.Bid.Value + q.Ask.Value) / 2m;
+        if (q.Last is > 0) return q.Last;
+        if (q.Bid is > 0) return q.Bid;
+        if (q.Ask is > 0) return q.Ask;
+        return null;
     }
 
     private static string Classify(string? question, string symbol)

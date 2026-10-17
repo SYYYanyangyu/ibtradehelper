@@ -14,7 +14,7 @@ public class NasdaqHotNamesClient(IHttpClientFactory httpFactory, ILogger<Nasdaq
 {
     private const string Url = "https://api.nasdaq.com/api/marketmovers?assetclass=stocks";
     private const string Rule =
-        "Nasdaq 成交额最活跃（价格×成交量）。不用成交股数，避免仙股；不用手写名单。";
+        "Nasdaq 官方：成交额最活跃 + 纳指100异动。不用手写名单，点选即可看期权。";
 
     private static readonly object Gate = new();
     private static HotUniverseDto? Cache;
@@ -78,10 +78,51 @@ public class NasdaqHotNamesClient(IHttpClientFactory httpFactory, ILogger<Nasdaq
     private static HotUniverseDto Parse(string json)
     {
         using var doc = JsonDocument.Parse(json);
-        var stocks = doc.RootElement.GetProperty("data").GetProperty("STOCKS").GetProperty("MostActiveByDollarVolume");
-        var asOf = stocks.TryGetProperty("dataAsOf", out var a) ? a.GetString() : null;
-        var rows = stocks.GetProperty("table").GetProperty("rows");
+        var stocks = doc.RootElement.GetProperty("data").GetProperty("STOCKS");
+        var dollar = ParseTable(stocks, "MostActiveByDollarVolume", "dollar");
+        var n100 = ParseTable(stocks, "Nasdaq100Movers", "n100");
+        var asOf = ReadAsOf(stocks, "MostActiveByDollarVolume")
+                   ?? ReadAsOf(stocks, "Nasdaq100Movers")
+                   ?? "";
+
+        var names = new List<HotNameDto>(dollar);
+        var seen = new HashSet<string>(dollar.Select(x => x.Symbol), StringComparer.OrdinalIgnoreCase);
+        foreach (var row in n100)
+        {
+            if (!seen.Add(row.Symbol)) continue;
+            names.Add(row);
+        }
+
+        return new HotUniverseDto(
+            asOf,
+            Rule,
+            Url,
+            names,
+            false,
+            null,
+            new DataSourceStatusDto(
+                "hot",
+                "Nasdaq movers",
+                names.Count > 0 ? "ok" : "error",
+                names.Count > 0 ? $"{names.Count} 只 · {asOf}" : "榜单为空",
+                Url));
+    }
+
+    private static string? ReadAsOf(JsonElement stocks, string table)
+    {
+        if (!stocks.TryGetProperty(table, out var node)) return null;
+        return node.TryGetProperty("dataAsOf", out var a) ? a.GetString() : null;
+    }
+
+    private static List<HotNameDto> ParseTable(JsonElement stocks, string table, string bucket)
+    {
         var names = new List<HotNameDto>();
+        if (!stocks.TryGetProperty(table, out var node) ||
+            !node.TryGetProperty("table", out var tbl) ||
+            !tbl.TryGetProperty("rows", out var rows) ||
+            rows.ValueKind != JsonValueKind.Array)
+            return names;
+
         foreach (var row in rows.EnumerateArray())
         {
             var sym = row.TryGetProperty("symbol", out var s) ? s.GetString() : null;
@@ -93,22 +134,16 @@ public class NasdaqHotNamesClient(IHttpClientFactory httpFactory, ILogger<Nasdaq
             if (string.IsNullOrWhiteSpace(rawChg) || !rawChg.Contains('%', StringComparison.Ordinal))
                 rawChg = row.TryGetProperty("lastSaleChange", out var c2) ? c2.GetString() : rawChg;
             var chg = IntelHttp.ParseDec(rawChg);
-            names.Add(new HotNameDto(names.Count + 1, sym.Trim().ToUpperInvariant(), name, last, chg, Kind(name)));
+            names.Add(new HotNameDto(
+                names.Count + 1,
+                sym.Trim().ToUpperInvariant(),
+                name,
+                last,
+                chg,
+                Kind(name),
+                bucket));
         }
-
-        return new HotUniverseDto(
-            asOf ?? "",
-            Rule,
-            Url,
-            names,
-            false,
-            null,
-            new DataSourceStatusDto(
-                "hot",
-                "Nasdaq dollar volume",
-                names.Count > 0 ? "ok" : "error",
-                names.Count > 0 ? $"{names.Count} 只 · {asOf}" : "榜单为空",
-                Url));
+        return names;
     }
 
     private static bool IsJunk(string symbol, string? name)

@@ -154,6 +154,7 @@ export interface HotName {
   last?: number | null
   changePct?: number | null
   kind: string
+  bucket?: string
 }
 
 export interface HotUniverse {

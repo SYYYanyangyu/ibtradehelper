@@ -11,6 +11,7 @@ public class TwsPositionDto
     public decimal Quantity { get; set; }
     public decimal AvgCost { get; set; }
     public decimal MarketPrice { get; set; }
+    public decimal Multiplier { get; set; } = 1m;
     public decimal MarketValue { get; set; }
     public decimal UnrealizedPnl { get; set; }
     public decimal RealizedPnl { get; set; }

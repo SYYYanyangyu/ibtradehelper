@@ -25,7 +25,8 @@ public record HotNameDto(
     string? Name,
     decimal? Last,
     decimal? ChangePct,
-    string Kind);
+    string Kind,
+    string Bucket);
 
 public record HotUniverseDto(
     string AsOf,

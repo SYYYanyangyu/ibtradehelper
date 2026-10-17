@@ -315,6 +315,12 @@ namespace IBTrade.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 6)
                         .HasColumnType("numeric(18,6)");
 
+                    b.Property<decimal>("Multiplier")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)")
+                        .HasDefaultValue(1m);
+
                     b.Property<string>("PriceSource")
                         .IsRequired()
                         .HasMaxLength(16)

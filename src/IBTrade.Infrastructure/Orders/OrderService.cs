@@ -48,16 +48,17 @@ public class OrderService : IOrderService
                 Console.WriteLine("[Risk] 警告：已配置 DailyLossLimit，但成交表为空（尚未执行 Flex 摄入），当日亏损熔断暂无法评估真实盈亏。");
         }
 
-        var check = _risk.Check(req, _store.ListOpen(), dayRealizedPnl, estimatedPrice);
+        if (string.Equals(req.SecType, "OPT", StringComparison.OrdinalIgnoreCase) && req.Multiplier <= 0)
+            req.Multiplier = 100m;
+        var est = estimatedPrice ?? req.EstimatedPrice ?? req.LimitPrice;
+        var check = _risk.Check(req, _store.ListOpen(), dayRealizedPnl, est);
         if (!check.Ok)
             throw new InvalidOperationException($"风控拦截：{check.Reason}");
 
-        if (!_client.IsConnected)
-            await _client.EnsureConnectedAsync(ct, TimeSpan.FromSeconds(10));
+        if (string.Equals(req.SecType, "OPT", StringComparison.OrdinalIgnoreCase))
+            ValidateOption(req);
 
-        var result = await _client.PlaceOrderAsync(
-            req.Symbol.Trim().ToUpperInvariant(), req.Side, req.Type, req.Quantity,
-            req.LimitPrice, ct, _timeout);
+        var result = await _client.PlaceOrderAsync(req, ct, _timeout);
 
         var order = new Order
         {
@@ -167,6 +168,16 @@ public class OrderService : IOrderService
             if (req.LimitPrice.Value <= 0)
                 throw new ArgumentException("LimitPrice 必须为正");
         }
+    }
+
+    private static void ValidateOption(PlaceOrderRequest req)
+    {
+        if (req.Strike is null or <= 0)
+            throw new ArgumentException("期权单必须提供 Strike");
+        if (string.IsNullOrWhiteSpace(req.Right))
+            throw new ArgumentException("期权单必须提供 Right（C/P）");
+        if (string.IsNullOrWhiteSpace(req.Expiry))
+            throw new ArgumentException("期权单必须提供 Expiry");
     }
 
     /// <summary>

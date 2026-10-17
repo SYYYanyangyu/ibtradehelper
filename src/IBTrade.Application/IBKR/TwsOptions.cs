@@ -9,13 +9,26 @@ public class TwsOptions
     public string Host { get; set; } = "127.0.0.1";
 
     /// <summary>API 端口：TWS 实盘 7496 / TWS 模拟 7497 / IB Gateway 实盘 4001 / 模拟 4002。</summary>
-    public int Port { get; set; } = 7497;
+    public int Port { get; set; } = 4002;
 
-    /// <summary>
-    /// 候选端口列表：同步时依次尝试，哪个开着连哪个，从而同时兼容 TWS 与 IB Gateway。
-    /// 若显式设置了单端口（TWS:Port），则只用该端口。
-    /// </summary>
-    public int[] Ports { get; set; } = { 7497, 7496, 4002, 4001 };
+    /// <summary>Paper 只连这些口：Gateway 模拟 4002、TWS 模拟 7497。绝不混扫实盘口。</summary>
+    public int[] PaperPorts { get; set; } = { 4002, 7497 };
+
+    /// <summary>Live 只连这些口：Gateway 实盘 4001、TWS 实盘 7496。</summary>
+    public int[] LivePorts { get; set; } = { 4001, 7496 };
+
+    /// <summary>兼容旧配置。新逻辑请用 <see cref="PortsFor"/>。</summary>
+    public int[] Ports { get; set; } = { 4002, 7497 };
+
+    public int[] PortsFor(TradingMode mode)
+    {
+        var list = mode == TradingMode.Live ? LivePorts : PaperPorts;
+        if (list is { Length: > 0 }) return list;
+        return mode == TradingMode.Live ? new[] { 4001, 7496 } : new[] { 4002, 7497 };
+    }
+
+    public static bool IsLivePort(int port) => port is 4001 or 7496;
+    public static bool IsPaperPort(int port) => port is 4002 or 7497;
 
     /// <summary>客户端 ID（同一 TWS 实例可连多个，需各不相同）。</summary>
     public int ClientId { get; set; } = 1;

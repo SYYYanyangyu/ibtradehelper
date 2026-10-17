@@ -20,6 +20,7 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
         builder.Property(x => x.Quantity).HasPrecision(18, 6);
         builder.Property(x => x.AvgCost).HasPrecision(18, 6);
         builder.Property(x => x.MarketPrice).HasPrecision(18, 6);
+        builder.Property(x => x.Multiplier).HasPrecision(18, 6).HasDefaultValue(1m);
         builder.Property(x => x.Source).HasMaxLength(16).IsRequired();
         builder.Property(x => x.PriceSource).HasMaxLength(16).IsRequired();
 

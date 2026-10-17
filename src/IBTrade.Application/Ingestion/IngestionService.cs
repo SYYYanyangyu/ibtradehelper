@@ -84,6 +84,7 @@ public class IngestionService(
                     Quantity = p.Quantity,
                     AvgCost = p.AvgCost,
                     MarketPrice = p.MarketPrice,
+                    Multiplier = p.Multiplier > 0 ? p.Multiplier : 1m,
                     Source = DataSources.Flex,
                     PriceSource = DataSources.Flex
                 }).ToList();

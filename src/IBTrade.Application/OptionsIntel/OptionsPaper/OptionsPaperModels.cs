@@ -6,11 +6,11 @@ namespace IBTrade.Application.OptionsIntel.OptionsPaper;
 public class OptionsPaperSettings
 {
     public string Symbol { get; set; } = "AAPL";
-    public decimal Quantity { get; set; } = 10;
+    public decimal Quantity { get; set; } = 1;
     public int PollSeconds { get; set; } = 90;
     /// <summary>预测概率变动阈值（绝对值，0.03 = 3 个百分点）。第一次采样只建基线，不交易。</summary>
     public decimal MinProbMove { get; set; } = 0.03m;
-    /// <summary>尝试向 IB Gateway Paper 发单。失败（周末/未连）则按最新官方现价本地记账。</summary>
+    /// <summary>必须向 IB Gateway Paper 发真实期权单。禁止本地假成交。</summary>
     public bool SendToGateway { get; set; } = true;
 }
 

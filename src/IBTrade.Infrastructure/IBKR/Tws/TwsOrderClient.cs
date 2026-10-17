@@ -1,5 +1,7 @@
 using IBApi;
 using IBTrade.Application.IBKR;
+using IBTrade.Application.Orders;
+using IBTrade.Application.Orders.Dtos;
 using IBTrade.Domain.Enums;
 
 namespace IBTrade.Infrastructure.IBKR.Tws;
@@ -11,8 +13,9 @@ namespace IBTrade.Infrastructure.IBKR.Tws;
 /// </summary>
 public class TwsOrderClient : DefaultEWrapper, IAsyncDisposable
 {
+    private readonly TwsOptions _options;
+    private readonly IRiskGuard _risk;
     private readonly string _host;
-    private readonly int[] _ports;
     private readonly int _clientId;
 
     private EClientSocket? _client;
@@ -22,15 +25,22 @@ public class TwsOrderClient : DefaultEWrapper, IAsyncDisposable
     private readonly object _lock = new();
     private int _nextOrderId = -1;
     private int _connectedPort;
-    private readonly TaskCompletionSource<int> _orderIdTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private TaskCompletionSource<int> _orderIdTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly Dictionary<int, BrokerOrderState> _states = new();
 
-    public TwsOrderClient(TwsOptions options)
+    public TwsOrderClient(TwsOptions options, IRiskGuard risk)
     {
+        _options = options;
+        _risk = risk;
         _host = options.Host;
-        _ports = options.Ports;
         _clientId = options.OrderClientId;
     }
+
+    private TradingMode ActiveMode => _risk.Settings.Mode == TradingMode.Live
+        ? TradingMode.Live
+        : TradingMode.Paper;
+
+    private int[] AllowedPorts => _options.PortsFor(ActiveMode);
 
     public bool IsConnected => _client is not null && _client.IsConnected();
     public int ConnectedPort => _connectedPort;
@@ -39,11 +49,19 @@ public class TwsOrderClient : DefaultEWrapper, IAsyncDisposable
 
     public async Task EnsureConnectedAsync(CancellationToken ct, TimeSpan timeout)
     {
-        if (IsConnected) return;
+        var ports = AllowedPorts;
+        if (IsConnected && ports.Contains(_connectedPort)) return;
+        if (IsConnected)
+        {
+            try { _client?.eDisconnect(); } catch { }
+            _client = null;
+        }
 
         Exception? lastError = null;
-        foreach (var port in _ports)
+        foreach (var port in ports)
         {
+            if (_orderIdTcs.Task.IsCompleted)
+                _orderIdTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
             try
             {
                 _signal = new EReaderMonitorSignal();
@@ -84,44 +102,42 @@ public class TwsOrderClient : DefaultEWrapper, IAsyncDisposable
             }
         }
         throw new InvalidOperationException(
-            $"下单客户端无法连接到任何端口（{string.Join(", ", _ports)}）。请确认 IB Gateway 已启动、已开启 API，且启用了 “Enable Multiple Clients”（与看板推送共用同一 Gateway 需多客户端支持）。",
+            $"下单客户端无法连接到 {ActiveMode} 端口（{string.Join(", ", ports)}）。Paper 只连 4002/7497，Live 只连 4001/7496。请确认对应 Gateway 已登录并开启 API。",
             lastError);
     }
 
     /// <summary>下限价/市价单，等待进入终态或超时后返回结果。</summary>
     public async Task<OrderResult> PlaceOrderAsync(
-        string symbol, OrderSide side, OrderType type, decimal quantity, decimal? limitPrice,
-        CancellationToken ct, TimeSpan timeout)
+        PlaceOrderRequest req, CancellationToken ct, TimeSpan timeout)
     {
         await EnsureConnectedAsync(ct, timeout);
+        if (ActiveMode == TradingMode.Paper && TwsOptions.IsLivePort(_connectedPort))
+            throw new InvalidOperationException($"风控为 Paper，但已连实盘口 {_connectedPort}，已拒绝下单。");
+        if (ActiveMode == TradingMode.Live && TwsOptions.IsPaperPort(_connectedPort))
+            throw new InvalidOperationException($"风控为 Live，但已连模拟口 {_connectedPort}，已拒绝下单。");
 
+        var symbol = req.Symbol.Trim().ToUpperInvariant();
         int id = Interlocked.Increment(ref _nextOrderId);
         var state = new BrokerOrderState
         {
             BrokerOrderId = id,
             Symbol = symbol,
-            Side = side,
-            Quantity = quantity,
+            Side = req.Side,
+            Quantity = req.Quantity,
             Status = OrderStatus.PendingSubmit,
             CreatedAt = DateTime.UtcNow
         };
         lock (_lock) _states[id] = state;
 
-        var contract = new Contract
-        {
-            Symbol = symbol,
-            SecType = "STK",
-            Exchange = "SMART",
-            Currency = "USD"
-        };
+        var contract = BuildContract(req);
         var order = new Order
         {
-            Action = side == OrderSide.Buy ? "BUY" : "SELL",
-            TotalQuantity = (double)quantity,
-            OrderType = type == OrderType.Limit ? "LMT" : "MKT"
+            Action = req.Side == OrderSide.Buy ? "BUY" : "SELL",
+            TotalQuantity = (double)req.Quantity,
+            OrderType = req.Type == OrderType.Limit ? "LMT" : "MKT"
         };
-        if (type == OrderType.Limit && limitPrice.HasValue)
-            order.LmtPrice = (double)limitPrice.Value;
+        if (req.Type == OrderType.Limit && req.LimitPrice.HasValue)
+            order.LmtPrice = (double)req.LimitPrice.Value;
 
         _client!.placeOrder(id, contract, order);
 
@@ -230,6 +246,60 @@ public class TwsOrderClient : DefaultEWrapper, IAsyncDisposable
     }
 
     // ---------------- 内部辅助 ----------------
+
+    private static Contract BuildContract(PlaceOrderRequest req)
+    {
+        var symbol = req.Symbol.Trim().ToUpperInvariant();
+        var sec = string.IsNullOrWhiteSpace(req.SecType) ? "STK" : req.SecType.Trim().ToUpperInvariant();
+        if (sec is not ("STK" or "OPT"))
+            throw new InvalidOperationException($"不支持的 SecType={sec}，仅 STK / OPT。");
+
+        if (sec == "STK")
+        {
+            return new Contract
+            {
+                Symbol = symbol,
+                SecType = "STK",
+                Exchange = "SMART",
+                Currency = "USD"
+            };
+        }
+
+        if (req.Strike is null or <= 0 || string.IsNullOrWhiteSpace(req.Right) || string.IsNullOrWhiteSpace(req.Expiry))
+            throw new InvalidOperationException("期权单必须提供 Expiry、Strike、Right（C/P）。");
+
+        var right = req.Right.Trim().ToUpperInvariant();
+        if (right is "CALL") right = "C";
+        if (right is "PUT") right = "P";
+        if (right is not ("C" or "P"))
+            throw new InvalidOperationException("Right 只能是 C 或 P。");
+
+        return new Contract
+        {
+            Symbol = UnderlyingFromOcc(symbol),
+            SecType = "OPT",
+            LastTradeDateOrContractMonth = NormalizeExpiry(req.Expiry),
+            Strike = (double)req.Strike.Value,
+            Right = right,
+            Multiplier = req.Multiplier > 0 ? ((int)req.Multiplier).ToString() : "100",
+            Exchange = "SMART",
+            Currency = "USD"
+        };
+    }
+
+    private static string UnderlyingFromOcc(string symbol)
+    {
+        if (symbol.Length >= 15 && symbol.Any(char.IsDigit))
+            return symbol.Trim()[..6].Trim();
+        return symbol;
+    }
+
+    private static string NormalizeExpiry(string raw)
+    {
+        var s = raw.Trim().Replace("-", "", StringComparison.Ordinal);
+        if (s.Length >= 8 && s[..8].All(char.IsDigit)) return s[..8];
+        throw new InvalidOperationException($"到期日无效：{raw}");
+    }
 
     private static OrderResult ToResult(BrokerOrderState? st) => st is null
         ? new OrderResult { Status = OrderStatus.Failed, LastError = "订单状态丢失" }

@@ -23,7 +23,7 @@ public class TwsSyncService(
     {
         Exception? lastError = null;
         var syncClientId = options.ClientId + 1;
-        foreach (var port in options.Ports)
+        foreach (var port in options.PortsFor(options.Mode))
         {
             try
             {
@@ -45,7 +45,7 @@ public class TwsSyncService(
         }
 
         throw new InvalidOperationException(
-            $"无法连接到任何端口（{string.Join(", ", options.Ports)}）。请确认 IB Gateway 已启动并开启 API，Trusted IP 含 127.0.0.1。",
+            $"无法连接到 {options.Mode} 端口（{string.Join(", ", options.PortsFor(options.Mode))}）。Paper 只连 4002/7497，Live 只连 4001/7496。",
             lastError);
     }
 
@@ -77,6 +77,7 @@ public class TwsSyncService(
             Quantity = p.Quantity,
             AvgCost = p.AvgCost,
             MarketPrice = p.MarketPrice,
+            Multiplier = p.Multiplier > 0 ? p.Multiplier : (p.AssetType == AssetType.Option ? 100m : 1m),
             Source = DataSources.Gateway,
             PriceSource = DataSources.Gateway
         }).ToList();

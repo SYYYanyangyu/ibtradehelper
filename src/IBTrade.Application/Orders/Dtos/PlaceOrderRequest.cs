@@ -29,4 +29,19 @@ public class PlaceOrderRequest
     public string? Strategy { get; set; }
 
     public string? Note { get; set; }
+
+    /// <summary>STK 正股 / OPT 期权。默认正股。</summary>
+    public string SecType { get; set; } = "STK";
+
+    /// <summary>期权到期，yyyy-MM-dd 或 yyyyMMdd。</summary>
+    public string? Expiry { get; set; }
+
+    /// <summary>期权行权价。</summary>
+    public decimal? Strike { get; set; }
+
+    /// <summary>C 或 P。</summary>
+    public string? Right { get; set; }
+
+    /// <summary>合约乘数。期权默认 100，正股 1。</summary>
+    public decimal Multiplier { get; set; }
 }

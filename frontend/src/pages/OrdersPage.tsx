@@ -50,6 +50,11 @@ export function OrdersPage() {
   const [type, setType] = useState<OrderType>('Market')
   const [quantity, setQuantity] = useState('')
   const [limitPrice, setLimitPrice] = useState('')
+  const [estimatedPrice, setEstimatedPrice] = useState('')
+  const [secType, setSecType] = useState<'STK' | 'OPT'>('STK')
+  const [expiry, setExpiry] = useState('')
+  const [strike, setStrike] = useState('')
+  const [right, setRight] = useState<'C' | 'P'>('C')
   const [note, setNote] = useState('')
   const [confirmLive, setConfirmLive] = useState(false)
 
@@ -94,6 +99,14 @@ export function OrdersPage() {
       const lp = Number(limitPrice)
       if (!lp || lp <= 0) return showToast('err', '限价单需填写有效的限价')
     }
+    const est = Number(estimatedPrice)
+    if (type === 'Market' && (!est || est <= 0)) {
+      return showToast('err', '市价单必须填写参考价，风控按 数量×价格×乘数 校验金额')
+    }
+    if (secType === 'OPT') {
+      if (!expiry.trim()) return showToast('err', '期权单必须填写到期日')
+      if (!Number(strike) || Number(strike) <= 0) return showToast('err', '期权单必须填写行权价')
+    }
     if (risk?.mode === 'Live' && !confirmLive) {
       return showToast('err', '实盘模式下请先勾选风险确认')
     }
@@ -106,12 +119,19 @@ export function OrdersPage() {
         type,
         quantity: qty,
         limitPrice: type === 'Limit' ? Number(limitPrice) : null,
+        estimatedPrice: est > 0 ? est : type === 'Limit' ? Number(limitPrice) : null,
+        secType,
+        expiry: secType === 'OPT' ? expiry.trim() : null,
+        strike: secType === 'OPT' ? Number(strike) : null,
+        right: secType === 'OPT' ? right : null,
+        multiplier: secType === 'OPT' ? 100 : 1,
         note: note.trim() || null
       })
       showToast('ok', `${sym} ${side === 'Buy' ? '买入' : '卖出'} 订单已提交`)
       setSymbol('')
       setQuantity('')
       setLimitPrice('')
+      setEstimatedPrice('')
       setNote('')
       setConfirmLive(false)
       await load()
@@ -186,7 +206,9 @@ export function OrdersPage() {
         <Card className="animate-fade-up">
           <CardHeader>
             <CardTitle>Trading</CardTitle>
-            <span className="text-xs text-muted-2">默认 Paper 模拟盘 · 受风控拦截</span>
+            <span className="text-xs text-muted-2">
+              Paper 只连 4002/7497 · Live 只连 4001/7496 · 期权按乘数 100 计金额
+            </span>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLive && (
@@ -208,6 +230,26 @@ export function OrdersPage() {
                   placeholder="如 AAPL / TSLA"
                   className={cn(inputCls, 'uppercase')}
                 />
+              </div>
+
+              <div className="col-span-2">
+                <label className="mb-1 block text-xs text-muted">品种</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['STK', 'OPT'] as const).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setSecType(t)}
+                      className={cn(
+                        'rounded-lg border px-3 py-2 text-sm font-medium transition',
+                        secType === t
+                          ? 'border-primary/40 bg-primary/10 text-primary'
+                          : 'border-border bg-surface/60 text-muted hover:bg-surface-2'
+                      )}
+                    >
+                      {t === 'STK' ? '正股 STK' : '期权 OPT'}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div>
@@ -279,6 +321,64 @@ export function OrdersPage() {
                 />
               </div>
 
+              <div>
+                <label className="mb-1 block text-xs text-muted">参考价 {type === 'Market' ? '（市价必填）' : '（可选）'}</label>
+                <input
+                  type="number"
+                  min={0}
+                  step="any"
+                  value={estimatedPrice}
+                  onChange={(e) => setEstimatedPrice(e.target.value)}
+                  placeholder={secType === 'OPT' ? '每股权利金' : '最新价'}
+                  className={inputCls}
+                />
+              </div>
+
+              {secType === 'OPT' && (
+                <>
+                  <div>
+                    <label className="mb-1 block text-xs text-muted">到期 yyyy-MM-dd</label>
+                    <input
+                      value={expiry}
+                      onChange={(e) => setExpiry(e.target.value)}
+                      placeholder="2026-10-24"
+                      className={inputCls}
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-muted">行权价</label>
+                    <input
+                      type="number"
+                      min={0}
+                      step="any"
+                      value={strike}
+                      onChange={(e) => setStrike(e.target.value)}
+                      placeholder="0.00"
+                      className={inputCls}
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="mb-1 block text-xs text-muted">权利</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(['C', 'P'] as const).map((r) => (
+                        <button
+                          key={r}
+                          onClick={() => setRight(r)}
+                          className={cn(
+                            'rounded-lg border px-3 py-2 text-sm font-medium transition',
+                            right === r
+                              ? 'border-primary/40 bg-primary/10 text-primary'
+                              : 'border-border bg-surface/60 text-muted hover:bg-surface-2'
+                          )}
+                        >
+                          {r === 'C' ? 'Call' : 'Put'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div className="col-span-2">
                 <label className="mb-1 block text-xs text-muted">备注（可选）</label>
                 <input
@@ -320,7 +420,7 @@ export function OrdersPage() {
         <Card className="animate-fade-up">
           <CardHeader>
             <CardTitle>风控配置</CardTitle>
-            <span className="text-xs text-muted-2">实时生效 · 拦截越界交易</span>
+            <span className="text-xs text-muted-2">保存后写入磁盘 · Paper 只连模拟口 · 期权金额含乘数</span>
           </CardHeader>
           <CardContent className="space-y-4">
             {riskDraft ? (
