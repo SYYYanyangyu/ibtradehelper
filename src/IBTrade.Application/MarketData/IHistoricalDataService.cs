@@ -11,5 +11,8 @@ public interface IHistoricalDataService
         string? currency = "USD",
         string duration = "1 Y",
         string barSize = "1 day",
-        CancellationToken ct = default);
+        CancellationToken ct = default,
+        string? secType = null,
+        string? whatToShow = null,
+        string? endDateTime = null);
 }

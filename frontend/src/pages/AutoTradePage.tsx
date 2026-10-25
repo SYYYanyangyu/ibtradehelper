@@ -19,6 +19,8 @@ import {
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
+import { TrendScalperCard } from '../components/TrendScalperCard'
+import { MarketNewsCard } from '../components/MarketNewsCard'
 import { cn, fmtMoney, fmtNum, signalMeta, modeMeta, dryRunMeta, eventTypeMeta, orderTypeLabel, fmtTime } from '../lib/utils'
 import {
   getAutoTradeStatus,
@@ -369,6 +371,9 @@ export function AutoTradePage() {
           </button>
         </div>
       </section>
+
+      <TrendScalperCard />
+      <MarketNewsCard />
 
       {/* ── 概览指标 ── */}
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">

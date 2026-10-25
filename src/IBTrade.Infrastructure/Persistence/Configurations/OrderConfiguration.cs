@@ -14,6 +14,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.Symbol).HasMaxLength(32).IsRequired();
         builder.Property(x => x.Quantity).HasPrecision(18, 6);
         builder.Property(x => x.LimitPrice).HasPrecision(18, 6);
+        builder.Property(x => x.SecType).HasMaxLength(8);
+        builder.Property(x => x.Expiry).HasMaxLength(8);
+        builder.Property(x => x.Strike).HasPrecision(18, 6);
+        builder.Property(x => x.Right).HasMaxLength(1);
+        builder.Property(x => x.Multiplier).HasPrecision(18, 6);
         builder.Property(x => x.FilledQuantity).HasPrecision(18, 6);
         builder.Property(x => x.AvgFillPrice).HasPrecision(18, 6);
         builder.Property(x => x.Strategy).HasMaxLength(64);

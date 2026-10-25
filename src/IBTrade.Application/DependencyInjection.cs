@@ -2,6 +2,7 @@ using IBTrade.Application.Ai;
 using IBTrade.Application.AutoTrade;
 using IBTrade.Application.Backtest;
 using IBTrade.Application.Backtest.Strategies;
+using IBTrade.Application.Discipline;
 using IBTrade.Application.IBKR;
 using IBTrade.Application.Ingestion;
 using IBTrade.Application.MarketData;
@@ -9,6 +10,7 @@ using IBTrade.Application.OptionsIntel;
 using IBTrade.Application.OptionsIntel.OptionsPaper;
 using IBTrade.Application.Portfolio;
 using IBTrade.Application.Positions;
+using IBTrade.Application.Quant.TrendScalper;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IBTrade.Application;
@@ -23,13 +25,20 @@ public static class DependencyInjection
         services.AddScoped<IPositionService, PositionService>();
         services.AddScoped<IPortfolioService, PortfolioService>();
         services.AddScoped<IRealizedPnlService, RealizedPnlService>();
+        services.AddScoped<ITradePnlService, TradePnlService>();
+        services.AddScoped<IWeeklyReviewService, WeeklyReviewService>();
         services.AddScoped<IIngestionService, IngestionService>();
         services.AddScoped<ISnapshotService, SnapshotService>();
         services.AddScoped<IDailyPnlService, DailyPnlService>();
         services.AddScoped<IPositionDailyPnlService, PositionDailyPnlService>();
         services.AddScoped<ITwsSyncService, TwsSyncService>();
         // 历史行情服务：短连接拉数，无状态，注册为单例（供回测与自动交易引擎共用）
-        services.AddSingleton<IHistoricalDataService, HistoricalDataService>();
+        services.AddSingleton<HistoricalDataService>();
+        services.AddSingleton<IHistoricalDataService>(sp => sp.GetRequiredService<HistoricalDataService>());
+        services.AddSingleton<IGatewayNewsSource>(sp => sp.GetRequiredService<HistoricalDataService>());
+        services.AddSingleton<MarketNewsService>();
+        services.AddSingleton<IndexHistoryCache>();
+        services.AddScoped<IPerformanceCompareService, PerformanceCompareService>();
         // 回测模块（与看板解耦）：策略以 IStrategy 注册，工厂自动汇总。
         // 策略为无状态计算，注册为单例，供自动交易引擎（同样单例）直接消费。
         services.AddSingleton<IStrategy, SmaCrossStrategy>();
@@ -47,6 +56,9 @@ public static class DependencyInjection
         services.AddScoped<IOptionsIntelService, OptionsIntelService>();
         services.AddSingleton<PredictionSnapshotStore>();
         services.AddSingleton<IOptionsPaperEngine, OptionsPaperEngine>();
+        services.AddSingleton<MarketContextProvider>();
+        services.AddSingleton<IDisciplineGate, DisciplineGate>();
+        services.AddSingleton<ITrendScalperEngine, TrendScalperEngine>();
         return services;
     }
 }

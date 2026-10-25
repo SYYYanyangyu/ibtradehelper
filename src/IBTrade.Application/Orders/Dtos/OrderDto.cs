@@ -12,6 +12,10 @@ public class OrderDto
     public OrderType Type { get; set; }
     public decimal Quantity { get; set; }
     public decimal? LimitPrice { get; set; }
+    public string? SecType { get; set; }
+    public string? Expiry { get; set; }
+    public decimal? Strike { get; set; }
+    public string? Right { get; set; }
     public OrderStatus Status { get; set; }
     public decimal FilledQuantity { get; set; }
     public decimal AvgFillPrice { get; set; }

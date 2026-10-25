@@ -81,7 +81,7 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
       <Card className="animate-fade-up">
         <CardHeader>
           <CardTitle>Trades</CardTitle>
-          <span className="text-xs text-muted-2">Buy / sell shares & notional</span>
+          <span className="text-xs text-muted-2">Flex 成交：数量与成交额（期权已含乘数）</span>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center gap-2 py-12 text-center">
@@ -115,8 +115,8 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
               <span className="ml-auto text-xs text-muted-2">{buys.length}</span>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <Metric label="Shares" value={fmtNum(buyShares)} tone="up" />
-              <Metric label="Notional" value={fmtMoney(buyGross, currency)} tone="up" />
+              <Metric label="数量（股/张）" value={fmtNum(buyShares)} tone="up" />
+              <Metric label="成交额" value={fmtMoney(buyGross, currency)} tone="up" />
             </div>
           </div>
           <div className="rounded-xl border border-border bg-surface-2/40 p-4">
@@ -125,14 +125,14 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
               <span className="ml-auto text-xs text-muted-2">{sells.length}</span>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <Metric label="Shares" value={fmtNum(sellShares)} tone="down" />
-              <Metric label="Notional" value={fmtMoney(sellGross, currency)} tone="down" />
+              <Metric label="数量（股/张）" value={fmtNum(sellShares)} tone="down" />
+              <Metric label="成交额" value={fmtMoney(sellGross, currency)} tone="down" />
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-between rounded-xl bg-surface-2/60 px-4 py-2.5 text-sm">
-          <span className="text-muted">Net cash (buy − sell)</span>
+          <span className="text-muted">净现金（卖出回笼 − 买入支出，已含佣金）</span>
           <span className={cn('font-semibold tabular-nums', gainClass(netCash))}>
             {fmtMoney(netCash, currency)}
           </span>
@@ -142,7 +142,7 @@ export function TradeSummary({ trades, currency, envLabel }: Props) {
         {bySymbol.length > 0 && (
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-medium text-muted">Notional by symbol</p>
+              <p className="text-xs font-medium text-muted">成交额（按标的）</p>
               {filterSymbol && (
                 <button
                   type="button"

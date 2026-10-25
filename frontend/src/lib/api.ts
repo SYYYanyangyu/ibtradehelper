@@ -3,7 +3,10 @@ import type {
   PositionLite,
   CashTransaction,
   DailyPnlPoint,
+  PerformanceCompare,
+  PerformanceRange,
   PositionDailyPnl,
+  TradePnl,
   TradeRecord,
   OrderDto,
   RiskSettings,
@@ -11,7 +14,14 @@ import type {
   OrderType,
   AutoTradeStatus,
   AutoTradeSymbolConfig,
-  AutoTradeSettings
+  AutoTradeSettings,
+  TrendScalperSettings,
+  TrendScalperStatus,
+  DisciplineSettings,
+  DisciplineStatus,
+  DisciplineCheckResult,
+  WeeklyReview,
+  MarketNewsFeed
 } from '../types'
 
 const API_BASE: string =
@@ -126,6 +136,19 @@ export function getDailyPnl(accountId?: string, days = 30, env?: TradeEnvFilter)
   return getJson<DailyPnlPoint[]>(url.toString())
 }
 
+/** 组合 vs 恒生/美股三大指数的区间收益率（Flex NAV + Gateway 指数日线）。 */
+export function getPerformance(
+  accountId?: string,
+  range: PerformanceRange | string = '1Y',
+  env?: TradeEnvFilter
+): Promise<PerformanceCompare> {
+  const url = new URL('/api/portfolio/performance', API_BASE)
+  if (accountId) url.searchParams.set('accountId', accountId)
+  if (env) url.searchParams.set('env', env)
+  url.searchParams.set('range', range)
+  return getJson<PerformanceCompare>(url.toString())
+}
+
 /** 查最近 days 天的外部现金流（入金/出金/股息等）。不传 accountId 取跨账户汇总。 */
 export function getCashTransactions(accountId?: string, days = 30): Promise<CashTransaction[]> {
   const url = new URL('/api/portfolio/cash-transactions', API_BASE)
@@ -158,6 +181,14 @@ export function getTrades(
   if (env) url.searchParams.set('env', env)
   url.searchParams.set('days', String(days))
   return getJson<TradeRecord[]>(url.toString())
+}
+
+/** 逐笔 FIFO 平仓盈亏。不传 accountId/env 为全部账户。 */
+export function getTradePnl(accountId?: string, env?: TradeEnvFilter): Promise<TradePnl> {
+  const url = new URL('/api/portfolio/trade-pnl', API_BASE)
+  if (accountId) url.searchParams.set('accountId', accountId)
+  if (env) url.searchParams.set('env', env)
+  return getJson<TradePnl>(url.toString())
 }
 
 /** 记录一笔外部现金流。金额符号会按类型自动归一（入金/股息/利息为正，出金/费用为负）。 */
@@ -658,4 +689,65 @@ export function evaluateAutoTrade(symbol: string): Promise<{ evaluated: string }
     { method: 'POST' },
     EVAL_TIMEOUT
   )
+}
+
+// ---- QQQ 0DTE 顺势短线（调 /api/trend-scalper，只 Paper）----
+
+const TREND = '/api/trend-scalper'
+
+export function getTrendScalper(): Promise<TrendScalperStatus> {
+  return getJson<TrendScalperStatus>(new URL(TREND, API_BASE).toString())
+}
+
+export function updateTrendScalperSettings(s: TrendScalperSettings): Promise<TrendScalperStatus> {
+  return req<TrendScalperStatus>(new URL(`${TREND}/settings`, API_BASE).toString(), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(s)
+  })
+}
+
+export function trendScalperAction(action: 'start' | 'stop' | 'tick' | 'flatten'): Promise<TrendScalperStatus> {
+  return req<TrendScalperStatus>(
+    new URL(`${TREND}/${action}`, API_BASE).toString(),
+    { method: 'POST' },
+    action === 'stop' ? 20000 : EVAL_TIMEOUT
+  )
+}
+
+const DISCIPLINE = '/api/discipline'
+
+export function getDiscipline(): Promise<DisciplineStatus> {
+  return getJson<DisciplineStatus>(new URL(DISCIPLINE, API_BASE).toString())
+}
+
+export function updateDisciplineSettings(s: DisciplineSettings): Promise<DisciplineStatus> {
+  return req<DisciplineStatus>(new URL(`${DISCIPLINE}/settings`, API_BASE).toString(), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(s)
+  })
+}
+
+/** 纪律预检（不下单）：顺势项要拉分钟线，放宽超时。 */
+export function checkDiscipline(body: PlaceOrderRequest): Promise<DisciplineCheckResult> {
+  return req<DisciplineCheckResult>(new URL(`${DISCIPLINE}/check`, API_BASE).toString(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, EVAL_TIMEOUT)
+}
+
+export function getWeeklyReview(accountId?: string, env?: TradeEnvFilter, weeks = 8): Promise<WeeklyReview> {
+  const url = new URL('/api/portfolio/weekly-review', API_BASE)
+  if (accountId) url.searchParams.set('accountId', accountId)
+  if (env) url.searchParams.set('env', env)
+  url.searchParams.set('weeks', String(weeks))
+  return req<WeeklyReview>(url.toString(), undefined, EVAL_TIMEOUT)
+}
+
+export function getMarketNews(symbol = 'QQQ'): Promise<MarketNewsFeed> {
+  const url = new URL('/api/market-news', API_BASE)
+  url.searchParams.set('symbol', symbol)
+  return req<MarketNewsFeed>(url.toString(), undefined, EVAL_TIMEOUT)
 }

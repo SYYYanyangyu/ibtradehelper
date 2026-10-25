@@ -22,6 +22,7 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
   const [month, setMonth] = useState(() => months[months.length - 1] ?? '')
   const safeMonth = months.includes(month) ? month : (months[months.length - 1] ?? '')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [metric, setMetric] = useState<MetricMode>(readMetricMode)
 
   const monthDays = useMemo(
     () =>
@@ -35,8 +36,17 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
     const monthPnl = monthDays.reduce((s, d) => s + d.dailyPnl, 0)
     const up = monthDays.filter((d) => d.dailyPnl > 0).length
     const down = monthDays.filter((d) => d.dailyPnl < 0).length
-    return { monthPnl, up, down }
+    return { monthPnl, monthPct: monthReturnPct(monthDays), up, down }
   }, [monthDays])
+
+  function changeMetric(next: MetricMode) {
+    setMetric(next)
+    try {
+      localStorage.setItem(METRIC_KEY, next)
+    } catch {
+      /* ignore */
+    }
+  }
 
   useEffect(() => {
     if (!monthDays.length) {
@@ -91,12 +101,20 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
               <p
                 className={cn(
                   'mt-2 text-4xl font-semibold tracking-[-0.03em] tabular sm:text-[2.75rem]',
-                  gainClass(summary.monthPnl)
+                  gainClass(metric === 'pct' ? (summary.monthPct ?? 0) : summary.monthPnl)
                 )}
               >
-                {summary.monthPnl > 0 ? '+' : ''}
-                {fmtMoney(summary.monthPnl, currency)}
+                {metric === 'pct'
+                  ? summary.monthPct == null
+                    ? '—'
+                    : fmtPct(summary.monthPct, false)
+                  : `${summary.monthPnl > 0 ? '+' : ''}${fmtMoney(summary.monthPnl, currency)}`}
               </p>
+              {metric === 'both' && summary.monthPct != null && (
+                <p className={cn('mt-1 text-sm font-medium tabular', gainClass(summary.monthPct))}>
+                  {fmtPct(summary.monthPct, false)}
+                </p>
+              )}
             </div>
             <p className="pb-1 text-sm text-muted-2">
               <span className="text-foreground">{monthDays.length}</span> 天记录
@@ -112,6 +130,8 @@ export function DailyPnlPanel({ data, currency, env, accountId }: Props) {
             points={monthDays}
             selectedDate={selectedDate}
             selectedIdx={selectedIdx}
+            metric={metric}
+            onMetric={changeMetric}
             onSelect={setSelectedDate}
           />
 
@@ -225,6 +245,25 @@ function weekdayLabel(iso: string): string {
   ]
 }
 
+type MetricMode = 'amount' | 'pct' | 'both'
+
+const METRIC_KEY = 'ibtrade-dailypnl-metric'
+const METRIC_OPTIONS: { id: MetricMode; label: string }[] = [
+  { id: 'amount', label: '金额' },
+  { id: 'pct', label: '百分比' },
+  { id: 'both', label: '全部' }
+]
+
+function readMetricMode(): MetricMode {
+  try {
+    const v = localStorage.getItem(METRIC_KEY)
+    if (v === 'amount' || v === 'pct' || v === 'both') return v
+  } catch {
+    /* ignore */
+  }
+  return 'both'
+}
+
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'] as const
 
 function monthsBetween(data: DailyPnlPoint[]): string[] {
@@ -277,20 +316,41 @@ function MonthCalendar({
   points,
   selectedDate,
   selectedIdx,
+  metric,
+  onMetric,
   onSelect
 }: {
   month: string
   points: DailyPnlPoint[]
   selectedDate: string | null
   selectedIdx: number
+  metric: MetricMode
+  onMetric: (m: MetricMode) => void
   onSelect: (date: string) => void
 }) {
   const cells = useMemo(() => buildMonthCells(month, points), [month, points])
+  const tall = metric === 'both'
   return (
     <div className="mt-6">
-      <div className="mb-2 flex items-center justify-between text-[11px] text-muted-2">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-2">
         <span>本月日历</span>
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-2">
+          <span className="flex rounded-md bg-surface-2/80 p-0.5">
+            {METRIC_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => onMetric(opt.id)}
+                className={cn(
+                  'rounded px-2 py-0.5 text-[11px] font-medium transition',
+                  metric === opt.id ? 'bg-surface text-foreground shadow-soft' : 'text-muted hover:text-foreground'
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </span>
+          <span className="flex items-center gap-1">
           <button
             type="button"
             aria-label="Previous day"
@@ -311,6 +371,7 @@ function MonthCalendar({
           >
             <ChevronRight size={14} />
           </button>
+          </span>
         </span>
       </div>
       <div className="grid grid-cols-7 gap-1">
@@ -337,7 +398,8 @@ function MonthCalendar({
               <div
                 key={cell.key}
                 className={cn(
-                  'flex min-h-[3.25rem] flex-col items-center rounded-lg px-1 py-1.5',
+                  'flex flex-col items-center rounded-lg px-1 py-1.5',
+                  tall ? 'min-h-[4.25rem]' : 'min-h-[3.25rem]',
                   weekend ? 'text-muted-2/50' : 'text-muted-2/70'
                 )}
               >
@@ -351,14 +413,28 @@ function MonthCalendar({
               type="button"
               onClick={() => onSelect(point.date)}
               className={cn(
-                'flex min-h-[3.25rem] flex-col items-center rounded-lg px-1 py-1.5 transition',
+                'flex flex-col items-center rounded-lg px-1 py-1.5 transition',
+                tall ? 'min-h-[4.25rem]' : 'min-h-[3.25rem]',
                 active ? 'bg-surface-2 ring-1 ring-border' : 'hover:bg-surface-2/60'
               )}
             >
               <span className="text-[11px] tabular text-muted-2">{cell.day}</span>
-              <span className={cn('mt-0.5 text-xs font-semibold tabular', gainClass(point.dailyPnl))}>
-                {compactPnl(point.dailyPnl)}
-              </span>
+              {(metric === 'amount' || metric === 'both') && (
+                <span className={cn('mt-0.5 text-xs font-semibold tabular', gainClass(point.dailyPnl))}>
+                  {compactPnl(point.dailyPnl)}
+                </span>
+              )}
+              {(metric === 'pct' || metric === 'both') && (
+                <span
+                  className={cn(
+                    'tabular',
+                    metric === 'both' ? 'text-[10px] font-medium' : 'mt-0.5 text-xs font-semibold',
+                    gainClass(point.dailyPnlPct)
+                  )}
+                >
+                  {compactPct(point.dailyPnlPct)}
+                </span>
+              )}
               {active && (
                 <span
                   className={cn(
@@ -381,6 +457,24 @@ function compactPnl(v: number): string {
   if (abs >= 1_000_000) return `${sign}${(abs / 1_000_000).toFixed(1)}M`
   if (abs >= 1_000) return `${sign}${(abs / 1_000).toFixed(1)}k`
   return `${sign}${abs.toFixed(0)}`
+}
+
+function compactPct(v: number): string {
+  const abs = Math.abs(v)
+  const digits = abs >= 100 ? 0 : 1
+  return fmtPct(v, false, digits)
+}
+
+/** 本月收益率：月末净值 / 本月首个记录日前净值 − 1。 */
+function monthReturnPct(days: DailyPnlPoint[]): number | null {
+  if (!days.length) return null
+  const first = days[0]
+  const last = days[days.length - 1]
+  const start = first.netLiquidation - first.dailyPnl
+  if (Math.abs(start) >= 1) return ((last.netLiquidation / start) - 1) * 100
+  let growth = 1
+  for (const d of days) growth *= 1 + d.dailyPnlPct / 100
+  return (growth - 1) * 100
 }
 
 function MonthNav({

@@ -233,12 +233,16 @@ public class FlexQueryClient(HttpClient httpClient, ILogger<FlexQueryClient>? lo
 
             foreach (var e in stmt.Descendants("Trade"))
             {
+                var asset = MapAssetType(Attr(e, "assetCategory"));
+                var mult = Dec(e, "multiplier");
+                if (mult <= 0) mult = asset == AssetType.Option ? 100m : 1m;
                 trades.Add(new FlexTradeDto(
-                    Acct(e, stmtAccountId), Attr(e, "symbol"), MapAssetType(Attr(e, "assetCategory")),
+                    Acct(e, stmtAccountId), Attr(e, "symbol"), asset,
                     MapSide(Attr(e, "buySell"), Dec(e, "quantity")),
                     Attr(e, "currency", "USD"),
                     Math.Abs(Dec(e, "quantity")), Dec(e, "tradePrice"),
-                    Dec(e, "ibCommission"), ParseFlexDateTime(Attr(e, "dateTime"))));
+                    Dec(e, "ibCommission"), ParseFlexDateTime(Attr(e, "dateTime")),
+                    mult));
             }
 
             foreach (var e in stmt.Descendants("CashTransaction"))
@@ -407,6 +411,8 @@ public class FlexQueryClient(HttpClient httpClient, ILogger<FlexQueryClient>? lo
         return quantity < 0 ? Side.Sell : Side.Buy;
     }
 
+    private static readonly TimeZoneInfo UsEastern = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
+
     private static DateTime ParseFlexDateTime(string s)
     {
         if (string.IsNullOrWhiteSpace(s)) return DateTime.UtcNow;
@@ -418,7 +424,9 @@ public class FlexQueryClient(HttpClient httpClient, ILogger<FlexQueryClient>? lo
             && int.TryParse(s.Substring(11, 2), out var mm)
             && int.TryParse(s.Substring(13, 2), out var ss))
         {
-            return new DateTime(y, mo, da, hh, mm, ss, DateTimeKind.Utc);
+            // Flex 的 dateTime 是美东墙钟时间（含夏令时），不是 UTC
+            var eastern = new DateTime(y, mo, da, hh, mm, ss, DateTimeKind.Unspecified);
+            return TimeZoneInfo.ConvertTimeToUtc(eastern, UsEastern);
         }
         if (s.Length >= 8
             && int.TryParse(s.Substring(0, 4), out var y2)

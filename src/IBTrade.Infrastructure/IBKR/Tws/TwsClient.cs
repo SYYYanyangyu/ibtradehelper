@@ -42,6 +42,16 @@ public class TwsClient : DefaultEWrapper, ITwsClient
     private readonly Dictionary<int, List<TwsCandleDto>> _historicalBars = new();
     private readonly Dictionary<int, TaskCompletionSource<List<TwsCandleDto>>> _historicalTcs = new();
     private bool _liveMode;
+
+    // ---- 新闻（reqNewsProviders / reqContractDetails / reqHistoricalNews）----
+    private TaskCompletionSource<IReadOnlyList<TwsNewsProviderDto>>? _newsProvidersTcs;
+    private readonly Dictionary<int, TaskCompletionSource<int>> _conIdTcs = new();
+    private readonly Dictionary<int, List<TwsNewsHeadlineDto>> _newsRows = new();
+    private readonly Dictionary<int, TaskCompletionSource<List<TwsNewsHeadlineDto>>> _newsTcs = new();
+    private const int NewsTapeReqBase = 9000;
+    private readonly Dictionary<int, string> _newsTapeIds = new();
+    private Action<TwsNewsHeadlineDto>? _onNews;
+    private Action<string>? _onNewsError;
     private DateTime _lastTickUtc = DateTime.MinValue;
     private volatile bool _connectClosed;
 
@@ -94,7 +104,8 @@ public class TwsClient : DefaultEWrapper, ITwsClient
     /// </summary>
     public async Task<IReadOnlyList<TwsCandleDto>> GetHistoricalBarsAsync(
         string symbol, string? exchange, string? currency, string duration, string barSize,
-        string? endDateTime, CancellationToken ct, TimeSpan? connectTimeout, TimeSpan? dataTimeout)
+        string? endDateTime, CancellationToken ct, TimeSpan? connectTimeout, TimeSpan? dataTimeout,
+        string? secType = null, string? whatToShow = null)
     {
         connectTimeout ??= TimeSpan.FromSeconds(10);
         dataTimeout ??= TimeSpan.FromSeconds(30);
@@ -112,12 +123,21 @@ public class TwsClient : DefaultEWrapper, ITwsClient
         var contract = new Contract
         {
             Symbol = symbol,
-            SecType = "STK",
+            SecType = string.IsNullOrWhiteSpace(secType) ? "STK" : secType.Trim().ToUpperInvariant(),
             Exchange = exchange ?? "SMART",
             Currency = currency ?? "USD"
         };
+        if (contract.SecType == "OPT" && TryParseOcc(symbol, out var root, out var expiry, out var right, out var strike))
+        {
+            contract.Symbol = root;
+            contract.LastTradeDateOrContractMonth = expiry;
+            contract.Right = right;
+            contract.Strike = strike;
+            contract.Multiplier = "100";
+        }
 
-        _client!.reqHistoricalData(reqId, contract, endDateTime ?? "", duration, barSize, "TRADES", 1, 1, false, new List<TagValue>());
+        var show = string.IsNullOrWhiteSpace(whatToShow) ? "TRADES" : whatToShow.Trim().ToUpperInvariant();
+        _client!.reqHistoricalData(reqId, contract, endDateTime ?? "", duration, barSize, show, 1, 1, false, new List<TagValue>());
 
         try
         {
@@ -131,6 +151,100 @@ public class TwsClient : DefaultEWrapper, ITwsClient
                 _historicalBars.Remove(reqId);
                 _historicalTcs.Remove(reqId);
             }
+            Disconnect();
+        }
+    }
+
+    public async Task<IReadOnlyList<TwsNewsProviderDto>> GetNewsProvidersAsync(CancellationToken ct)
+    {
+        await EnsureConnectedAsync(ct, TimeSpan.FromSeconds(10));
+        var tcs = new TaskCompletionSource<IReadOnlyList<TwsNewsProviderDto>>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _newsProvidersTcs = tcs;
+        try
+        {
+            _client!.reqNewsProviders();
+            return await tcs.Task.WaitAsync(TimeSpan.FromSeconds(10), ct);
+        }
+        finally
+        {
+            _newsProvidersTcs = null;
+            Disconnect();
+        }
+    }
+
+    public async Task<IReadOnlyList<TwsNewsHeadlineDto>> GetHistoricalNewsAsync(
+        string symbol, string providerCodes, int maxResults, CancellationToken ct)
+    {
+        await EnsureConnectedAsync(ct, TimeSpan.FromSeconds(10));
+        try
+        {
+            var cdId = _nextHistReqId++;
+            var cdTcs = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+            lock (_lock) _conIdTcs[cdId] = cdTcs;
+            _client!.reqContractDetails(cdId, new Contract
+            {
+                Symbol = symbol.Trim().ToUpperInvariant(), SecType = "STK", Exchange = "SMART", Currency = "USD"
+            });
+            int conId;
+            try { conId = await cdTcs.Task.WaitAsync(TimeSpan.FromSeconds(10), ct); }
+            finally { lock (_lock) _conIdTcs.Remove(cdId); }
+
+            var reqId = _nextHistReqId++;
+            var tcs = new TaskCompletionSource<List<TwsNewsHeadlineDto>>(TaskCreationOptions.RunContinuationsAsynchronously);
+            lock (_lock)
+            {
+                _newsRows[reqId] = new List<TwsNewsHeadlineDto>();
+                _newsTcs[reqId] = tcs;
+            }
+            try
+            {
+                _client.reqHistoricalNews(reqId, conId, providerCodes, "", "", Math.Clamp(maxResults, 1, 300), new List<TagValue>());
+                return await tcs.Task.WaitAsync(TimeSpan.FromSeconds(20), ct);
+            }
+            finally
+            {
+                lock (_lock)
+                {
+                    _newsRows.Remove(reqId);
+                    _newsTcs.Remove(reqId);
+                }
+            }
+        }
+        finally
+        {
+            Disconnect();
+        }
+    }
+
+    public async Task RunNewsTapeAsync(IReadOnlyList<string> providerCodes, Action<TwsNewsHeadlineDto> onNews,
+        Action<string> onError, CancellationToken ct)
+    {
+        _connectClosed = false;
+        await EnsureConnectedAsync(ct, TimeSpan.FromSeconds(10));
+        _onNews = onNews;
+        _onNewsError = onError;
+        try
+        {
+            var id = NewsTapeReqBase;
+            lock (_lock) _newsTapeIds.Clear();
+            foreach (var code in providerCodes)
+            {
+                // "源@交易所"：Dow Jones 这类源的合约代码与交易所名不同
+                var parts = code.Split('@');
+                var sym = parts[0];
+                var exch = parts.Length > 1 ? parts[1] : parts[0];
+                lock (_lock) _newsTapeIds[id] = code;
+                _client!.reqMktData(id++, new Contract { Symbol = $"{sym}:{sym}_ALL", SecType = "NEWS", Exchange = exch },
+                    "mdoff,292", false, false, new List<TagValue>());
+            }
+            while (!ct.IsCancellationRequested && !_connectClosed && _client is not null && _client.IsConnected())
+                await Task.Delay(TimeSpan.FromSeconds(2), ct);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
+        finally
+        {
+            _onNews = null;
+            _onNewsError = null;
             Disconnect();
         }
     }
@@ -423,6 +537,69 @@ public class TwsClient : DefaultEWrapper, ITwsClient
         tcs.TrySetResult(bars);
     }
 
+    public override void newsProviders(NewsProvider[] newsProviders) =>
+        _newsProvidersTcs?.TrySetResult(newsProviders
+            .Select(p => new TwsNewsProviderDto { Code = p.ProviderCode, Name = p.ProviderName })
+            .ToList());
+
+    public override void contractDetails(int reqId, ContractDetails contractDetails)
+    {
+        TaskCompletionSource<int>? tcs;
+        lock (_lock) _conIdTcs.TryGetValue(reqId, out tcs);
+        tcs?.TrySetResult(contractDetails.Contract.ConId);
+    }
+
+    public override void contractDetailsEnd(int reqId)
+    {
+        TaskCompletionSource<int>? tcs;
+        lock (_lock) _conIdTcs.TryGetValue(reqId, out tcs);
+        tcs?.TrySetException(new InvalidOperationException("IBKR 没有返回该合约"));
+    }
+
+    public override void historicalNews(int requestId, string time, string providerCode, string articleId, string headline)
+    {
+        lock (_lock)
+        {
+            if (_newsRows.TryGetValue(requestId, out var list))
+                list.Add(new TwsNewsHeadlineDto { RawTime = time, Provider = providerCode, ArticleId = articleId, Headline = headline });
+        }
+    }
+
+    public override void tickNews(int tickerId, long timeStamp, string providerCode, string articleId, string headline, string extraData) =>
+        _onNews?.Invoke(new TwsNewsHeadlineDto
+        {
+            RawTime = DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"),
+            Provider = providerCode,
+            ArticleId = articleId,
+            Headline = headline
+        });
+
+    public override void historicalNewsEnd(int requestId, bool hasMore)
+    {
+        TaskCompletionSource<List<TwsNewsHeadlineDto>>? tcs;
+        List<TwsNewsHeadlineDto> rows;
+        lock (_lock)
+        {
+            _newsTcs.TryGetValue(requestId, out tcs);
+            rows = _newsRows.TryGetValue(requestId, out var l) ? new List<TwsNewsHeadlineDto>(l) : new();
+        }
+        tcs?.TrySetResult(rows);
+    }
+
+    /// <summary>OCC 期权代码：ROOT + yyMMdd + C/P + 行权价×1000（8 位），根与日期间可有空格。</summary>
+    private static bool TryParseOcc(string s, out string root, out string expiry, out string right, out double strike)
+    {
+        root = expiry = right = "";
+        strike = 0;
+        var m = System.Text.RegularExpressions.Regex.Match(s.Replace(" ", "").ToUpperInvariant(), @"^([A-Z]{1,6})(\d{6})([CP])(\d{8})$");
+        if (!m.Success) return false;
+        root = m.Groups[1].Value;
+        expiry = "20" + m.Groups[2].Value;
+        right = m.Groups[3].Value;
+        strike = long.Parse(m.Groups[4].Value) / 1000.0;
+        return true;
+    }
+
     private static DateTime ParseBarTime(string s)
     {
         if (DateTime.TryParseExact(s, "yyyyMMdd  HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out var dt1))
@@ -442,6 +619,7 @@ public class TwsClient : DefaultEWrapper, ITwsClient
     {
         // 市场数据农场的连接/断开类信息是良性的，忽略
         if (errorCode is 2104 or 2105 or 2106 or 2107 or 2158 or 2169 or 2170) return;
+        errorMsg = FixMojibake(errorMsg);
 
         // 连接/登录类错误：标记失败，便于上层抛出明确异常
         if (errorCode is 501 or 502 or 503 or 504 or 509 or 1100 or 1101 or 1102)
@@ -456,6 +634,24 @@ public class TwsClient : DefaultEWrapper, ITwsClient
         {
             htcs.TrySetException(new InvalidOperationException($"TWS 返回错误 {errorCode}: {errorMsg}"));
         }
+
+        lock (_lock)
+        {
+            if (_conIdTcs.TryGetValue(id, out var ctcs))
+                ctcs.TrySetException(new InvalidOperationException($"TWS 返回错误 {errorCode}: {errorMsg}"));
+            if (_newsTcs.TryGetValue(id, out var ntcs))
+                ntcs.TrySetException(new InvalidOperationException($"TWS 返回错误 {errorCode}: {errorMsg}"));
+            if (_newsTapeIds.TryGetValue(id, out var code))
+                _onNewsError?.Invoke($"{code}：{errorCode} {errorMsg}");
+        }
+    }
+
+    /// <summary>中文 Gateway 的报错是 UTF-8 字节被按 Latin-1 解码的结果，还原回来。</summary>
+    private static string FixMojibake(string s)
+    {
+        if (string.IsNullOrEmpty(s) || s.Any(c => c > 0xFF)) return s;
+        var fixedText = System.Text.Encoding.UTF8.GetString(System.Text.Encoding.Latin1.GetBytes(s));
+        return fixedText.Contains('\uFFFD') ? s : fixedText;
     }
 
     private static decimal ParseMultiplier(string? raw, AssetType asset)

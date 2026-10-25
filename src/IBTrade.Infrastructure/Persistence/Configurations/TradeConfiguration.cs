@@ -16,9 +16,11 @@ public class TradeConfiguration : IEntityTypeConfiguration<Trade>
         builder.Property(x => x.Quantity).HasPrecision(18, 6);
         builder.Property(x => x.Price).HasPrecision(18, 6);
         builder.Property(x => x.Commission).HasPrecision(18, 6);
+        builder.Property(x => x.Multiplier).HasPrecision(18, 6).HasDefaultValue(1m);
 
-        builder.Ignore(x => x.GrossAmount);   // 计算属性不入库
+        builder.Ignore(x => x.GrossAmount);
         builder.Ignore(x => x.NetAmount);
+        builder.Ignore(x => x.EffectiveMultiplier);
 
         builder.HasIndex(x => new { x.AccountId, x.TradeTimeUtc });
     }

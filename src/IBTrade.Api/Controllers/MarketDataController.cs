@@ -18,12 +18,15 @@ public class MarketDataController(IHistoricalDataService svc) : ControllerBase
         [FromQuery] string? currency,
         [FromQuery] string duration = "1 Y",
         [FromQuery] string barSize = "1 day",
+        [FromQuery] string? endDateTime = null,
+        [FromQuery] string? secType = null,
+        [FromQuery] string? whatToShow = null,
         CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(symbol))
             return BadRequest(new { error = "symbol 必填，例如 ?symbol=AAPL" });
 
-        var bars = await svc.GetBarsAsync(symbol, exchange, currency, duration, barSize, ct);
+        var bars = await svc.GetBarsAsync(symbol, exchange, currency, duration, barSize, ct, secType, whatToShow, endDateTime);
         return Ok(new
         {
             symbol,
@@ -31,6 +34,7 @@ public class MarketDataController(IHistoricalDataService svc) : ControllerBase
             currency = currency ?? "USD",
             duration,
             barSize,
+            endDateTime,
             count = bars.Count,
             bars
         });

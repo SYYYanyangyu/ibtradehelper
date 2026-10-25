@@ -233,7 +233,15 @@ namespace IBTrade.Infrastructure.Persistence.Migrations
                         .HasMaxLength(512)
                         .HasColumnType("character varying(512)");
 
+                    b.Property<string>("Expiry")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
                     b.Property<decimal?>("LimitPrice")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)");
+
+                    b.Property<decimal?>("Multiplier")
                         .HasPrecision(18, 6)
                         .HasColumnType("numeric(18,6)");
 
@@ -244,6 +252,14 @@ namespace IBTrade.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("Quantity")
                         .HasPrecision(18, 6)
                         .HasColumnType("numeric(18,6)");
+
+                    b.Property<string>("Right")
+                        .HasMaxLength(1)
+                        .HasColumnType("character varying(1)");
+
+                    b.Property<string>("SecType")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Side")
                         .IsRequired()
@@ -258,6 +274,10 @@ namespace IBTrade.Infrastructure.Persistence.Migrations
                     b.Property<string>("Strategy")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
+
+                    b.Property<decimal?>("Strike")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)");
 
                     b.Property<string>("Symbol")
                         .IsRequired()
@@ -487,6 +507,12 @@ namespace IBTrade.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("character varying(8)");
+
+                    b.Property<decimal>("Multiplier")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 6)
+                        .HasColumnType("numeric(18,6)")
+                        .HasDefaultValue(1m);
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 6)

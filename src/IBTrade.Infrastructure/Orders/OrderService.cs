@@ -1,3 +1,4 @@
+using IBTrade.Application.Discipline;
 using IBTrade.Application.Orders;
 using IBTrade.Application.Orders.Dtos;
 using IBTrade.Domain.Entities;
@@ -18,14 +19,17 @@ public class OrderService : IOrderService
     private readonly IOrderStore _store;
     private readonly IRiskGuard _risk;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IDisciplineGate _discipline;
     private readonly TimeSpan _timeout = TimeSpan.FromSeconds(30);
 
-    public OrderService(TwsOrderClient client, IOrderStore store, IRiskGuard risk, IServiceScopeFactory scopeFactory)
+    public OrderService(TwsOrderClient client, IOrderStore store, IRiskGuard risk, IServiceScopeFactory scopeFactory,
+        IDisciplineGate discipline)
     {
         _client = client;
         _store = store;
         _risk = risk;
         _scopeFactory = scopeFactory;
+        _discipline = discipline;
     }
 
     public IRiskGuard Risk => _risk;
@@ -58,7 +62,15 @@ public class OrderService : IOrderService
         if (string.Equals(req.SecType, "OPT", StringComparison.OrdinalIgnoreCase))
             ValidateOption(req);
 
+        if (string.IsNullOrWhiteSpace(req.Strategy))
+        {
+            var gate = await _discipline.CheckAsync(req, ct);
+            if (!gate.Allowed)
+                throw new InvalidOperationException($"纪律{gate.Summary}");
+        }
+
         var result = await _client.PlaceOrderAsync(req, ct, _timeout);
+        var isOpt = string.Equals(req.SecType, "OPT", StringComparison.OrdinalIgnoreCase);
 
         var order = new Order
         {
@@ -67,6 +79,11 @@ public class OrderService : IOrderService
             Type = req.Type,
             Quantity = req.Quantity,
             LimitPrice = req.LimitPrice,
+            SecType = isOpt ? "OPT" : "STK",
+            Expiry = isOpt ? NormalizeExpiry(req.Expiry) : null,
+            Strike = isOpt ? req.Strike : null,
+            Right = isOpt ? NormalizeRight(req.Right) : null,
+            Multiplier = isOpt ? (req.Multiplier > 0 ? req.Multiplier : 100m) : 1m,
             Strategy = req.Strategy,
             Note = req.Note,
             BrokerOrderId = result.BrokerOrderId,
@@ -170,6 +187,17 @@ public class OrderService : IOrderService
         }
     }
 
+    private static string? NormalizeExpiry(string? expiry) =>
+        string.IsNullOrWhiteSpace(expiry) ? null : expiry.Replace("-", "").Trim();
+
+    private static string? NormalizeRight(string? right) =>
+        right?.Trim().ToUpperInvariant() switch
+        {
+            "CALL" or "C" => "C",
+            "PUT" or "P" => "P",
+            _ => null
+        };
+
     private static void ValidateOption(PlaceOrderRequest req)
     {
         if (req.Strike is null or <= 0)
@@ -244,6 +272,10 @@ public class OrderService : IOrderService
         Type = o.Type,
         Quantity = o.Quantity,
         LimitPrice = o.LimitPrice,
+        SecType = o.SecType,
+        Expiry = o.Expiry,
+        Strike = o.Strike,
+        Right = o.Right,
         Status = o.Status,
         FilledQuantity = o.FilledQuantity,
         AvgFillPrice = o.AvgFillPrice,

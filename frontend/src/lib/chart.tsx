@@ -6,7 +6,11 @@ export const CHART_COLORS = {
   primary: '#6b7280',
   up: '#0f766e',
   down: '#b91c1c',
-  rose: '#d97706'
+  rose: '#d97706',
+  hsi: '#c2410c',
+  spx: '#1d4ed8',
+  dji: '#b45309',
+  ixic: '#7c3aed'
 } as const
 
 /** 饼图 / 环形图调色板（低饱和中性系）。 */

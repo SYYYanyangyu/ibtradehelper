@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { ShoppingCart, Ban, ShieldAlert, Loader2, AlertTriangle, RefreshCw, CheckCircle2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
+import { DisciplineCard } from '../components/DisciplineCard'
+import { MarketNewsCard } from '../components/MarketNewsCard'
 import { cn, fmtMoney, inputCls, thCls, trCls } from '../lib/utils'
 import {
   listOrders,
@@ -10,9 +12,10 @@ import {
   getRiskSettings,
   updateRiskSettings,
   reconcileOrders,
-  type OrderReconcileResult
+  type OrderReconcileResult,
+  type PlaceOrderRequest
 } from '../lib/api'
-import type { OrderDto, RiskSettings, OrderSide, OrderType, OrderStatus } from '../types'
+import type { DisciplineCheckResult, OrderDto, RiskSettings, OrderSide, OrderType, OrderStatus } from '../types'
 
 // 活动订单（可撤单）的状态
 const WORKING: OrderStatus[] = ['PendingSubmit', 'PreSubmitted', 'Submitted', 'PartiallyFilled', 'ApiPending']
@@ -63,6 +66,7 @@ export function OrdersPage() {
   const [savingRisk, setSavingRisk] = useState(false)
   const [reconcile, setReconcile] = useState<OrderReconcileResult | null>(null)
   const [reconciling, setReconciling] = useState(false)
+  const [gate, setGate] = useState<DisciplineCheckResult | null>(null)
 
   const showToast = useCallback((kind: 'ok' | 'err', text: string) => {
     setToast({ kind, text })
@@ -181,6 +185,27 @@ export function OrdersPage() {
       setReconciling(false)
     }
   }
+
+  const disciplineOrder = useMemo<PlaceOrderRequest | null>(() => {
+    const sym = symbol.trim().toUpperCase()
+    const qty = Number(quantity)
+    if (secType !== 'OPT' || side !== 'Buy' || !sym || !(qty > 0) || !expiry.trim() || !(Number(strike) > 0)) return null
+    const lp = Number(limitPrice)
+    const est = Number(estimatedPrice)
+    return {
+      symbol: sym,
+      side,
+      type,
+      quantity: qty,
+      limitPrice: type === 'Limit' && lp > 0 ? lp : null,
+      estimatedPrice: est > 0 ? est : null,
+      secType,
+      expiry: expiry.trim(),
+      strike: Number(strike),
+      right,
+      multiplier: 100
+    }
+  }, [symbol, quantity, secType, side, expiry, strike, limitPrice, estimatedPrice, type, right])
 
   const isLive = risk?.mode === 'Live'
   const riskDirty = riskDraft && risk && JSON.stringify(riskDraft) !== JSON.stringify(risk)
@@ -405,6 +430,21 @@ export function OrdersPage() {
               </label>
             )}
 
+            {gate?.applies && !gate.items.every((i) => i.ok || !i.blocking) && (
+              <div
+                className={cn(
+                  'flex items-start gap-2 rounded-xl border px-3 py-2 text-xs',
+                  gate.allowed ? 'border-amber-500/30 bg-amber-500/10 text-amber-500' : 'border-down/30 bg-down/5 text-down'
+                )}
+              >
+                <ShieldAlert size={15} className="mt-0.5 shrink-0" />
+                <span>
+                  {gate.summary}
+                  {!gate.allowed && '。提交会被后端拒绝；平仓单不受影响。'}
+                </span>
+              </div>
+            )}
+
             <button
               onClick={handlePlace}
               disabled={submitting}
@@ -516,6 +556,10 @@ export function OrdersPage() {
           </CardContent>
         </Card>
       </section>
+
+      <DisciplineCard order={disciplineOrder} onResult={setGate} />
+
+      <MarketNewsCard />
 
       {/* 订单列表 */}
       <Card className="animate-fade-up">

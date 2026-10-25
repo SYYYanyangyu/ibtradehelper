@@ -13,10 +13,11 @@ import { cn } from '../lib/utils'
 import { DataSourceBar } from './DataSourceBar'
 import type { TradeEnvSelection, DataFeedStatusItem } from '../lib/api'
 
-export type AppView = 'dashboard' | 'backtest' | 'orders' | 'autotrade' | 'options'
+export type AppView = 'dashboard' | 'trades' | 'backtest' | 'orders' | 'autotrade' | 'options'
 
 const NAV: { id: AppView; label: string }[] = [
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'trades', label: 'Trades' },
   { id: 'backtest', label: 'Backtest' },
   { id: 'orders', label: 'Trading' },
   { id: 'autotrade', label: 'Quant' },
@@ -206,7 +207,7 @@ export function AppHeader({
         {/* 移动端：四等分保证全显示；桌面：原先横排导航 */}
         <nav
           aria-label="页面"
-          className="grid min-w-0 flex-1 grid-cols-5 items-stretch md:flex md:items-stretch md:gap-0.5"
+          className="grid min-w-0 flex-1 grid-cols-6 items-stretch md:flex md:items-stretch md:gap-0.5"
         >
           {NAV.map((item) => {
             const active = view === item.id
@@ -216,7 +217,7 @@ export function AppHeader({
                 type="button"
                 onClick={() => onViewChange(item.id)}
                 className={cn(
-                  'relative text-center text-[12px] font-medium transition-colors md:shrink-0 md:px-3 md:text-[13px]',
+                  'relative text-center text-[11px] font-medium transition-colors md:shrink-0 md:px-3 md:text-[13px]',
                   active ? 'text-foreground' : 'text-muted hover:text-foreground'
                 )}
               >
@@ -233,7 +234,7 @@ export function AppHeader({
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          {view === 'dashboard' && (
+          {(view === 'dashboard' || view === 'trades') && (
             <div className="relative hidden sm:block">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-2" />
               <input
@@ -269,7 +270,7 @@ export function AppHeader({
         </div>
       </div>
 
-      {view === 'dashboard' && (
+      {(view === 'dashboard' || view === 'trades') && (
         <div className="border-t border-border/50 bg-bg/40">
           {/* 桌面：单行环境 · 账户芯片 · 数据源（原 Web 观感） */}
           <div className="mx-auto hidden h-11 max-w-7xl items-center gap-5 px-6 md:flex">

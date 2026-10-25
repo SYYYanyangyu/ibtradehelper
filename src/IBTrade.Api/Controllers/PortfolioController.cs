@@ -16,9 +16,12 @@ public class PortfolioController(
     IPortfolioService portfolioService,
     ISnapshotService snapshotService,
     IDailyPnlService dailyPnlService,
+    IPerformanceCompareService performanceCompare,
     IPositionDailyPnlService positionDailyPnlService,
     ICashTransactionRepository cashTxnRepo,
     IRealizedPnlService realizedPnlService,
+    ITradePnlService tradePnlService,
+    IWeeklyReviewService weeklyReview,
     ITradeRepository tradeRepo,
     IAccountRepository accountRepo) : ControllerBase
 {
@@ -57,6 +60,29 @@ public class PortfolioController(
         return Ok(result);
     }
 
+    /// <summary>逐笔 FIFO 平仓盈亏。每一例是一笔开仓被反向成交平掉的部分。</summary>
+    [HttpGet("trade-pnl")]
+    public async Task<ActionResult<TradePnlDto>> GetTradePnl(
+        [FromQuery] string? accountId,
+        [FromQuery] TradeEnv? env,
+        CancellationToken ct)
+    {
+        var result = await tradePnlService.GetAsync(accountId, env, ct);
+        return Ok(result);
+    }
+
+    /// <summary>每周复盘：胜率 / 期望 / 回撤，逐条对照纪律设置统计违规次数与对应盈亏。</summary>
+    [HttpGet("weekly-review")]
+    public async Task<ActionResult<WeeklyReviewDto>> GetWeeklyReview(
+        [FromQuery] string? accountId,
+        [FromQuery] TradeEnv? env,
+        [FromQuery] int weeks = 8,
+        CancellationToken ct = default)
+    {
+        var result = await weeklyReview.GetAsync(accountId, env, weeks, ct);
+        return Ok(result);
+    }
+
     /// <summary>
     /// 每日盈亏曲线：最近 days 天（默认 30，上限 365）的每日净值与纯交易盈亏。
     /// 不传 accountId 取跨账户汇总（"ALL"）。
@@ -70,6 +96,22 @@ public class PortfolioController(
     {
         if (days is < 1 or > MaxDailyPnlDays) days = DefaultDailyPnlDays;
         var result = await dailyPnlService.GetAsync(accountId, days, env, ct);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 组合收益曲线 vs 恒生 / 标普500 / 道琼斯 / 纳斯达克。
+    /// 组合用 Flex 官方净值；指数用 IB Gateway IND 日线。区间起点归一为 0。
+    /// range：1M / 3M / 6M / YTD / 1Y / ALL
+    /// </summary>
+    [HttpGet("performance")]
+    public async Task<IActionResult> GetPerformance(
+        [FromQuery] string? accountId,
+        [FromQuery] string range = "1Y",
+        [FromQuery] TradeEnv? env = null,
+        CancellationToken ct = default)
+    {
+        var result = await performanceCompare.GetAsync(accountId, range, env, ct);
         return Ok(result);
     }
 

@@ -42,6 +42,9 @@ public class TwsOptions
     /// <summary>下单客户端使用的 clientId（须与看板实时推送 clientId=1、历史数据 clientId=ClientId+2 不同）。</summary>
     public int OrderClientId { get; set; } = 5;
 
+    /// <summary>全市场新闻快讯常驻连接的 clientId（避开历史数据池 max(ClientId+2, OrderClientId+1) 起的 4 个）。</summary>
+    public int NewsClientId { get; set; } = 20;
+
     /// <summary>交易模式：Paper（模拟盘，默认）/ Live（实盘，需显式开启）。</summary>
     public TradingMode Mode { get; set; } = TradingMode.Paper;
 }

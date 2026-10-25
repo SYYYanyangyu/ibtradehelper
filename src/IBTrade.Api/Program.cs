@@ -68,6 +68,8 @@ if ((builder.Configuration["DAILY_SNAPSHOT__ENABLED"] ?? "false").Equals("true",
 if (twsOptions.Enabled)
     builder.Services.AddHostedService<TwsSyncHostedService>();
 
+builder.Services.AddHostedService<NewsTapeHostedService>();
+
 // 跨域：开发环境为本地联调便利放开；生产环境必须显式配置 AllowedOrigins，否则默认拒绝跨域（安全优先）。
 // 配置方式（appsettings 或环境变量）：AllowedOrigins = "https://a.example.com,https://b.example.com"
 var allowedOrigins = builder.Configuration["AllowedOrigins"]?
@@ -130,5 +132,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 app.MapGet("/", () => Results.Ok(new { service = "IBTrade", status = "ok" }));
+
+app.Services.GetRequiredService<IBTrade.Application.Quant.TrendScalper.ITrendScalperEngine>().ResumeIfWasRunning();
 
 app.Run();

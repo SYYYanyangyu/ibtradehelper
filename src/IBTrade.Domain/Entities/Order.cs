@@ -22,6 +22,19 @@ public class Order
     /// <summary>限价单价格；市价单为 null。</summary>
     public decimal? LimitPrice { get; set; }
 
+    /// <summary>STK / OPT；旧记录为 null（按正股处理）。</summary>
+    public string? SecType { get; set; }
+
+    /// <summary>期权到期 yyyyMMdd。</summary>
+    public string? Expiry { get; set; }
+
+    public decimal? Strike { get; set; }
+
+    /// <summary>C / P。</summary>
+    public string? Right { get; set; }
+
+    public decimal? Multiplier { get; set; }
+
     public OrderStatus Status { get; set; } = OrderStatus.PendingSubmit;
 
     /// <summary>已成交数量。</summary>

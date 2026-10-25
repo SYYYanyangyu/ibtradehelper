@@ -6,6 +6,8 @@ using IBTrade.Domain.Repositories;
 using IBTrade.Infrastructure.Ai;
 using IBTrade.Infrastructure.IBKR;
 using IBTrade.Infrastructure.IBKR.Tws;
+using IBTrade.Application.MarketData;
+using IBTrade.Infrastructure.MarketData;
 using IBTrade.Infrastructure.OptionsIntel;
 using IBTrade.Infrastructure.Orders;
 using IBTrade.Infrastructure.Persistence;
@@ -106,6 +108,9 @@ public static class DependencyInjection
                          ?? Environment.GetEnvironmentVariable("HTTPS_PROXY")
                          ?? Environment.GetEnvironmentVariable("ALL_PROXY")
                          ?? Environment.GetEnvironmentVariable("HTTP_PROXY");
+        services.AddSingleton<IOfficialIndexQuotes, FredIndexClient>();
+        services.AddSingleton<IMacroCalendar, FedFomcCalendarClient>();
+
         services.AddHttpClient("ibtrade-intel", client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(12);

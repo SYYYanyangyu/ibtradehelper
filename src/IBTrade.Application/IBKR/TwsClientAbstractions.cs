@@ -65,7 +65,7 @@ public class TwsLiveSnapshot
 }
 
 /// <summary>TWS 客户端抽象（实现于基础设施层，避免 Application 依赖具体 socket 实现）。</summary>
-public interface ITwsClient : IDisposable
+public interface ITwsClient : ITwsNewsClient, IDisposable
 {
     Task<TwsSnapshot> PullSnapshotAsync(CancellationToken ct, TimeSpan? connectTimeout = null, TimeSpan? dataTimeout = null);
 
@@ -94,10 +94,44 @@ public interface ITwsClient : IDisposable
         string? endDateTime = null,
         CancellationToken ct = default,
         TimeSpan? connectTimeout = null,
-        TimeSpan? dataTimeout = null);
+        TimeSpan? dataTimeout = null,
+        string? secType = null,
+        string? whatToShow = null);
 }
 
 /// <summary>创建 <see cref="ITwsClient"/> 的工厂（实现于基础设施层）。</summary>
+public interface ITwsNewsClient
+{
+    /// <summary>当前账号可用的 API 新闻源（reqNewsProviders）。</summary>
+    Task<IReadOnlyList<TwsNewsProviderDto>> GetNewsProvidersAsync(CancellationToken ct);
+
+    /// <summary>某正股/ETF 的历史头条（reqContractDetails 取 conId → reqHistoricalNews），新到旧。</summary>
+    Task<IReadOnlyList<TwsNewsHeadlineDto>> GetHistoricalNewsAsync(
+        string symbol, string providerCodes, int maxResults, CancellationToken ct);
+
+    /// <summary>
+    /// 订阅各新闻源的全市场快讯（NEWS 合约 + tickNews），保持连接直到取消或断线才返回。
+    /// onError 收到单个新闻源的订阅错误（例如没开通）。
+    /// </summary>
+    Task RunNewsTapeAsync(IReadOnlyList<string> providerCodes, Action<TwsNewsHeadlineDto> onNews,
+        Action<string> onError, CancellationToken ct);
+}
+
+public class TwsNewsProviderDto
+{
+    public string Code { get; set; } = "";
+    public string Name { get; set; } = "";
+}
+
+public class TwsNewsHeadlineDto
+{
+    /// <summary>IBKR 返回的原始时间串（时区以 Gateway 返回为准，由上层换算）。</summary>
+    public string RawTime { get; set; } = "";
+    public string Provider { get; set; } = "";
+    public string ArticleId { get; set; } = "";
+    public string Headline { get; set; } = "";
+}
+
 public interface ITwsClientFactory
 {
     ITwsClient Create(string host, int port, int clientId);

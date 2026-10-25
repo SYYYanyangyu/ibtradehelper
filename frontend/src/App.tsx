@@ -12,7 +12,6 @@ import {
   getPortfolio,
   getAccounts,
   getDailyPnl,
-  getTrades,
   syncGateway,
   runFlexIngest,
   getDataFeedStatus,
@@ -25,14 +24,14 @@ import {
   type DataFeedStatusItem
 } from './lib/api'
 import type { TwsLiveSnapshot } from './lib/api'
-import type { PortfolioSummary, DailyPnlPoint, TradeRecord } from './types'
+import type { PortfolioSummary, DailyPnlPoint } from './types'
 import { useTheme } from './theme'
 import { cn, fmtMoney, thCls, trCls } from './lib/utils'
 import { CHART_COLORS } from './lib/chart'
 import { DailyPnlPanel } from './components/DailyPnlPanel'
+import { PerformanceCurve } from './components/PerformanceCurve'
 import { TodayPnlHero } from './components/TodayPnlHero'
 import { PositionContribution } from './components/PositionContribution'
-import { TradeSummary } from './components/TradeSummary'
 import { StatCard } from './components/StatCard'
 import { AllocationChart } from './components/AllocationChart'
 import { PnlBarChart } from './components/PnlBarChart'
@@ -43,6 +42,7 @@ import { BacktestPage } from './pages/BacktestPage'
 import { OrdersPage } from './pages/OrdersPage'
 import { AutoTradePage } from './pages/AutoTradePage'
 import { OptionsIntelPage } from './pages/OptionsIntelPage'
+import { TradesPage } from './pages/TradesPage'
 
 export default function App() {
   const { theme, toggle } = useTheme()
@@ -55,7 +55,6 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [dailyPnl, setDailyPnl] = useState<DailyPnlPoint[]>([])
-  const [trades, setTrades] = useState<TradeRecord[]>([])
   const [syncingGateway, setSyncingGateway] = useState(false)
   const [syncingFlex, setSyncingFlex] = useState(false)
   /** 顶部轻量提示（自动消失，不占大卡片） */
@@ -74,7 +73,7 @@ export default function App() {
   const [liveData, setLiveData] = useState<TwsLiveSnapshot | null>(null)
   const [liveError, setLiveError] = useState<string | null>(null)
   const [togglingLive, setTogglingLive] = useState(false)
-  const [view, setView] = useState<'dashboard' | 'backtest' | 'orders' | 'autotrade' | 'options'>('dashboard')
+  const [view, setView] = useState<'dashboard' | 'trades' | 'backtest' | 'orders' | 'autotrade' | 'options'>('dashboard')
 
   /** 防止 Paper↔Live 快速切换时旧请求后返回，把看板写回上一环境。 */
   const loadSeq = useRef(0)
@@ -88,21 +87,18 @@ export default function App() {
     setLoading(true)
     setError(null)
     try {
-      const [d, pnlPoints, tradeRows] = await Promise.all([
+      const [d, pnlPoints] = await Promise.all([
         getPortfolio(aid || undefined, envParam),
-        getDailyPnl(aid || undefined, 365, envParam).catch(() => [] as DailyPnlPoint[]),
-        getTrades(aid || undefined, 365, envParam).catch(() => [] as TradeRecord[])
+        getDailyPnl(aid || undefined, 365, envParam).catch(() => [] as DailyPnlPoint[])
       ])
       if (seq !== loadSeq.current) return
       setData(d)
       setDailyPnl(pnlPoints)
-      setTrades(tradeRows)
     } catch (e) {
       if (seq !== loadSeq.current) return
       setError(e instanceof Error ? e.message : '加载失败，请确认后端已启动 (localhost:8090)')
       setData(null)
       setDailyPnl([])
-      setTrades([])
     } finally {
       if (seq === loadSeq.current) setLoading(false)
     }
@@ -201,7 +197,6 @@ export default function App() {
     setQuery('')
     setData(null)
     setDailyPnl([])
-    setTrades([])
     setError(null)
     setLoading(true)
     setTradeEnv(next)
@@ -319,7 +314,10 @@ export default function App() {
     <div className="relative min-h-full overflow-x-hidden">
       <AppHeader
         view={view}
-        onViewChange={setView}
+        onViewChange={(v) => {
+          setView(v)
+          if (v === 'trades') setTradeEnv('')
+        }}
         theme={theme}
         onToggleTheme={toggle}
         query={query}
@@ -341,7 +339,13 @@ export default function App() {
       />
 
       <main className="mx-auto max-w-7xl space-y-3 px-3 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:space-y-4 sm:px-6 sm:py-4">
-        {view === 'options' ? (
+        {view === 'trades' ? (
+          <TradesPage
+            env={tradeEnv || undefined}
+            accountId={selected || undefined}
+            accounts={accountInfos}
+          />
+        ) : view === 'options' ? (
           <OptionsIntelPage />
         ) : view === 'autotrade' ? (
           <AutoTradePage />
@@ -607,25 +611,18 @@ export default function App() {
               </Card>
             </section>
 
+            <PerformanceCurve
+              key={`perf-${scopeKey}`}
+              env={tradeEnv || undefined}
+              accountId={selected || undefined}
+            />
+
             <DailyPnlPanel
               key={`dailypnl-${scopeKey}`}
               data={dailyPnl}
               currency={currency}
               env={tradeEnv || undefined}
               accountId={selected || undefined}
-            />
-
-            <TradeSummary
-              key={`trades-${scopeKey}`}
-              trades={trades}
-              currency={currency}
-              envLabel={
-                tradeEnv === 'Paper'
-                  ? 'Paper'
-                  : tradeEnv === 'Live'
-                    ? 'Live'
-                    : 'All'
-              }
             />
 
             <p className="text-center text-xs text-muted-2">

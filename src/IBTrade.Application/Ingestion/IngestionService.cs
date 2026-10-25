@@ -25,7 +25,6 @@ public class IngestionService(
     IPositionDailySnapshotRepository positionSnapshotRepo,
     ISnapshotService snapshotService,
     IDataFeedStatusRepository feedStatusRepo,
-    ITwsSyncService twsSync,
     IConfiguration configuration,
     ILogger<IngestionService>? logger = null) : IIngestionService
 {
@@ -113,6 +112,9 @@ public class IngestionService(
                     Quantity = t.Quantity,
                     Price = t.Price,
                     Commission = t.Commission,
+                    Multiplier = t.Multiplier > 0
+                        ? t.Multiplier
+                        : (t.AssetType == AssetType.Option ? 100m : 1m),
                     TradeTimeUtc = t.TradeTimeUtc
                 }).ToList();
             if (toAdd.Count > 0)
@@ -273,18 +275,7 @@ public class IngestionService(
             await snapshotService.CaptureTodayAsync(null, null, null, ct);
         }
 
-        // Flex 常缺 Open Positions / 当日 NAV 只有现金 → 摄入后自动 Gateway 修补（无需每天手工点同步）
-        try
-        {
-            await twsSync.SyncAsync(ct);
-            logger?.LogInformation("Flex（{Env}）摄入后已自动 Gateway 同步修补持仓/当日快照", env);
-        }
-        catch (Exception ex)
-        {
-            logger?.LogWarning(ex,
-                "Flex（{Env}）摄入后 Gateway 自动同步失败（Gateway 未开时不影响历史成交/净值）", env);
-        }
-
+        // 历史成交/净值只靠 Flex。Gateway 未开时不要连端口，否则会拖死这次摄入。
         await feedStatusRepo.UpsertAsync(new DataFeedStatus
         {
             Feed = DataSources.Flex,
@@ -296,6 +287,9 @@ public class IngestionService(
                 $"navDays={snap.DailyNavsOrEmpty.Count()}, queryId={qid}"
         }, ct);
         await feedStatusRepo.SaveChangesAsync(ct);
+        logger?.LogInformation(
+            "Flex（{Env}）已入库 accounts={Accounts} trades={Trades} navDays={NavDays}，未连 Gateway",
+            env, snap.Accounts.Count, snap.Trades.Count, snap.DailyNavsOrEmpty.Count());
     }
 
     /// <summary>依次摄入所有已配置默认 queryId 的环境（Live / Paper）。未配置默认 queryId 的环境自动跳过。</summary>

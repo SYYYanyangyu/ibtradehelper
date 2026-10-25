@@ -14,7 +14,8 @@ public record FlexPositionDto(
 /// <summary>解析后的成交行。</summary>
 public record FlexTradeDto(
     string AccountId, string Symbol, AssetType AssetType, Side Side, string Currency,
-    decimal Quantity, decimal Price, decimal Commission, DateTime TradeTimeUtc);
+    decimal Quantity, decimal Price, decimal Commission, DateTime TradeTimeUtc,
+    decimal Multiplier = 1m);
 
 /// <summary>解析后的外部现金流行（入金/出金/股息等，金额带符号）。</summary>
 public record FlexCashTransactionDto(
