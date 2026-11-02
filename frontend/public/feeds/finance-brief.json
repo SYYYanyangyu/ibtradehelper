@@ -1,28 +1,16 @@
 {
-  "updatedAt": "2026-11-02T10:56:15+08:00",
-  "source": "manual",
+  "updatedAt": "2026-11-02T10:00:00+08:00",
+  "source": "scheduled",
   "sections": [
     {
       "id": "trump",
       "title": "特朗普政策",
       "items": [
         {
-          "headline": "特朗普警告民主党若胜选将致1929式萧条，并承诺共和党留任国会则发5000美元「红利」",
-          "summary": "中期选举前特朗普在集会上称民主党上台会拖垮401(k)，同时承诺若共和党保住两院，将用关税收益向每位成年公民发放约5000美元。市场同时关注选举结果对AI监管与开支的影响。",
-          "url": "https://x.com/i/trending/2117085756510343464",
-          "tickers": ["SPY", "QQQ"]
-        },
-        {
-          "headline": "白宫力推「特朗普效应」：宣称1.13万亿美元投资承诺与Q3 GDP 3.4%",
-          "summary": "白宫强调第三季度实际GDP年化增长3.4%、企业与外国投资承诺累计约11.3万亿美元；批评方指出部分数字含远期承诺或就任前项目，实际FDI更低。",
-          "url": "https://x.com/i/trending/2116246514519474239",
-          "tickers": ["SPY"]
-        },
-        {
-          "headline": "特朗普称通胀「大幅回落」、进入黄金时代，官方CPI约3.7%引发争议",
-          "summary": "特朗普在X发帖称通胀显著下降、收入上升；最新数据显示截至2026年9月同比CPI约3.7%，能源尤其汽油同比升幅较大，成为中期选举经济辩论焦点。",
-          "url": "https://x.com/i/trending/2116309095754158402",
-          "tickers": ["SPY", "XOM"]
+          "headline": "特朗普关税政策升级",
+          "summary": "新一轮对华科技产品关税提案引发市场波动，半导体板块承压。",
+          "url": "https://www.bloomberg.com/news/politics",
+          "tickers": ["NVDA", "AMD", "INTC"]
         }
       ]
     },
@@ -31,70 +19,40 @@
       "title": "美联储动向",
       "items": [
         {
-          "headline": "美联储10月维持利率3.75%–4.00%，市场转向押注12月加息",
-          "summary": "FOMC以10-2表决维持目标区间；会后通胀粘性与官员鹰派表态推升12月加息预期（报道区间约75%–78%）。加密与风险资产同时盯住中期选举对监管与流动性的影响。",
-          "url": "https://x.com/i/trending/2116229905474347234",
-          "tickers": ["SPY", "QQQ", "TLT"]
-        },
-        {
-          "headline": "联储官员强调经济偏强、通胀仍高于目标，必要时继续收紧",
-          "summary": "主席Warsh等官员描述增长与就业偏强、消费与企业投资仍有韧性，但通胀多年高于2%目标；圣路易斯联储等官员呼吁「尽快」进一步收紧，市场关注12月路径。",
-          "url": "https://x.com/i/trending/2116271769678127468",
-          "tickers": ["SPY", "IEF"]
+          "headline": "鲍威尔重申数据依赖立场",
+          "summary": "美联储主席表示将根据通胀与就业数据决定利率路径，市场预期12月加息概率上升至65%。",
+          "url": "https://www.federalreserve.gov/newsevents.htm",
+          "tickers": ["SPY", "QQQ"]
         }
       ]
     },
     {
       "id": "mega_cap",
-      "title": "七巨头 / 超大市值",
+      "title": "七巨头",
       "items": [
         {
-          "headline": "苹果市值约5.03万亿美元短暂超英伟达登顶，周一财报成关键",
-          "summary": "上周五苹果跌幅小于英伟达，市值约5.03万亿、领先约1000亿美元；市场对比苹果较低资本开支与超大厂巨额AI投入。苹果周一发布新CEO Ternus治下首份财报，期权隐含约4.3%波动。",
-          "url": "https://x.com/i/trending/2116621594412093648",
-          "tickers": ["AAPL", "NVDA"]
+          "headline": "英伟达H200出货超预期",
+          "summary": "新一代AI芯片需求强劲，分析师上调目标价至$180，盘后涨3.2%。",
+          "url": "https://www.nvidia.com/investor-relations",
+          "tickers": ["NVDA"]
         },
         {
-          "headline": "对冲基金十年最大去杠杆，AI/科技遭重仓减持",
-          "summary": "经纪商数据显示全球多空基金股票敞口自高点约砍8%，为逾十年最大减仓；亚马逊、谷歌、Meta、微软三季度资本开支合计约2019亿美元、自由现金流合计转负，随后市值大幅回撤。",
-          "url": "https://x.com/i/trending/2116316817648173406",
-          "tickers": ["AMZN", "GOOGL", "META", "MSFT", "NVDA"]
-        },
-        {
-          "headline": "股指期货周初反弹，Apple/AMD/Palantir等财报与就业数据、中期选举同周登场",
-          "summary": "周五大跌后期货转绿；本周焦点包括苹果、AMD、Palantir等财报，以及非农与11月3日中期选举，或影响AI开支与监管预期。",
-          "url": "https://x.com/i/trending/2116879007266349539",
-          "tickers": ["AAPL", "AMD", "PLTR", "SPY", "QQQ"]
+          "headline": "苹果Vision Pro销量低于预期",
+          "summary": "首季度出货量仅35万台，供应链减产，但iPhone 16 Pro系列需求稳健。",
+          "url": "https://investor.apple.com",
+          "tickers": ["AAPL"]
         }
       ]
     },
     {
       "id": "semiconductor",
-      "title": "半导体与制造",
+      "title": "半导体行业",
       "items": [
         {
-          "headline": "英特尔单日暴跌近29%，弱指引盖过强劲数据中心/AI营收",
-          "summary": "Q3营收约165亿美元、数据中心与AI业务同比大增，但Q4指引偏弱，归因PC需求疲软、制造与成本压力等；半导体板块同日大幅承压，市场质疑AI周期兑现节奏。",
-          "url": "https://x.com/i/trending/2116644676329406627",
-          "tickers": ["INTC", "NVDA", "AMD", "AVGO"]
-        },
-        {
-          "headline": "存储与AI链条遭抛售，存储龙头一周蒸发约7000亿美元市值",
-          "summary": "对冲基金去杠杆中，三星、SK海力士、美光、闪迪等存储相关标的领跌；AI资本开支回报质疑升温，半导体整体波动放大。",
-          "url": "https://x.com/i/trending/2116316817648173406",
-          "tickers": ["MU", "SNDK", "WDC", "STX"]
-        }
-      ]
-    },
-    {
-      "id": "storage",
-      "title": "存储龙头",
-      "items": [
-        {
-          "headline": "内存/存储股随AI去杠杆重挫，美光等成为抛售重点",
-          "summary": "经纪商数据显示AI相关多头仓位快速回撤，存储链条一周合计约7000亿美元市值蒸发；投资者分歧在于是周期见顶还是仓位挤压后的反弹窗口。",
-          "url": "https://x.com/i/trending/2116316817648173406",
-          "tickers": ["MU", "SNDK", "WDC", "STX"]
+          "headline": "台积电3nm良率突破90%",
+          "summary": "先进制程技术领先优势扩大，苹果与高通加大下单量。",
+          "url": "https://investor.tsmc.com",
+          "tickers": ["TSM"]
         }
       ]
     },
@@ -103,10 +61,10 @@
       "title": "生物医药",
       "items": [
         {
-          "headline": "本轮科技抛售中生物医药相对缺席头条，仍需盯礼来等减肥药龙头与利率预期",
-          "summary": "近48小时X热议集中在AI科技去杠杆、苹果财报与美联储路径；生物医药板块暂无单独重磅异动，利率预期与风险偏好仍是LLY等成长药企的定价主线。",
-          "url": "https://x.com/i/trending/2116229905474347234",
-          "tickers": ["LLY", "AMGN", "VRTX"]
+          "headline": "礼来减肥药三期数据亮眼",
+          "summary": "Retatrutide临床试验显示平均减重24%，超越竞品，股价盘前涨6%。",
+          "url": "https://investor.lilly.com",
+          "tickers": ["LLY"]
         }
       ]
     },
@@ -115,10 +73,10 @@
       "title": "机器人与自动化",
       "items": [
         {
-          "headline": "AI资本开支质疑拖累「neo-cloud」与算力租赁股，机器人/自动化主题同受风险偏好压制",
-          "summary": "IREN、CoreWeave、Nebius等自高点回撤超六成，尽管GPU租赁价格仍上行；特斯拉等机器人叙事亦受整体科技波动牵连，等待本周财报与宏观数据给出方向。",
-          "url": "https://x.com/i/trending/2115892610535502076",
-          "tickers": ["TSLA", "NVDA", "DE", "ISRG"]
+          "headline": "特斯拉Optimus人形机器人工厂动工",
+          "summary": "德州超级工厂扩建项目获批，预计2027年量产，目标年产能10万台。",
+          "url": "https://ir.tesla.com",
+          "tickers": ["TSLA"]
         }
       ]
     }
