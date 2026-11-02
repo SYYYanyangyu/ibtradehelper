@@ -1,55 +1,54 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { RefreshCw, ExternalLink, Clock, AlertTriangle, TrendingUp, BookOpen, Sparkles } from 'lucide-react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { RefreshCw, ExternalLink, Clock, AlertTriangle, BookOpen, Sparkles } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
+import { getLiveFinanceBrief, isFinanceBrief, refreshFinanceBrief } from '../lib/api'
 import { cn } from '../lib/utils'
-
-interface BriefItem {
-  headline: string
-  summary: string
-  url: string
-  tickers: string[]
-}
-
-interface BriefSection {
-  id: string
-  title: string
-  items: BriefItem[]
-}
-
-interface FinanceBrief {
-  updatedAt: string
-  source: 'scheduled' | 'manual'
-  sections: BriefSection[]
-}
+import type { FinanceBrief } from '../lib/api'
 
 export function NewsBriefPage() {
   const [brief, setBrief] = useState<FinanceBrief | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [polling, setPolling] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null)
   const [activeSection, setActiveSection] = useState<string | null>(null)
+  const pollRef = useRef<number | null>(null)
 
   const showToast = useCallback((kind: 'ok' | 'err', text: string) => {
     setToast({ kind, text })
     window.setTimeout(() => setToast(null), 3500)
   }, [])
 
+  const applyBrief = useCallback((data: FinanceBrief) => {
+    setBrief(data)
+    setActiveSection((current) => current ?? data.sections[0]?.id ?? null)
+    setError(null)
+  }, [])
+
+  const loadSnapshot = useCallback(async () => {
+    const res = await fetch(`/feeds/finance-brief.json?t=${Date.now()}`)
+    if (!res.ok) throw new Error('加载简报失败')
+    const data = (await res.json()) as FinanceBrief
+    applyBrief(data)
+  }, [applyBrief])
+
   async function loadBrief() {
     try {
-      const cacheBust = `?t=${Date.now()}`
-      const res = await fetch(`/feeds/finance-brief.json${cacheBust}`)
-      if (!res.ok) throw new Error('加载简报失败')
-      const data = await res.json()
-      setBrief(data)
-      if (data.sections.length > 0 && !activeSection) {
-        setActiveSection(data.sections[0].id)
+      const live = await getLiveFinanceBrief()
+      if (isFinanceBrief(live)) {
+        applyBrief(live)
+        return
       }
-      setError(null)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '加载失败')
-      setBrief(null)
+      await loadSnapshot()
+    } catch {
+      try {
+        await loadSnapshot()
+      } catch (e) {
+        setError(e instanceof Error ? e.message : '加载失败')
+        setBrief(null)
+      }
     } finally {
       setLoading(false)
     }
@@ -57,33 +56,69 @@ export function NewsBriefPage() {
 
   useEffect(() => {
     loadBrief()
+    return () => {
+      if (pollRef.current != null) window.clearInterval(pollRef.current)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  function stopPolling() {
+    if (pollRef.current != null) {
+      window.clearInterval(pollRef.current)
+      pollRef.current = null
+    }
+    setPolling(false)
+    setRefreshing(false)
+  }
 
   async function handleRefresh() {
     setRefreshing(true)
     setToast(null)
     setError(null)
+    stopPolling()
+    setRefreshing(true)
+    const prevUpdatedAt = brief?.updatedAt
+
     try {
-      const res = await fetch('/api/news/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      
-      if (!res.ok) {
-        const text = await res.text()
-        throw new Error(text || '请求刷新失败')
+      const result = await refreshFinanceBrief()
+      if (isFinanceBrief(result)) {
+        applyBrief(result)
+        showToast('ok', '简报已更新')
+        setRefreshing(false)
+        return
       }
 
-      showToast('ok', '已请求 Grok Bot 更新简报，请稍后刷新查看')
-      
-      setTimeout(() => {
-        loadBrief()
-      }, 3000)
+      setPolling(true)
+      showToast('ok', '已通知 Grok Bot 从 X 更新，正在等待回传...')
+
+      let attempts = 0
+      const maxAttempts = 24
+      pollRef.current = window.setInterval(async () => {
+        attempts++
+        try {
+          const live = await getLiveFinanceBrief()
+          if (isFinanceBrief(live) && live.updatedAt !== prevUpdatedAt) {
+            applyBrief(live)
+            showToast('ok', '简报已更新')
+            stopPolling()
+            return
+          }
+        } catch (e) {
+          if (attempts >= maxAttempts) {
+            showToast('err', e instanceof Error ? e.message : '等待回传失败')
+            stopPolling()
+            return
+          }
+        }
+        if (attempts >= maxAttempts) {
+          showToast('err', '等待超时，Bot 还没有回传简报')
+          stopPolling()
+        }
+      }, 5000)
     } catch (e) {
       showToast('err', e instanceof Error ? e.message : '刷新失败，请检查后端配置')
-    } finally {
       setRefreshing(false)
+      setPolling(false)
     }
   }
 
@@ -191,13 +226,22 @@ export function NewsBriefPage() {
           </div>
           <button
             onClick={handleRefresh}
-            disabled={refreshing}
+            disabled={refreshing || polling}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted transition hover:bg-surface-2 hover:text-foreground disabled:opacity-40"
           >
-            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={refreshing || polling ? 'animate-spin' : ''} />
             更新
           </button>
         </CardHeader>
+
+        {polling && (
+          <CardContent className="pb-3">
+            <div className="flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2 text-xs text-primary">
+              <RefreshCw size={14} className="animate-spin" />
+              正在等待 Grok Bot 从 X 回传最新简报，预计 1-2 分钟...
+            </div>
+          </CardContent>
+        )}
 
         {error && brief && (
           <CardContent className="pb-3">
