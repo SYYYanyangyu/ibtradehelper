@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { RefreshCw, ExternalLink, Clock, AlertTriangle, TrendingUp } from 'lucide-react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { RefreshCw, ExternalLink, Clock, AlertTriangle, TrendingUp, BookOpen, Sparkles } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { cn } from '../lib/utils'
@@ -29,6 +29,7 @@ export function NewsBriefPage() {
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
 
   const showToast = useCallback((kind: 'ok' | 'err', text: string) => {
     setToast({ kind, text })
@@ -42,6 +43,9 @@ export function NewsBriefPage() {
       if (!res.ok) throw new Error('加载简报失败')
       const data = await res.json()
       setBrief(data)
+      if (data.sections.length > 0 && !activeSection) {
+        setActiveSection(data.sections[0].id)
+      }
       setError(null)
     } catch (e) {
       setError(e instanceof Error ? e.message : '加载失败')
@@ -53,6 +57,7 @@ export function NewsBriefPage() {
 
   useEffect(() => {
     loadBrief()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function handleRefresh() {
@@ -82,21 +87,29 @@ export function NewsBriefPage() {
     }
   }
 
-  function formatTime(iso: string): string {
-    try {
-      const d = new Date(iso)
-      return d.toLocaleString('zh-CN', {
-        timeZone: 'Asia/Shanghai',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    } catch {
-      return iso
+  const timeAgo = useMemo(() => {
+    if (!brief?.updatedAt) return ''
+    const now = new Date()
+    const updated = new Date(brief.updatedAt)
+    const diff = now.getTime() - updated.getTime()
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    if (hours > 24) {
+      return `${Math.floor(hours / 24)} 天前`
     }
-  }
+    if (hours > 0) {
+      return `${hours} 小时前`
+    }
+    if (minutes > 0) {
+      return `${minutes} 分钟前`
+    }
+    return '刚刚'
+  }, [brief?.updatedAt])
+
+  const currentSection = useMemo(
+    () => brief?.sections.find((s) => s.id === activeSection),
+    [brief, activeSection]
+  )
 
   if (loading) {
     return (
@@ -151,81 +164,123 @@ export function NewsBriefPage() {
         </div>
       )}
 
-      <Card>
+      <Card className="animate-fade-up">
         <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
+          <div className="flex items-start gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <BookOpen size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp size={20} className="text-primary" />
                 Finance Brief · 金融简报
               </CardTitle>
-              {brief && (
-                <div className="mt-1 flex items-center gap-2 text-xs text-muted-2">
-                  <Clock size={13} />
-                  <span>更新于：{formatTime(brief.updatedAt)}</span>
-                  <Badge tone={brief.source === 'manual' ? 'primary' : 'neutral'}>
-                    {brief.source === 'manual' ? '手动' : '定时'}
-                  </Badge>
-                </div>
-              )}
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-2">
+                {brief && (
+                  <>
+                    <span className="inline-flex items-center gap-1">
+                      <Clock size={12} />
+                      {timeAgo}更新
+                    </span>
+                    <Badge tone={brief.source === 'manual' ? 'primary' : 'neutral'}>
+                      {brief.source === 'manual' ? '手动' : '定时'}
+                    </Badge>
+                  </>
+                )}
+              </div>
             </div>
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className={cn(
-                'flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition',
-                refreshing ? 'opacity-50' : 'hover:opacity-90'
-              )}
-            >
-              <RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
-              更新
-            </button>
           </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted transition hover:bg-surface-2 hover:text-foreground disabled:opacity-40"
+          >
+            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+            更新
+          </button>
         </CardHeader>
-      </Card>
 
-      {brief?.sections.map((section) => (
-        <Card key={section.id} className="animate-fade-up">
-          <CardHeader>
-            <CardTitle className="text-lg">{section.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {section.items.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="group rounded-lg border border-border/50 bg-surface-2/30 p-4 transition hover:border-border hover:bg-surface-2/60"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1 space-y-2">
-                      <h3 className="font-semibold text-foreground group-hover:text-primary">
-                        {item.headline}
-                      </h3>
-                      <p className="text-sm leading-relaxed text-muted">{item.summary}</p>
-                      <div className="flex flex-wrap items-center gap-2">
-                        {item.tickers.map((ticker) => (
-                          <Badge key={ticker} tone="neutral">
-                            {ticker}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="shrink-0 rounded-md p-2 text-muted transition hover:bg-surface hover:text-primary"
-                      title="查看详情"
-                    >
-                      <ExternalLink size={16} />
-                    </a>
-                  </div>
-                </div>
-              ))}
+        {error && brief && (
+          <CardContent className="pb-3">
+            <div className="flex items-center gap-2 rounded-lg border border-down/25 bg-down/5 px-3 py-2 text-xs text-down">
+              <AlertTriangle size={14} />
+              {error}
             </div>
           </CardContent>
-        </Card>
-      ))}
+        )}
+      </Card>
+
+      {brief && brief.sections.length > 0 && (
+        <>
+          <div className="sticky top-12 z-10 -mx-3 overflow-x-auto border-y border-border/50 bg-surface/90 px-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
+            <div className="flex items-center gap-2 py-2">
+              {brief.sections.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={cn(
+                    'shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition',
+                    activeSection === section.id
+                      ? 'border-primary/40 bg-primary/10 text-primary'
+                      : 'border-border/70 text-muted hover:bg-surface-2 hover:text-foreground'
+                  )}
+                >
+                  {section.title}
+                  <span className="ml-1.5 text-[10px] opacity-70">
+                    {section.items.length}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {currentSection && (
+            <div className="space-y-3">
+              {currentSection.items.map((item, idx) => (
+                <Card key={idx} className="group animate-fade-up transition-all hover:shadow-md">
+                  <CardContent className="py-4">
+                    <div className="flex items-start gap-3">
+                      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/5 text-primary/60 transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+                        <Sparkles size={14} />
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className="text-sm font-semibold leading-snug text-foreground group-hover:text-primary">
+                            {item.headline}
+                          </h3>
+                          {item.url && (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="shrink-0 text-primary/60 transition-colors hover:text-primary"
+                              aria-label="查看详情"
+                            >
+                              <ExternalLink size={16} />
+                            </a>
+                          )}
+                        </div>
+                        <p className="text-xs leading-relaxed text-muted">{item.summary}</p>
+                        {item.tickers.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {item.tickers.map((ticker) => (
+                              <span
+                                key={ticker}
+                                className="inline-flex items-center rounded border border-border/60 bg-surface-2/50 px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-muted-2 transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                              >
+                                {ticker}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       {brief && brief.sections.length === 0 && (
         <Card>
