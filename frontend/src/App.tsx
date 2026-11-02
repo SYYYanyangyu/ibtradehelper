@@ -43,6 +43,7 @@ import { OrdersPage } from './pages/OrdersPage'
 import { AutoTradePage } from './pages/AutoTradePage'
 import { OptionsIntelPage } from './pages/OptionsIntelPage'
 import { TradesPage } from './pages/TradesPage'
+import { NewsBriefPage } from './pages/NewsBriefPage'
 
 export default function App() {
   const { theme, toggle } = useTheme()
@@ -73,7 +74,7 @@ export default function App() {
   const [liveData, setLiveData] = useState<TwsLiveSnapshot | null>(null)
   const [liveError, setLiveError] = useState<string | null>(null)
   const [togglingLive, setTogglingLive] = useState(false)
-  const [view, setView] = useState<'dashboard' | 'trades' | 'backtest' | 'orders' | 'autotrade' | 'options'>('dashboard')
+  const [view, setView] = useState<'dashboard' | 'trades' | 'backtest' | 'orders' | 'autotrade' | 'options' | 'brief'>('dashboard')
 
   /** 防止 Paper↔Live 快速切换时旧请求后返回，把看板写回上一环境。 */
   const loadSeq = useRef(0)
@@ -353,6 +354,8 @@ export default function App() {
           <OrdersPage />
         ) : view === 'backtest' ? (
           <BacktestPage />
+        ) : view === 'brief' ? (
+          <NewsBriefPage />
         ) : (
           <>
             {error && (

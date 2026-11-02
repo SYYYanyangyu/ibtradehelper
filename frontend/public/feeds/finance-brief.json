@@ -1,0 +1,84 @@
+{
+  "updatedAt": "2026-11-02T10:00:00+08:00",
+  "source": "scheduled",
+  "sections": [
+    {
+      "id": "trump",
+      "title": "特朗普政策",
+      "items": [
+        {
+          "headline": "特朗普关税政策升级",
+          "summary": "新一轮对华科技产品关税提案引发市场波动，半导体板块承压。",
+          "url": "https://www.bloomberg.com/news/politics",
+          "tickers": ["NVDA", "AMD", "INTC"]
+        }
+      ]
+    },
+    {
+      "id": "fed",
+      "title": "美联储动向",
+      "items": [
+        {
+          "headline": "鲍威尔重申数据依赖立场",
+          "summary": "美联储主席表示将根据通胀与就业数据决定利率路径，市场预期12月加息概率上升至65%。",
+          "url": "https://www.federalreserve.gov/newsevents.htm",
+          "tickers": ["SPY", "QQQ"]
+        }
+      ]
+    },
+    {
+      "id": "mega_cap",
+      "title": "七巨头",
+      "items": [
+        {
+          "headline": "英伟达H200出货超预期",
+          "summary": "新一代AI芯片需求强劲，分析师上调目标价至$180，盘后涨3.2%。",
+          "url": "https://www.nvidia.com/investor-relations",
+          "tickers": ["NVDA"]
+        },
+        {
+          "headline": "苹果Vision Pro销量低于预期",
+          "summary": "首季度出货量仅35万台，供应链减产，但iPhone 16 Pro系列需求稳健。",
+          "url": "https://investor.apple.com",
+          "tickers": ["AAPL"]
+        }
+      ]
+    },
+    {
+      "id": "semiconductor",
+      "title": "半导体行业",
+      "items": [
+        {
+          "headline": "台积电3nm良率突破90%",
+          "summary": "先进制程技术领先优势扩大，苹果与高通加大下单量。",
+          "url": "https://investor.tsmc.com",
+          "tickers": ["TSM"]
+        }
+      ]
+    },
+    {
+      "id": "biotech",
+      "title": "生物医药",
+      "items": [
+        {
+          "headline": "礼来减肥药三期数据亮眼",
+          "summary": "Retatrutide临床试验显示平均减重24%，超越竞品，股价盘前涨6%。",
+          "url": "https://investor.lilly.com",
+          "tickers": ["LLY"]
+        }
+      ]
+    },
+    {
+      "id": "robotics",
+      "title": "机器人与自动化",
+      "items": [
+        {
+          "headline": "特斯拉Optimus人形机器人工厂动工",
+          "summary": "德州超级工厂扩建项目获批，预计2027年量产，目标年产能10万台。",
+          "url": "https://ir.tesla.com",
+          "tickers": ["TSLA"]
+        }
+      ]
+    }
+  ]
+}

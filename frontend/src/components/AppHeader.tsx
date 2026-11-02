@@ -13,7 +13,7 @@ import { cn } from '../lib/utils'
 import { DataSourceBar } from './DataSourceBar'
 import type { TradeEnvSelection, DataFeedStatusItem } from '../lib/api'
 
-export type AppView = 'dashboard' | 'trades' | 'backtest' | 'orders' | 'autotrade' | 'options'
+export type AppView = 'dashboard' | 'trades' | 'backtest' | 'orders' | 'autotrade' | 'options' | 'brief'
 
 const NAV: { id: AppView; label: string }[] = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -21,7 +21,8 @@ const NAV: { id: AppView; label: string }[] = [
   { id: 'backtest', label: 'Backtest' },
   { id: 'orders', label: 'Trading' },
   { id: 'autotrade', label: 'Quant' },
-  { id: 'options', label: 'Options' }
+  { id: 'options', label: 'Options' },
+  { id: 'brief', label: '简报' }
 ]
 
 const ENV: { id: TradeEnvSelection; label: string }[] = [
@@ -207,7 +208,7 @@ export function AppHeader({
         {/* 移动端：四等分保证全显示；桌面：原先横排导航 */}
         <nav
           aria-label="页面"
-          className="grid min-w-0 flex-1 grid-cols-6 items-stretch md:flex md:items-stretch md:gap-0.5"
+          className="grid min-w-0 flex-1 grid-cols-7 items-stretch md:flex md:items-stretch md:gap-0.5"
         >
           {NAV.map((item) => {
             const active = view === item.id
