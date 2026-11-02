@@ -7,27 +7,21 @@
       "title": "特朗普动态",
       "items": [
         {
-          "headline": "爱荷华集会：特朗普称伊朗冲突将很快结束、油价将回落",
-          "summary": "中期选举前两天，特朗普在爱荷华州迪比克集会上警告伊朗须达成协议，并称冲突将「很快结束」；同期多哈斡旋推进核与霍尔木兹海峡议题，油价对谈判消息有所回落。",
-          "url": "https://x.com/i/trending/2117038896777175071",
+          "headline": "特朗普称伊朗战争将很快结束,股指期货上涨、油价回落",
+          "summary": "爱荷华集会前对媒体称美方已取得胜利,将「很快以某种方式结束」伊朗冲突(谈妥或单方面收场);道指期货约+0.35%,布伦特回落至约111美元。另称更倾向给外交更多时间,市场交易去升级预期。",
+          "url": "https://www.benzinga.com/markets/economic-data/26/11/62767505/trump-iran-war-midterms-dow-futures-rise-brent-crude-111",
           "tickers": []
         },
         {
-          "headline": "特朗普与加总理卡尼通话：推进美加贸易协议并提及Keystone XL",
-          "summary": "双方称已形成交易「概念」，团队将在数周内谈判细节，包括降低加方对美农产品高关税，以及加拿大出资重启Keystone XL管道的可能。",
-          "url": "https://apnews.com/article/canada-us-trump-canada-trade-d0bfffc67ecdf22d9a5abffb2d26d848",
+          "headline": "中期选举前警告民主党获胜将重演1929式萧条,并承诺5000美元「分红」",
+          "summary": "特朗普在助选活动中称若民主党拿下国会将拖垮401(k),同时承诺共和党保住国会则以关税收益向成年公民发放约5000美元。市场与舆论聚焦11月3日中期选举对财政与监管的影响。",
+          "url": "https://x.com/i/trending/2117085756510343464",
           "tickers": []
         },
         {
-          "headline": "内塔尼亚胡促特朗普中期选举后迅速打击伊朗",
-          "summary": "据报内塔尼亚胡在秘密通话中敦促美方在11月3日选举后尽快打击伊朗核设施；特朗普称讨论「很好」，同时保留经卡塔尔的外交通道。",
-          "url": "https://x.com/i/trending/2116920010815803521",
-          "tickers": []
-        },
-        {
-          "headline": "汽油均价仍超4美元：伊朗冲突与能源成本成选战焦点",
-          "summary": "全国均价约4.18–4.27美元/加仑，较战前显著抬升；白宫称冲突为短期扰动并承诺油价将大降，反对派则将其与对伊战争成本挂钩。",
-          "url": "https://x.com/i/trending/2116361599774519806",
+          "headline": "白宫归咎民主党推高通胀与油价,全国油价约4.31美元/加仑",
+          "summary": "临近中期选举,特朗普团队以边境、通胀与贸易逆差攻击民主党;部分州油价分化明显。市场把油价与伊朗冲突溢价、选举结果一并定价。",
+          "url": "https://x.com/i/trending/2117066809962881219",
           "tickers": []
         }
       ]
@@ -37,21 +31,21 @@
       "title": "美联储",
       "items": [
         {
-          "headline": "FOMC维持联邦基金利率3.75%–4.00%，两票反对要求加息",
-          "summary": "10月28日美联储以10–2维持利率区间，库克与哈马克倾向加息25个基点；声明称经济活动强劲但通胀仍偏高，主席沃什强调将视后续数据决定政策。",
-          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm",
-          "tickers": []
-        },
-        {
-          "headline": "市场押注12月加息概率上升，沃什称经济仍具韧性",
-          "summary": "决议后官员表态偏鹰，部分官员称需「额外收紧」；交易员上调12月加息赔率，同时关注11月3日中期选举对财政与监管路径的影响。",
+          "headline": "美联储10月维持利率3.75%–4.00%,市场转向押注12月加息",
+          "summary": "10月28日以10-2票按兵不动,声明称经济韧性、通胀仍黏;两名票委倾向加息。圣路易斯联储穆萨莱姆等官员暗示需进一步收紧,交易员将12月加息概率抬升至约七成以上。",
           "url": "https://x.com/i/trending/2116229905474347234",
           "tickers": []
         },
         {
-          "headline": "10月会议纪要定于11月18日公布，下一次FOMC为12月8–9日",
-          "summary": "美联储日程显示10月27–28日会议纪要将于11月18日发布，下次政策会议为12月会议，届时或伴随经济预测更新。",
-          "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+          "headline": "美联储主席沃什称增长与就业稳健,市场仍盯12月路径",
+          "summary": "沃什在决议后强调GDP与消费、投资仍强,但通胀连续近六年高于2%目标;将依数据决定是否进一步加息。市场同时关注中期选举对监管与流动性预期的扰动。",
+          "url": "https://x.com/i/trending/2116271769678127468",
+          "tickers": []
+        },
+        {
+          "headline": "美国I债券新利率升至5.51%(2026年11月–2027年4月)",
+          "summary": "财政部公布新一期Series I债券综合年化5.51%,固定利率1.40%为2006年以来最高,叠加通胀调整;对偏好抗通胀现金类配置的投资者有吸引力。",
+          "url": "https://x.com/i/trending/2116239773798993999",
           "tickers": []
         }
       ]
@@ -61,53 +55,28 @@
       "title": "超大市值",
       "items": [
         {
-          "headline": "苹果市值约5.03万亿美元重夺全球第一，今晚发布财报",
-          "summary": "周五苹果市值反超英伟达约1000亿美元；周一盘后将公布财年Q4业绩，为新CEO约翰·特努斯任内首份财报，市场预期营收约1130亿美元、EPS约1.98–1.99美元。",
-          "url": "https://investor.apple.com/investor-relations/event-details/2026/FY-26-Fourth-Quarter-Results/default.aspx",
-          "tickers": [
-            "AAPL",
-            "NVDA"
-          ]
+          "headline": "苹果市值约5.03万亿美元再超英伟达,周一将公布财报",
+          "summary": "周五苹果跌幅小于英伟达,市值反超约1000亿美元登顶;市场对比苹果较低资本开支与超大盘AI巨头高额CapEx。周一盘后财报或决定能否守住领先。",
+          "url": "https://x.com/i/trending/2116621594412093648",
+          "tickers": ["AAPL", "NVDA"]
         },
         {
-          "headline": "S&P将Meta展望下调至负面，担忧AI资本开支与负自由现金流",
-          "summary": "S&P维持AA-评级但展望改负面，指Meta全年资本开支指引1350–1450亿美元、自由现金流转负，并质疑AI变现节奏；公司回应称不同意该判断。",
-          "url": "https://www.cnbc.com/2026/10/30/meta-outlook-to-revised-to-negative-by-sp-after-cash-flow-negative.html",
-          "tickers": [
-            "META"
-          ]
-        },
-        {
-          "headline": "四大云巨头Q3资本开支创纪录，合计自由现金流转负",
-          "summary": "亚马逊、Alphabet、Meta、微软当季资本开支约2019亿美元，合计自由现金流约-264亿美元；近期市值蒸发近8940亿美元，市场质疑AI回报周期。",
+          "headline": "四大云巨头Q3 AI资本开支约2019亿美元,合计自由现金流转负",
+          "summary": "亚马逊、Alphabet、Meta、微软单季CapEx同比翻倍,合计自由现金流约-264亿美元,近几日合计市值蒸发约8940亿美元;云收入仍高增,市场争论回报周期。",
           "url": "https://x.com/i/trending/2116953371605135855",
-          "tickers": [
-            "AMZN",
-            "GOOGL",
-            "META",
-            "MSFT"
-          ]
+          "tickers": ["AMZN", "GOOGL", "META", "MSFT"]
         },
         {
-          "headline": "对冲基金近十年最快去杠杆，美股科技净卖出约430亿美元",
-          "summary": "高盛数据显示近三个月对冲基金大规模削减美股科技多头，10月单月净卖出约200亿美元，AI估值与利率压力是主因。",
-          "url": "https://x.com/i/trending/2117026072843698305",
-          "tickers": [
-            "NVDA",
-            "MSFT",
-            "AAPL",
-            "AMZN"
-          ]
+          "headline": "礼来肥胖药营收创新高,上调2026年展望至910–920亿美元",
+          "summary": "Q3营收244亿美元(+39%),Mounjaro与Zepbound合计贡献显著;下一代retatrutide减重数据强,推动管线叙事与估值。",
+          "url": "https://x.com/i/trending/2116526618382627252",
+          "tickers": ["LLY"]
         },
         {
-          "headline": "本周重磅财报与就业数据：苹果/Palantir周一，AMD周二",
-          "summary": "美股期货周末回升，交易员聚焦苹果与Palantir盘后业绩、AMD周二财报，以及周五10月非农；中期选举亦可能扰动监管与财政预期。",
-          "url": "https://movertape.com/news/earnings-week-ahead-2026-11-02",
-          "tickers": [
-            "AAPL",
-            "PLTR",
-            "AMD"
-          ]
+          "headline": "美股期货周一温和反弹,本周聚焦苹果/AMD等财报与中期选举",
+          "summary": "上周五科技股急跌后,周一股指期货小幅回升;日程含苹果、Palantir、AMD等财报、就业数据与11月3日中期选举。",
+          "url": "https://x.com/i/trending/2116879007266349539",
+          "tickers": ["AAPL", "AMD", "PLTR"]
         }
       ]
     },
@@ -116,35 +85,22 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "对冲基金集中抛售AI存储链：三星、SK海力士、美光、闪迪承压",
-          "summary": "经纪商数据显示资金快速削减存储与AI相关仓位，一周内相关市值蒸发约7000亿美元；内存供需紧张与AI开支回报质疑并存。",
+          "headline": "对冲基金大幅去杠杆,存储股三星/SK海力士/美光/闪迪等承压",
+          "summary": "全球多空基金股票敞口自高点回撤约8%,为十余年最大;AI相关存储与存储概念一周蒸发约7000亿美元市值,反映对AI开支回报疑虑。",
           "url": "https://x.com/i/trending/2116316817648173406",
-          "tickers": [
-            "MU",
-            "SNDK",
-            "SKHY",
-            "SSNLF"
-          ]
+          "tickers": ["MU", "SNDK", "SSNLF"]
         },
         {
-          "headline": "TipRanks：对冲基金连续四周抛售MU、SNDK、WDC等芯片股",
-          "summary": "市场跟踪显示存储与硬盘相关标的成为去杠杆重灾区，此前高估值与集中持仓放大回调；资金轮动仍在观察AI需求是否兑现。",
-          "url": "https://www.tipranks.com/news/mu-sndk-wdc-hedge-funds-spent-the-last-four-weeks-dumping-chip-stocks",
-          "tickers": [
-            "MU",
-            "SNDK",
-            "WDC"
-          ]
-        },
-        {
-          "headline": "奥特曼称个人电脑闲置DRAM浪费，存储供应紧张再成焦点",
-          "summary": "OpenAI CEO在播客中主张将稀缺DRAM优先用于数据中心，并与三星高管会谈推进Stargate合作；言论引发玩家与隐私派反弹，也凸显内存涨价压力。",
+          "headline": "奥特曼称个人电脑闲置DRAM浪费,存储紧缺叙事再升温",
+          "summary": "OpenAI CEO在播客呼吁把稀缺DRAM更多用于数据中心;正值与三星高层就Stargate等合作讨论之际,强化HBM/DRAM供需紧张交易主题。",
           "url": "https://x.com/i/trending/2116462554394284316",
-          "tickers": [
-            "MU",
-            "SNDK",
-            "SSNLF"
-          ]
+          "tickers": ["MU", "SSNLF"]
+        },
+        {
+          "headline": "韩国10月出口创纪录,半导体出货同比大增领跑",
+          "summary": "韩国出口约1153亿美元(同比+93.7%),半导体约564亿美元(+259%);SK海力士单季业绩与利润率强劲,长约锁定产能至2029。",
+          "url": "https://x.com/i/trending/2116708944189993406",
+          "tickers": ["MU", "SSNLF"]
         }
       ]
     },
@@ -153,29 +109,22 @@
       "title": "机器人",
       "items": [
         {
-          "headline": "马斯克否认「12月开放Optimus预订」传闻",
-          "summary": "媒体称特斯拉拟在人形机器人峰会前后开放Optimus预订，马斯克在X上直接回复「No」；工厂仍在推进量产准备，市场兴趣仍高。",
-          "url": "https://x.com/i/trending/2116256042158059557",
-          "tickers": [
-            "TSLA"
-          ]
-        },
-        {
-          "headline": "Neuralink展示R1手术机器人与Blindsight视觉植入进展",
-          "summary": "公司称R1可快速精准植入超千根电极，Blindsight瞄准绕过受损眼睛直接刺激视觉皮层，已获FDA突破性器械认定并准备推进试验。",
-          "url": "https://x.com/i/trending/2116890094611157366",
-          "tickers": [
-            "TSLA"
-          ]
-        },
-        {
-          "headline": "OpenAI Astra在机器人基准领先，被视为通用模型「GPT-3时刻」",
-          "summary": "报告称通用大模型在多项机器人评测中胜过专用模型，投资人形容为机器人领域的跃迁；精细操作、时延与安全仍是落地瓶颈。",
+          "headline": "OpenAI Astra在机器人基准领先,被称「机器人界GPT-3时刻」",
+          "summary": "通用大模型路线在多项机器人评测中胜过专用模型;市场关注通用AI向实体机器人迁移,以及特斯拉Optimus等玩家的竞争格局。",
           "url": "https://x.com/i/trending/2116805922211410376",
-          "tickers": [
-            "TSLA",
-            "NVDA"
-          ]
+          "tickers": ["TSLA"]
+        },
+        {
+          "headline": "Neuralink R1手术机器人与Blindsight植入进展更新",
+          "summary": "R1可高精度植入1024电极;Blindsight瞄准视觉皮层恢复视力,已获FDA突破性器械认定并接近试验。与脑机接口/手术机器人主题相关。",
+          "url": "https://x.com/i/trending/2116636101020729603",
+          "tickers": ["TSLA"]
+        },
+        {
+          "headline": "美初创Lightberry人形机器人Lumi获有条件批准",
+          "summary": "约4英尺高的Lumi获美国战争部有条件批准,需改用国产传感器与软件;创始版标价约39990美元,2026年发货。",
+          "url": "https://x.com/i/trending/2116357500177981716",
+          "tickers": []
         }
       ]
     },
@@ -184,71 +133,46 @@
       "title": "生物科技",
       "items": [
         {
-          "headline": "礼来Q3营收244亿美元同比+39%，上调全年指引至910–920亿美元",
-          "summary": "Mounjaro销售额约107亿美元、Zepbound约53.5亿美元，肥胖与糖尿病管线继续主导增长；公司同步强调医保可及性与后续减重候选药进展。",
-          "url": "https://investor.lilly.com/news-releases/news-release-details/lilly-reports-third-quarter-2026-financial-results-raises-full",
-          "tickers": [
-            "LLY"
-          ]
+          "headline": "礼来Q3肥胖药放量,上调全年展望并推高管线预期",
+          "summary": "Mounjaro/Zepbound驱动营收与指引上修;retatrutide等下一代减重与代谢管线受关注,板块情绪向龙头集中。",
+          "url": "https://x.com/i/trending/2115760741894828107",
+          "tickers": ["LLY"]
         },
         {
-          "headline": "CNBC：礼来减肥药需求超预期，国际市场贡献显著",
-          "summary": "Mounjaro海外收入同比大增约93%，Zepbound亦好于华尔街预期；股价此前受业绩与管线乐观情绪推动，市场关注价格竞争与产能扩张。",
-          "url": "https://www.cnbc.com/2026/10/29/eli-lilly-lly-earnings-q3-2026.html",
-          "tickers": [
-            "LLY"
-          ]
+          "headline": "马斯克称赞礼来后续管线「猛药」,减重/长寿叙事升温",
+          "summary": "市场将礼来指引上修与口服GLP-1、组合疗法进展一并定价;投资者讨论从治病向预防/健康寿命延伸的估值含义。",
+          "url": "https://x.com/i/trending/2116483829196091831",
+          "tickers": ["LLY"]
         },
         {
-          "headline": "本周生物科技财报：Vertex周一盘后公布业绩",
-          "summary": "Vertex定于11月2日盘后发布财报并召开电话会，市场预期EPS约4.36美元；本周亦有其他大型药企业绩窗口，关注管线与定价政策。",
-          "url": "https://movertape.com/news/earnings-week-ahead-2026-11-02",
-          "tickers": [
-            "VRTX"
-          ]
+          "headline": "印度PopVax启动个性化mRNA癌症疫苗代工厂",
+          "summary": "海得拉巴GMP工厂提供从新抗原设计到灌装的一站式服务,宣称8–10周定制;获盖茨基金会等支持,利好mRNA平台叙事。",
+          "url": "https://x.com/i/trending/2116256036768362963",
+          "tickers": ["MRNA", "BNTX"]
         }
       ]
     },
     {
       "id": "semiconductor",
-      "title": "半导体",
+      "title": "半导体与制造",
       "items": [
         {
-          "headline": "英特尔股价单日暴跌约29%，PC疲软与指引逊预期拖累",
-          "summary": "Q3业绩尚可但Q4指引营收150–160亿美元、调整后EPS约0.25美元远低预期；公司称PC疲软至少持续至2027上半年，以色列工厂扰动亦冲击供应。",
-          "url": "https://www.cnbc.com/2026/10/30/amazon-intel-earnings-big-tech-ai-spending-concerns.html",
-          "tickers": [
-            "INTC",
-            "AMD"
-          ]
+          "headline": "英特尔单日暴跌约29%,Q4指引大幅低于预期",
+          "summary": "Q3营收165亿美元尚可、数据中心与AI收入大增,但Q4收入与EPS指引逊预期,归因PC疲软、产能与以色列工厂事故等;拖累AMD等同业情绪。",
+          "url": "https://x.com/i/trending/2116644676329406627",
+          "tickers": ["INTC", "AMD"]
         },
         {
-          "headline": "分析师下调英特尔目标价：PC修正超预期，服务器供给仍紧",
-          "summary": "多家投行将目标价下调至约75–100美元区间，指客户端出货大幅下滑、先进封装基板与晶圆供给受限，并继续关注晶圆代工客户落地进度。",
-          "url": "https://www.cnbc.com/2026/10/30/intel-guidance-analyst-price-targets.html",
-          "tickers": [
-            "INTC"
-          ]
+          "headline": "韩国半导体出口爆发,SK海力士利润率创纪录",
+          "summary": "AI拉动存储与逻辑需求,韩国半导体出口同比近三倍;SK海力士营收与约80%营业利润率领先,并锁定长约产能。",
+          "url": "https://x.com/i/trending/2116708944189993406",
+          "tickers": ["TSM", "MU", "ASML"]
         },
         {
-          "headline": "《纽约时报》：美情报指中国相关高管经关系获取英伟达信息",
-          "summary": "报道称美方长期监控与黄仁勋有往来的Megaspeed高管，担忧先进AI芯片转口中国；英伟达称会面属常规商务、未分享敏感信息。",
-          "url": "https://x.com/i/trending/2115756302332776465",
-          "tickers": [
-            "NVDA",
-            "TSM"
-          ]
-        },
-        {
-          "headline": "AMD、高通本周财报；Palantir周一与苹果同场",
-          "summary": "AMD将于11月3日盘后公布业绩并给出约130亿美元营收指引区间；QCOM亦在周中，半导体板块情绪仍受英特尔暴跌与AI开支争议牵制。",
-          "url": "https://movertape.com/news/earnings-week-ahead-2026-11-02",
-          "tickers": [
-            "AMD",
-            "QCOM",
-            "PLTR",
-            "AVGO"
-          ]
+          "headline": "本周半导体与软件巨头扎堆财报:苹果、AMD、高通等",
+          "summary": "周一苹果与Palantir,周二AMD等,周三高通;叠加中期选举,短线波动或放大对AI资本开支与PC/手机需求的再定价。",
+          "url": "https://x.com/i/trending/2116879007266349539",
+          "tickers": ["AAPL", "AMD", "QCOM", "PLTR", "AVGO"]
         }
       ]
     }
