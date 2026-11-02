@@ -4,41 +4,34 @@
 
 金融简报（Finance Brief）是一个由 Grok Bot 自动更新的财经新闻摘要功能，显示在 IBTrade 的「简报」页面中。
 
-## ⭐ 实时更新特性（无需 git pull）
+## 数据从哪来
 
-点击「更新」按钮后，前端会：
-1. 触发 Grok Bot webhook 生成最新简报
-2. **自动从 GitHub raw API 轮询获取最新内容**（无需本地 git pull）
-3. 智能等待最多 2 分钟，每 5 秒检查一次更新
-4. 检测到 `updatedAt` 变化后立即显示最新内容
+条目内容来自 **X**。Grok Bot 读取 X 上的动态并整理成简报 JSON。仓库里的 `frontend/public/feeds/finance-brief.json` 只是 Bot 上次提交的快照，页面打开时用它做兜底。
+
+点「更新」之后，**不从 GitHub 拉文件**。后端用 `Authorization: Bearer <WebhookKey>` 调用现有 Grok Bot webhook，请 Bot 按 X 上的最新内容重做简报，然后：
+
+1. Bot 把这份 JSON 放在 webhook 响应体里，或
+2. Bot 再 `POST /api/news/brief`，请求头同样是 `Authorization: Bearer <WebhookKey>`
+
+后端只把 Bot 回传的 JSON 放在内存里给页面。GitHub 上的提交仍然可以当存档，但不是这次刷新的数据源。
 
 ## 工作流程
 
 ```
-┌─────────────┐         ┌──────────────┐         ┌─────────────┐
-│   Grok Bot  │ ───────>│ GitHub main  │<─────── │ 后端 API    │
-│   定时/手动  │  提交    │ (JSON 文件)   │  拉取   │ (实时获取)  │
-└─────────────┘         └──────────────┘         └─────────────┘
-      ▲                                                  │
-      │                                                  │
-      │  POST /api/news/refresh                         │ GET /api/news/brief
-      └──────────────────────────────────────────────────┘
-                     用户点击「更新」按钮
-                            ↓
-                   前端智能轮询等待更新
+X 上的动态
+    │
+    ▼
+Grok Bot 整理成简报 JSON
+    │  webhook 响应体，或 POST /api/news/brief
+    ▼
+后端内存缓存  ──GET /api/news/brief──►  简报页
+    ▲
+    │ POST /api/news/refresh（Bearer 只在服务端）
+    └──────── 用户点击「更新」
 ```
 
-### 流程说明
-
-1. **Grok Bot 写入**：Grok Bot 定时或手动将最新的金融简报内容提交到 GitHub `frontend/public/feeds/finance-brief.json`
-2. **前端展示**：用户访问「简报」页面时，前端调用后端 API 获取最新内容
-3. **手动刷新（智能轮询）**：用户点击「更新」按钮时：
-   - 前端调用后端 API `/api/news/refresh`（POST）触发 webhook
-   - 后端通知 Grok Bot 请求更新
-   - 前端开始智能轮询（每 5 秒调用 `/api/news/brief`）
-   - 后端从 GitHub raw API 获取最新 JSON（带 `no-cache` 头）
-   - 检测到 `updatedAt` 字段变化时停止轮询，显示最新内容
-   - 最多轮询 24 次（2 分钟），超时则提示用户
+打开页面时：若本进程还没有 Bot 回传，就显示本地 `finance-brief.json` 快照（内容仍是之前从 X 整理的条目）。
+点更新后：等 webhook 直接返回 JSON，或每 5 秒看一次缓存，直到 `updatedAt` 变化。最多等 2 分钟。
 
 ## 文件结构
 
@@ -105,105 +98,64 @@ src/IBTrade.Api/
 {
   "GrokBot": {
     "WebhookUrl": "https://your-grok-bot-webhook.example.com/webhook",
-    "WebhookKey": "YOUR_WEBHOOK_SECRET_KEY",
-    "GitHubOwner": "SYYYanyangyu",
-    "GitHubRepo": "ibtradehelper",
-    "GitHubBranch": "main"
+    "WebhookKey": "YOUR_WEBHOOK_SECRET_KEY"
   }
 }
 ```
 
-### 配置说明
+### Secrets 键
 
-- **WebhookUrl**: Grok Bot webhook 地址（必需）
-- **WebhookKey**: Webhook 授权密钥（必需）- 以 `Authorization: Bearer {key}` 头部发送
-- **GitHubOwner**: GitHub 用户名（默认：`SYYYanyangyu`）
-- **GitHubRepo**: 仓库名（默认：`ibtradehelper`）
-- **GitHubBranch**: 分支名（默认：`main`）
+| 键 | 必需 | 作用 |
+| --- | --- | --- |
+| `GrokBot:WebhookUrl` | 是 | Grok Bot webhook 地址。只放在服务端。 |
+| `GrokBot:WebhookKey` | 是 | 调用 webhook，以及校验 Bot 回传 `POST /api/news/brief`。请求头固定为 `Authorization: Bearer <WebhookKey>`。 |
 
-或使用环境变量：
+环境变量（双下划线）：
 
 ```bash
 export GrokBot__WebhookUrl="https://your-grok-bot-webhook.example.com/webhook"
 export GrokBot__WebhookKey="YOUR_WEBHOOK_SECRET_KEY"
-export GrokBot__GitHubOwner="SYYYanyangyu"  # 可选，默认值已设置
-export GrokBot__GitHubRepo="ibtradehelper"  # 可选，默认值已设置
-export GrokBot__GitHubBranch="main"         # 可选，默认值已设置
 ```
+
+浏览器不读取这两个键。若引擎另外配置了 `ApiKey`，前端刷新仍走原来的 `X-Api-Key`；Bot 回传简报只认 `GrokBot:WebhookKey`。
 
 ## API 端点
 
-### GET /api/news/brief
-
-从 GitHub raw API 获取最新简报（绕过本地文件缓存）。
-
-**请求：**
-```
-GET /api/news/brief
-Cache-Control: no-cache
-```
-
-**响应：**
-- `200 OK`: 返回最新的 JSON 内容
-- `404 Not Found`: GitHub 上文件不存在
-- `500 Internal Server Error`: 获取失败
-
 ### POST /api/news/refresh
 
-触发 Grok Bot 更新简报。
-
-**请求：**
-```
-POST /api/news/refresh
-Content-Type: application/json
-```
+通知 Grok Bot 按 X 上的最新内容重做简报。服务端附带 `Authorization: Bearer <WebhookKey>`。
 
 **响应：**
-- `202 Accepted`: 成功触发更新请求
-- `500 Internal Server Error`: webhook 未配置或调用失败
+- `200`：响应体就是简报 JSON（含 `updatedAt` 与 `sections`），页面直接显示
+- `202`：Bot 已接单，稍后会把 JSON POST 回来；页面继续等
+- `500` / `504`：webhook 未配置、调用失败或超时
+
+### GET /api/news/brief
+
+读取本进程里 Bot 已经回传的简报。
+
+- `200`：简报 JSON
+- `204`：还没有回传，页面使用本地 `finance-brief.json` 快照
+
+### POST /api/news/brief
+
+给 Grok Bot 用。请求头 `Authorization: Bearer <GrokBot:WebhookKey>`，正文为简报 JSON。
 
 ## 安全注意事项
 
-- ✅ **Webhook 密钥不暴露给前端**：前端只调用后端 API，后端负责添加 `Authorization: Bearer <key>` 头
-- ✅ **配置文件不提交**：`appsettings.Secrets.json` 已在 `.gitignore` 中，真实密钥不会进入版本控制
-- ✅ **示例配置安全**：`appsettings.Example.json` 中只包含占位符，没有真实密钥
-- ✅ **GitHub 只读访问**：后端从 GitHub raw API 读取，无需 token（公开仓库）
-- ✅ **默认值安全**：GitHubOwner/Repo/Branch 有合理默认值，无需暴露在环境变量中
+- Webhook 密钥只在服务端，前端刷新不带这个密钥
+- `appsettings.Secrets.json` 不提交
+- 示例配置只有占位符
 
 ## Grok Bot 集成说明
 
-Grok Bot 需要：
+1. 监听 webhook，校验 `Authorization: Bearer <WebhookKey>`
+2. 用 **X** 上的最新内容生成简报 JSON（字段与 `finance-brief.json` 相同）
+3. 把这份 JSON 作为 webhook 的 HTTP 响应体返回，或再 `POST /api/news/brief`（同一个 Bearer）
+4. 收到的触发体仍是 `{ "action": "refresh_finance_brief" }`
+5. 提交到 GitHub 只是存档，页面不会为了这次刷新去读 GitHub
 
-1. **监听 webhook**：接收来自 `/api/news/refresh` 的 POST 请求
-2. **验证 Authorization 头**：检查 `Bearer <WebhookKey>` 是否匹配
-3. **更新并提交 JSON 文件**：将最新简报内容提交到 GitHub `frontend/public/feeds/finance-brief.json`
-4. **请求格式**：
-   ```json
-   {
-     "action": "refresh_finance_brief"
-   }
-   ```
-5. **响应要求**：建议在 2 分钟内完成更新（匹配前端轮询超时）
-
-## 技术亮点
-
-### 1. 无需 git pull
-- 前端从 `/api/news/brief` 获取最新内容
-- 后端从 GitHub raw API 实时拉取
-- 开发者无需手动 `git pull` 即可看到更新
-
-### 2. 智能轮询
-- 点击「更新」后自动等待 Grok Bot 完成
-- 每 5 秒检查一次 `updatedAt` 字段变化
-- 最多等待 2 分钟，超时友好提示
-
-### 3. 降级处理
-- `/api/news/brief` 失败时回退到本地静态文件
-- 确保页面始终可访问
-
-### 4. 缓存绕过
-- GitHub raw API 请求带 `Cache-Control: no-cache` 头
-- 避免 CDN 缓存导致的延迟
+建议在 2 分钟内回传，和页面等待时间一致。
 
 ## 开发与测试
 
@@ -228,28 +180,24 @@ API 运行在 http://localhost:8090
 ### 测试刷新功能
 
 ```bash
-# 需要先配置 webhook URL 和 key
+# 触发 Bot（服务端会带 Bearer webhook key）
 curl -X POST http://localhost:8090/api/news/refresh
 
-# 测试获取最新简报（从 GitHub）
-curl http://localhost:8090/api/news/brief
+# 查看 Bot 是否已经回传。没有回传时是 204
+curl -i http://localhost:8090/api/news/brief
+
+# 模拟 Bot 把 X 上整理好的 JSON 推回来（不要从浏览器带这个 key）
+curl -X POST http://localhost:8090/api/news/brief \
+  -H "Authorization: Bearer $GrokBot__WebhookKey" \
+  -H "Content-Type: application/json" \
+  --data-binary @frontend/public/feeds/finance-brief.json
 ```
 
-### 完整测试流程
+### 本地验证
 
-1. 配置 `appsettings.Secrets.json` 中的 GrokBot 配置
-2. 启动后端和前端
-3. 访问「简报」页面
-4. 点击「更新」按钮
-5. 观察轮询状态提示（蓝色框）
-6. Grok Bot 完成后，页面自动显示最新内容
-7. 或 2 分钟后超时提示
+1. `appsettings.Secrets.json` 只填 `GrokBot:WebhookUrl` 和 `GrokBot:WebhookKey`
+2. 启动后端和前端，打开「简报」。此时看到的是本地快照，条目链接仍是 X
+3. 点「更新」。Bot 若在 webhook 响应里直接返回新 JSON，页面马上换成新条目，不需要 `git pull`，也不读 GitHub
+4. Bot 若稍后才推送，页面会显示「正在等待回传」，直到 `updatedAt` 变化或 2 分钟超时
 
-### 手动更新 JSON（无 Grok Bot 时）
-
-可以手动修改 GitHub 上的 `frontend/public/feeds/finance-brief.json`：
-1. 更新内容
-2. 修改 `updatedAt` 字段为当前时间
-3. 提交到 main 分支
-4. 点击前端「更新」按钮
-5. 等待轮询检测到变化（约 5-10 秒）
+没有 Bot 时，可以用上面的 `POST /api/news/brief` 把一份改过 `updatedAt` 的 JSON 推给本机 API，确认页面会换成这份内容。
