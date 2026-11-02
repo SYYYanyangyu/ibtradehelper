@@ -27,6 +27,7 @@ export function NewsBriefPage() {
   const [brief, setBrief] = useState<FinanceBrief | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [polling, setPolling] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null)
   const [activeSection, setActiveSection] = useState<string | null>(null)
@@ -38,9 +39,23 @@ export function NewsBriefPage() {
 
   async function loadBrief() {
     try {
-      const cacheBust = `?t=${Date.now()}`
-      const res = await fetch(`/feeds/finance-brief.json${cacheBust}`)
-      if (!res.ok) throw new Error('加载简报失败')
+      const res = await fetch('/api/news/brief', {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      })
+      if (!res.ok) {
+        const fallbackRes = await fetch(`/feeds/finance-brief.json?t=${Date.now()}`)
+        if (!fallbackRes.ok) throw new Error('加载简报失败')
+        const data = await fallbackRes.json()
+        setBrief(data)
+        if (data.sections.length > 0 && !activeSection) {
+          setActiveSection(data.sections[0].id)
+        }
+        setError(null)
+        return
+      }
       const data = await res.json()
       setBrief(data)
       if (data.sections.length > 0 && !activeSection) {
@@ -64,6 +79,8 @@ export function NewsBriefPage() {
     setRefreshing(true)
     setToast(null)
     setError(null)
+    const prevUpdatedAt = brief?.updatedAt
+    
     try {
       const res = await fetch('/api/news/refresh', {
         method: 'POST',
@@ -75,15 +92,66 @@ export function NewsBriefPage() {
         throw new Error(text || '请求刷新失败')
       }
 
-      showToast('ok', '已请求 Grok Bot 更新简报，请稍后刷新查看')
+      setPolling(true)
+      showToast('ok', '已触发 Grok Bot 更新，正在等待最新简报...')
       
-      setTimeout(() => {
-        loadBrief()
-      }, 3000)
+      let attempts = 0
+      const maxAttempts = 24
+      const pollInterval = 5000
+      
+      const checkForUpdate = async (): Promise<boolean> => {
+        attempts++
+        try {
+          const data = await (await fetch('/api/news/brief', {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          })).json()
+          
+          if (data.updatedAt !== prevUpdatedAt) {
+            setBrief(data)
+            if (data.sections.length > 0 && !activeSection) {
+              setActiveSection(data.sections[0].id)
+            }
+            setPolling(false)
+            setRefreshing(false)
+            showToast('ok', '简报已更新！')
+            return true
+          }
+          
+          if (attempts >= maxAttempts) {
+            setPolling(false)
+            setRefreshing(false)
+            showToast('err', '等待超时，请稍后手动刷新页面')
+            return true
+          }
+          
+          return false
+        } catch (e) {
+          if (attempts >= maxAttempts) {
+            setPolling(false)
+            setRefreshing(false)
+            showToast('err', e instanceof Error ? e.message : '轮询失败')
+            return true
+          }
+          return false
+        }
+      }
+      
+      const pollTimer = setInterval(async () => {
+        const done = await checkForUpdate()
+        if (done) {
+          clearInterval(pollTimer)
+        }
+      }, pollInterval)
+      
+      await checkForUpdate()
+      
     } catch (e) {
       showToast('err', e instanceof Error ? e.message : '刷新失败，请检查后端配置')
-    } finally {
       setRefreshing(false)
+      setPolling(false)
     }
   }
 
@@ -191,13 +259,22 @@ export function NewsBriefPage() {
           </div>
           <button
             onClick={handleRefresh}
-            disabled={refreshing}
+            disabled={refreshing || polling}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted transition hover:bg-surface-2 hover:text-foreground disabled:opacity-40"
           >
-            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={refreshing || polling ? 'animate-spin' : ''} />
             更新
           </button>
         </CardHeader>
+
+        {polling && (
+          <CardContent className="pb-3">
+            <div className="flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2 text-xs text-primary">
+              <RefreshCw size={14} className="animate-spin" />
+              正在等待 Grok Bot 生成最新简报，预计 1-2 分钟...
+            </div>
+          </CardContent>
+        )}
 
         {error && brief && (
           <CardContent className="pb-3">

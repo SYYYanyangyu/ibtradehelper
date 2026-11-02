@@ -8,6 +8,9 @@ public class GrokBotOptions
 {
     public string WebhookUrl { get; set; } = "";
     public string WebhookKey { get; set; } = "";
+    public string GitHubOwner { get; set; } = "SYYYanyangyu";
+    public string GitHubRepo { get; set; } = "ibtradehelper";
+    public string GitHubBranch { get; set; } = "main";
 }
 
 [ApiController]
@@ -19,6 +22,43 @@ public class NewsController(
     ILogger<NewsController> logger) : ControllerBase
 {
     private readonly GrokBotOptions _grokOptions = grokOptions.Value;
+    private const string JsonPath = "frontend/public/feeds/finance-brief.json";
+
+    /// <summary>
+    /// 从 GitHub raw API 获取最新的简报 JSON（绕过本地文件缓存）
+    /// </summary>
+    [HttpGet("brief")]
+    public async Task<IActionResult> GetBrief(CancellationToken ct)
+    {
+        try
+        {
+            var owner = string.IsNullOrWhiteSpace(_grokOptions.GitHubOwner) ? "SYYYanyangyu" : _grokOptions.GitHubOwner;
+            var repo = string.IsNullOrWhiteSpace(_grokOptions.GitHubRepo) ? "ibtradehelper" : _grokOptions.GitHubRepo;
+            var branch = string.IsNullOrWhiteSpace(_grokOptions.GitHubBranch) ? "main" : _grokOptions.GitHubBranch;
+            
+            var rawUrl = $"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{JsonPath}";
+            
+            var client = httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Add("Cache-Control", "no-cache");
+            client.DefaultRequestHeaders.Add("Pragma", "no-cache");
+            
+            var response = await client.GetAsync(rawUrl, ct);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogWarning("GitHub raw API returned {StatusCode} for {Url}", response.StatusCode, rawUrl);
+                return StatusCode((int)response.StatusCode, $"无法从 GitHub 获取简报：{response.StatusCode}");
+            }
+            
+            var json = await response.Content.ReadAsStringAsync(ct);
+            return Content(json, "application/json");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to fetch finance brief from GitHub");
+            return StatusCode(500, $"获取简报失败：{ex.Message}");
+        }
+    }
 
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh(CancellationToken ct)
