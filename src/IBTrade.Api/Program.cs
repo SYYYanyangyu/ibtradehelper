@@ -31,6 +31,7 @@ builder.Services.AddHttpContextAccessor(); // 供控制器提取来源 IP，用�
 // Grok Bot webhook 配置
 builder.Services.Configure<IBTrade.Api.Controllers.GrokBotOptions>(
     builder.Configuration.GetSection("GrokBot"));
+builder.Services.AddSingleton<IBTrade.Api.Controllers.FinanceBriefStore>();
 builder.Services.AddHttpClient();
 
 // TWS 实时接入配置（appsettings 的 TWS 段或环境变量 TWS__*）

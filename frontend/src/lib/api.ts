@@ -752,14 +752,52 @@ export function getWeeklyReview(accountId?: string, env?: TradeEnvFilter, weeks 
   return req<WeeklyReview>(url.toString(), undefined, EVAL_TIMEOUT)
 }
 
+export interface FinanceBriefItem {
+  headline: string
+  summary: string
+  url: string
+  tickers: string[]
+}
+
+export interface FinanceBriefSection {
+  id: string
+  title: string
+  items: FinanceBriefItem[]
+}
+
+/** Grok Bot 从 X 整理后的简报。 */
+export interface FinanceBrief {
+  updatedAt: string
+  source: 'scheduled' | 'manual' | string
+  sections: FinanceBriefSection[]
+}
+
+export function isFinanceBrief(value: unknown): value is FinanceBrief {
+  if (!value || typeof value !== 'object') return false
+  const brief = value as Partial<FinanceBrief>
+  return typeof brief.updatedAt === 'string' && Array.isArray(brief.sections)
+}
+
+/** 本次进程里 Bot 回传的简报。还没有回传时为 null，页面用本地快照。 */
+export function getLiveFinanceBrief(): Promise<FinanceBrief | null> {
+  return req<FinanceBrief | null>(apiUrl('/api/news/brief').toString())
+}
+
+/** 通知 Grok Bot 按 X 上的最新内容重做简报。若响应体就是简报 JSON，直接返回。 */
+export function refreshFinanceBrief(): Promise<FinanceBrief | { status?: string; message?: string }> {
+  return req(
+    apiUrl('/api/news/refresh').toString(),
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    },
+    180000
+  )
+}
+
 export function getMarketNews(symbol = 'QQQ'): Promise<MarketNewsFeed> {
   const url = apiUrl('/api/market-news')
   url.searchParams.set('symbol', symbol)
   return req<MarketNewsFeed>(url.toString(), undefined, EVAL_TIMEOUT)
-}
-
-
-/** Trigger finance-brief generation through the configured backend. */
-export function refreshFinanceBrief(): Promise<void> {
-  return req<void>(apiUrl('/api/news/refresh').toString(), { method: 'POST' })
 }

@@ -50,6 +50,15 @@ public sealed class ApiKeyAuthMiddleware
             return;
         }
 
+        // Grok Bot 回传简报：用 GrokBot:WebhookKey 作为 Bearer，不要求引擎 ApiKey。
+        if (HttpMethods.IsPost(context.Request.Method)
+            && path.Equals("/api/news/brief", StringComparison.OrdinalIgnoreCase)
+            && BearerMatchesWebhookKey(context))
+        {
+            await _next(context);
+            return;
+        }
+
         var configuredKey = _configuration["ApiKey"]
             ?? Environment.GetEnvironmentVariable(EnvVarName);
 
@@ -106,5 +115,15 @@ public sealed class ApiKeyAuthMiddleware
         }
 
         return CryptographicOperations.FixedTimeEquals(left, right);
+    }
+
+    private bool BearerMatchesWebhookKey(HttpContext context)
+    {
+        var expected = _configuration["GrokBot:WebhookKey"]?.Trim();
+        if (string.IsNullOrWhiteSpace(expected)) return false;
+        var auth = context.Request.Headers.Authorization.ToString();
+        if (!auth.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) return false;
+        var provided = auth["Bearer ".Length..].Trim();
+        return FixedTimeEquals(provided, expected);
     }
 }

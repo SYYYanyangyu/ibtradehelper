@@ -1,92 +1,338 @@
-import { useState, useEffect, useMemo } from 'react'
-import { RefreshCw, ExternalLink, Search, ArrowUpRight, Newspaper, AlertCircle, X } from 'lucide-react'
-import { refreshFinanceBrief } from '../lib/api'
-import './NewsBriefPage.css'
-
-interface BriefItem { headline: string; summary: string; url: string; tickers: string[] }
-interface BriefSection { id: string; title: string; items: BriefItem[] }
-interface FinanceBrief { updatedAt: string; source: 'scheduled' | 'manual'; sections: BriefSection[] }
-const descriptions: Record<string, string> = {
-  trump: '政策动向与全球市场', fed: '利率、通胀与货币政策', mega_cap: '科技巨头与市场焦点',
-  storage: '存储周期与算力需求', robotics: '具身智能与产业进展', biotech: '医药研发与生命科学', semiconductor: '芯片产业链与制造',
-}
-function sourceName(url: string) {
-  try { const u = new URL(url); return ['https:', 'http:'].includes(u.protocol) ? u.hostname.replace(/^www\./, '') : '' } catch { return '' }
-}
-function chinesePunctuation(text: string) {
-  return text.replace(/,(?!\d)/g, '，').replace(/;/g, '；').replace(/\(/g, '（').replace(/\)/g, '）')
-}
-function formatDate(value?: string) {
-  if (!value || !Number.isFinite(Date.parse(value))) return '更新时间待确认'
-  return new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value))
-}
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { RefreshCw, ExternalLink, Clock, AlertTriangle, BookOpen, Sparkles } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
+import { Badge } from '../components/ui/Badge'
+import { getLiveFinanceBrief, isFinanceBrief, refreshFinanceBrief } from '../lib/api'
+import { cn } from '../lib/utils'
+import type { FinanceBrief } from '../lib/api'
 
 export function NewsBriefPage() {
   const [brief, setBrief] = useState<FinanceBrief | null>(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState('')
-  const [notice, setNotice] = useState('')
-  const [active, setActive] = useState('all')
-  const [query, setQuery] = useState('')
+  const [polling, setPolling] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+  const pollRef = useRef<number | null>(null)
 
-  async function loadBrief(signal?: AbortSignal) {
+  const showToast = useCallback((kind: 'ok' | 'err', text: string) => {
+    setToast({ kind, text })
+    window.setTimeout(() => setToast(null), 3500)
+  }, [])
+
+  const applyBrief = useCallback((data: FinanceBrief) => {
+    setBrief(data)
+    setActiveSection((current) => current ?? data.sections[0]?.id ?? null)
+    setError(null)
+  }, [])
+
+  const loadSnapshot = useCallback(async () => {
+    const res = await fetch(`/feeds/finance-brief.json?t=${Date.now()}`)
+    if (!res.ok) throw new Error('加载简报失败')
+    const data = (await res.json()) as FinanceBrief
+    applyBrief(data)
+  }, [applyBrief])
+
+  async function loadBrief() {
     try {
-      const response = await fetch(`/feeds/finance-brief.json?t=${Date.now()}`, { signal })
-      if (!response.ok) throw new Error('暂时无法读取简报，请稍后重试。')
-      const data: FinanceBrief = await response.json()
-      if (!Array.isArray(data.sections) || data.sections.some(s => !Array.isArray(s.items))) throw new Error('简报格式异常，请检查数据源。')
-      setBrief(data)
-      setActive(current => current === 'all' || data.sections.some(s => s.id === current) ? current : 'all')
-      setError('')
+      const live = await getLiveFinanceBrief()
+      if (isFinanceBrief(live)) {
+        applyBrief(live)
+        return
+      }
+      await loadSnapshot()
+    } catch {
+      try {
+        await loadSnapshot()
+      } catch (e) {
+        setError(e instanceof Error ? e.message : '加载失败')
+        setBrief(null)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadBrief()
+    return () => {
+      if (pollRef.current != null) window.clearInterval(pollRef.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function stopPolling() {
+    if (pollRef.current != null) {
+      window.clearInterval(pollRef.current)
+      pollRef.current = null
+    }
+    setPolling(false)
+    setRefreshing(false)
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true)
+    setToast(null)
+    setError(null)
+    stopPolling()
+    setRefreshing(true)
+    const prevUpdatedAt = brief?.updatedAt
+
+    try {
+      const result = await refreshFinanceBrief()
+      if (isFinanceBrief(result)) {
+        applyBrief(result)
+        showToast('ok', '简报已更新')
+        setRefreshing(false)
+        return
+      }
+
+      setPolling(true)
+      showToast('ok', '已通知 Grok Bot 从 X 更新，正在等待回传...')
+
+      let attempts = 0
+      const maxAttempts = 24
+      pollRef.current = window.setInterval(async () => {
+        attempts++
+        try {
+          const live = await getLiveFinanceBrief()
+          if (isFinanceBrief(live) && live.updatedAt !== prevUpdatedAt) {
+            applyBrief(live)
+            showToast('ok', '简报已更新')
+            stopPolling()
+            return
+          }
+        } catch (e) {
+          if (attempts >= maxAttempts) {
+            showToast('err', e instanceof Error ? e.message : '等待回传失败')
+            stopPolling()
+            return
+          }
+        }
+        if (attempts >= maxAttempts) {
+          showToast('err', '等待超时，Bot 还没有回传简报')
+          stopPolling()
+        }
+      }, 5000)
     } catch (e) {
-      if (!signal?.aborted) setError(e instanceof Error ? e.message : '简报加载失败')
-    } finally { if (!signal?.aborted) setLoading(false) }
+      showToast('err', e instanceof Error ? e.message : '刷新失败，请检查后端配置')
+      setRefreshing(false)
+      setPolling(false)
+    }
   }
-  useEffect(() => { const controller = new AbortController(); void loadBrief(controller.signal); return () => controller.abort() }, [])
 
-  async function refresh() {
-    setRefreshing(true); setNotice(''); setError('')
-    try {
-      await refreshFinanceBrief()
-      setNotice('更新请求已发送。内容生成后，点击“重新读取”查看。')
-      await loadBrief()
-    } catch (e) { setError(e instanceof Error ? e.message : '更新失败，请稍后重试。') }
-    finally { setRefreshing(false) }
-  }
-  const allItems = useMemo(() => brief?.sections.flatMap(section => section.items.map(item => ({ ...item, section }))) ?? [], [brief])
-  const items = useMemo(() => allItems.filter(item => (active === 'all' || item.section.id === active) &&
-    `${chinesePunctuation(item.headline)} ${chinesePunctuation(item.summary)} ${item.tickers.join(' ')}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())), [allItems, active, query])
-  const section = brief?.sections.find(s => s.id === active)
+  const timeAgo = useMemo(() => {
+    if (!brief?.updatedAt) return ''
+    const now = new Date()
+    const updated = new Date(brief.updatedAt)
+    const diff = now.getTime() - updated.getTime()
+    const hours = Math.floor(diff / (1000 * 60 * 60))
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    if (hours > 24) {
+      return `${Math.floor(hours / 24)} 天前`
+    }
+    if (hours > 0) {
+      return `${hours} 小时前`
+    }
+    if (minutes > 0) {
+      return `${minutes} 分钟前`
+    }
+    return '刚刚'
+  }, [brief?.updatedAt])
 
-  return <section className="newsroom" aria-label="中文财经简报">
-    <header className="newsroom-heading">
-      <div><div className="newsroom-eyebrow"><span /> 市场观察 · 中文简报</div><h1>财经简报<span>读懂市场，关注变化。</span></h1>
-        <p className="newsroom-date">{formatDate(brief?.updatedAt)} <span>北京时间</span><i />{brief?.source === 'manual' ? '手动更新' : '定时更新'}</p></div>
-      <button className="newsroom-refresh" onClick={refresh} disabled={refreshing}><RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />{refreshing ? '正在请求…' : '更新简报'}</button>
-    </header>
-    {(error || notice) && <div className={`newsroom-notice ${error ? 'is-error' : ''}`} role={error ? 'alert' : 'status'}><AlertCircle size={16} /><span>{error || notice}</span><button onClick={() => void loadBrief()}>重新读取</button></div>}
-    <div className="newsroom-layout">
-      <aside className="newsroom-sidebar"><div className="newsroom-nav-title">内容导航 <span>{brief?.sections.length ?? 0} 个板块</span></div>
-        <nav aria-label="简报栏目"><button aria-pressed={active === 'all'} className={active === 'all' ? 'is-active' : ''} onClick={() => setActive('all')}><span>全部简报</span><b>{allItems.length}</b></button>
-          {brief?.sections.map(s => <button key={s.id} aria-pressed={active === s.id} className={active === s.id ? 'is-active' : ''} onClick={() => setActive(s.id)}><span>{s.title}</span><b>{s.items.length}</b></button>)}
-        </nav><div className="newsroom-note"><Newspaper size={19} /><p>信息有出处<br /><span>点击原文，了解完整背景。</span></p></div>
-      </aside>
-      <main className="newsroom-main">
-        <div className="newsroom-toolbar"><div><h2>{section?.title ?? '全部简报'} <span>{items.length} 条</span></h2><p>{section ? descriptions[section.id] ?? '追踪行业动态与市场变化' : '从宏观政策到产业趋势，按板块浏览市场动态。'}</p></div>
-          <label className="newsroom-search"><Search size={15} /><input aria-label="搜索简报" placeholder="搜索新闻或股票代码" value={query} onChange={e => setQuery(e.target.value)} />{query && <button aria-label="清空搜索" onClick={() => setQuery('')}><X size={14} /></button>}</label>
-        </div>
-        {loading ? <div className="newsroom-empty" role="status"><RefreshCw className="animate-spin" size={24} /><h3>正在整理简报…</h3></div> : items.length === 0 ? <div className="newsroom-empty"><Search size={26} /><h3>{query ? '没有找到相关简报' : '暂无简报'}</h3><p>{query ? '试试其他关键词，或切换至全部板块。' : '可重新读取数据或请求更新。'}</p><button onClick={() => { setQuery(''); setActive('all'); void loadBrief() }}>查看全部简报</button></div> :
-          <div className="newsroom-list">{items.map((item, index) => <article className="newsroom-article" key={`${item.section.id}-${item.url}-${index}`}>
-            <div className="newsroom-number">{String(index + 1).padStart(2, '0')}</div><div className="newsroom-article-body">
-              <div className="newsroom-meta"><span>{item.section.title}</span><i />{sourceName(item.url) || '来源待确认'}</div>
-              <h3>{sourceName(item.url) ? <a href={item.url} target="_blank" rel="noopener noreferrer">{chinesePunctuation(item.headline)}<ArrowUpRight size={17} /></a> : item.headline}</h3>
-              <p className="newsroom-summary">{chinesePunctuation(item.summary)}</p>
-              <footer><div className="newsroom-tickers">{item.tickers.map(ticker => <span key={ticker}>{ticker}</span>)}</div>{sourceName(item.url) && <a className="newsroom-source" href={item.url} target="_blank" rel="noopener noreferrer">阅读原文<ExternalLink size={12} /></a>}</footer>
+  const currentSection = useMemo(
+    () => brief?.sections.find((s) => s.id === activeSection),
+    [brief, activeSection]
+  )
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardContent className="flex items-center justify-center py-20">
+            <div className="flex items-center gap-3 text-muted">
+              <RefreshCw size={20} className="animate-spin" />
+              <span>加载中...</span>
             </div>
-          </article>)}</div>}
-        <div className="newsroom-bottom">以上为来源内容摘要，未经独立核实。请以原始报道为准。</div>
-      </main>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (error && !brief) {
+    return (
+      <div className="space-y-4">
+        <Card className="border-down/30 bg-down/5">
+          <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
+            <AlertTriangle className="text-down" size={28} />
+            <p className="text-sm text-down">{error}</p>
+            <button
+              onClick={() => {
+                setLoading(true)
+                setError(null)
+                loadBrief()
+              }}
+              className="rounded-xl bg-down px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+            >
+              重试
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {toast && (
+        <div
+          className={cn(
+            'flex items-center gap-2 rounded-lg border px-3 py-2 text-xs',
+            toast.kind === 'ok'
+              ? 'border-up/25 bg-up/5 text-up'
+              : 'border-down/25 bg-down/5 text-down'
+          )}
+        >
+          <span className="min-w-0 flex-1 truncate">{toast.text}</span>
+        </div>
+      )}
+
+      <Card className="animate-fade-up">
+        <CardHeader>
+          <div className="flex items-start gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <BookOpen size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <CardTitle className="flex items-center gap-2">
+                Finance Brief · 金融简报
+              </CardTitle>
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-2">
+                {brief && (
+                  <>
+                    <span className="inline-flex items-center gap-1">
+                      <Clock size={12} />
+                      {timeAgo}更新
+                    </span>
+                    <Badge tone={brief.source === 'manual' ? 'primary' : 'neutral'}>
+                      {brief.source === 'manual' ? '手动' : '定时'}
+                    </Badge>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing || polling}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted transition hover:bg-surface-2 hover:text-foreground disabled:opacity-40"
+          >
+            <RefreshCw size={13} className={refreshing || polling ? 'animate-spin' : ''} />
+            更新
+          </button>
+        </CardHeader>
+
+        {polling && (
+          <CardContent className="pb-3">
+            <div className="flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2 text-xs text-primary">
+              <RefreshCw size={14} className="animate-spin" />
+              正在等待 Grok Bot 从 X 回传最新简报，预计 1-2 分钟...
+            </div>
+          </CardContent>
+        )}
+
+        {error && brief && (
+          <CardContent className="pb-3">
+            <div className="flex items-center gap-2 rounded-lg border border-down/25 bg-down/5 px-3 py-2 text-xs text-down">
+              <AlertTriangle size={14} />
+              {error}
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {brief && brief.sections.length > 0 && (
+        <>
+          <div className="sticky top-12 z-10 -mx-3 overflow-x-auto border-y border-border/50 bg-surface/90 px-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
+            <div className="flex items-center gap-2 py-2">
+              {brief.sections.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={cn(
+                    'shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition',
+                    activeSection === section.id
+                      ? 'border-primary/40 bg-primary/10 text-primary'
+                      : 'border-border/70 text-muted hover:bg-surface-2 hover:text-foreground'
+                  )}
+                >
+                  {section.title}
+                  <span className="ml-1.5 text-[10px] opacity-70">
+                    {section.items.length}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {currentSection && (
+            <div className="space-y-3">
+              {currentSection.items.map((item, idx) => (
+                <Card key={idx} className="group animate-fade-up transition-all hover:shadow-md">
+                  <CardContent className="py-4">
+                    <div className="flex items-start gap-3">
+                      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/5 text-primary/60 transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+                        <Sparkles size={14} />
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 className="text-sm font-semibold leading-snug text-foreground group-hover:text-primary">
+                            {item.headline}
+                          </h3>
+                          {item.url && (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="shrink-0 text-primary/60 transition-colors hover:text-primary"
+                              aria-label="查看详情"
+                            >
+                              <ExternalLink size={16} />
+                            </a>
+                          )}
+                        </div>
+                        <p className="text-xs leading-relaxed text-muted">{item.summary}</p>
+                        {item.tickers.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {item.tickers.map((ticker) => (
+                              <span
+                                key={ticker}
+                                className="inline-flex items-center rounded border border-border/60 bg-surface-2/50 px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-muted-2 transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                              >
+                                {ticker}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {brief && brief.sections.length === 0 && (
+        <Card>
+          <CardContent className="py-12 text-center text-sm text-muted">
+            暂无简报内容
+          </CardContent>
+        </Card>
+      )}
     </div>
-  </section>
+  )
 }
