@@ -1,0 +1,79 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${IBTRADE_DB_USER}
+      POSTGRES_PASSWORD: ${IBTRADE_DB_PASSWORD}
+      POSTGRES_DB: ${IBTRADE_DB_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    mem_limit: 256m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - ibtrade
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8090
+      IBTRADE_DB_HOST: db
+      IBTRADE_DB_PORT: "5432"
+      TWS__Enabled: "false"
+      TWS__Mode: Paper
+    volumes:
+      - apidata:/data
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8090/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+    mem_limit: 512m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - ibtrade
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    environment:
+      IBTRADE_API_KEY: ${IBTRADE_API_KEY}
+    ports:
+      - "127.0.0.1:18090:8080"
+    volumes:
+      - ./htpasswd:/etc/nginx/htpasswd:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 64m
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - ibtrade
+
+volumes:
+  pgdata:
+  apidata:
+
+networks:
+  ibtrade:
+    driver: bridge

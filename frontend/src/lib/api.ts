@@ -24,8 +24,14 @@ import type {
   MarketNewsFeed
 } from '../types'
 
-const API_BASE: string =
-  (import.meta.env.VITE_API_BASE as string | undefined) ?? 'http://localhost:8090'
+// 未设置时保持本地开发默认；显式设为空字符串时走当前页面的同源地址（由反向代理转发 /api）。
+const rawApiBase = import.meta.env.VITE_API_BASE as string | undefined
+const API_BASE: string = rawApiBase === undefined ? 'http://localhost:8090' : rawApiBase
+
+export function apiUrl(path: string): URL {
+  const base = API_BASE || (typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1')
+  return new URL(path, base)
+}
 
 // 引擎 API Key（可选）：配置后统一在请求头携带 X-Api-Key，使真实下单/启停接口受保护。
 // 未配置时不附加任何头，兼容开发环境与只读看板场景。
@@ -111,7 +117,7 @@ export interface AccountInfo {
 
 /** 组合看板汇总。env=Paper|Live 可隔离模拟/真实；不传则全部混算。 */
 export function getPortfolio(accountId?: string, env?: TradeEnvFilter): Promise<PortfolioSummary> {
-  const url = new URL('/api/portfolio/summary', API_BASE)
+  const url = apiUrl('/api/portfolio/summary')
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
   return getJson<PortfolioSummary>(url.toString())
@@ -119,17 +125,17 @@ export function getPortfolio(accountId?: string, env?: TradeEnvFilter): Promise<
 
 /** 账户列表：Flex 入库的真实 IB 账户。 */
 export function getAccounts(): Promise<AccountInfo[]> {
-  return getJson<AccountInfo[]>(new URL('/api/portfolio/accounts', API_BASE).toString())
+  return getJson<AccountInfo[]>(apiUrl('/api/portfolio/accounts').toString())
 }
 
 /** 全部持仓（用于派生账户列表）。 */
 export function getPositions(): Promise<PositionLite[]> {
-  return getJson<PositionLite[]>(new URL('/api/positions', API_BASE).toString())
+  return getJson<PositionLite[]>(apiUrl('/api/positions').toString())
 }
 
 /** 每日盈亏曲线（最近 days 天）。env 用于 Paper/Live「全部」按环境汇总，避免串盘。 */
 export function getDailyPnl(accountId?: string, days = 30, env?: TradeEnvFilter): Promise<DailyPnlPoint[]> {
-  const url = new URL('/api/portfolio/daily-pnl', API_BASE)
+  const url = apiUrl('/api/portfolio/daily-pnl')
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
   url.searchParams.set('days', String(days))
@@ -142,7 +148,7 @@ export function getPerformance(
   range: PerformanceRange | string = '1Y',
   env?: TradeEnvFilter
 ): Promise<PerformanceCompare> {
-  const url = new URL('/api/portfolio/performance', API_BASE)
+  const url = apiUrl('/api/portfolio/performance')
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
   url.searchParams.set('range', range)
@@ -151,7 +157,7 @@ export function getPerformance(
 
 /** 查最近 days 天的外部现金流（入金/出金/股息等）。不传 accountId 取跨账户汇总。 */
 export function getCashTransactions(accountId?: string, days = 30): Promise<CashTransaction[]> {
-  const url = new URL('/api/portfolio/cash-transactions', API_BASE)
+  const url = apiUrl('/api/portfolio/cash-transactions')
   if (accountId) url.searchParams.set('accountId', accountId)
   url.searchParams.set('days', String(days))
   return getJson<CashTransaction[]>(url.toString())
@@ -163,7 +169,7 @@ export function getPositionDailyPnl(
   accountId?: string,
   env?: TradeEnvFilter
 ): Promise<PositionDailyPnl> {
-  const url = new URL('/api/portfolio/position-daily-pnl', API_BASE)
+  const url = apiUrl('/api/portfolio/position-daily-pnl')
   if (date) url.searchParams.set('date', date)
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
@@ -176,7 +182,7 @@ export function getTrades(
   days = 365,
   env?: TradeEnvFilter
 ): Promise<TradeRecord[]> {
-  const url = new URL('/api/portfolio/trades', API_BASE)
+  const url = apiUrl('/api/portfolio/trades')
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
   url.searchParams.set('days', String(days))
@@ -185,7 +191,7 @@ export function getTrades(
 
 /** 逐笔 FIFO 平仓盈亏。不传 accountId/env 为全部账户。 */
 export function getTradePnl(accountId?: string, env?: TradeEnvFilter): Promise<TradePnl> {
-  const url = new URL('/api/portfolio/trade-pnl', API_BASE)
+  const url = apiUrl('/api/portfolio/trade-pnl')
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
   return getJson<TradePnl>(url.toString())
@@ -200,7 +206,7 @@ export function addCashTransaction(reqBody: {
   date?: string
   note?: string
 }): Promise<CashTransaction> {
-  return req<CashTransaction>(new URL('/api/portfolio/cash-transactions', API_BASE).toString(), {
+  return req<CashTransaction>(apiUrl('/api/portfolio/cash-transactions').toString(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(reqBody)
@@ -217,7 +223,7 @@ export function syncGateway(): Promise<{
   source: 'TWS' | 'Gateway'
   note?: string
 }> {
-  return req(new URL('/api/tws/sync', API_BASE).toString(), { method: 'POST' })
+  return req(apiUrl('/api/tws/sync').toString(), { method: 'POST' })
 }
 
 /** @deprecated 使用 syncGateway */
@@ -239,7 +245,7 @@ export interface DataFeedStatusResponse {
 
 /** 查询 Flex / Gateway 最近成功同步状态。 */
 export function getDataFeedStatus(): Promise<DataFeedStatusResponse> {
-  return req(new URL('/api/ingestion/status', API_BASE).toString())
+  return req(apiUrl('/api/ingestion/status').toString())
 }
 
 /**
@@ -252,7 +258,7 @@ export function runFlexIngest(env?: TradeEnvFilter): Promise<{
   queryId?: string | null
   feeds: DataFeedStatusItem[]
 }> {
-  const u = new URL('/api/ingestion/run', API_BASE)
+  const u = apiUrl('/api/ingestion/run')
   if (env) u.searchParams.set('env', env)
   // Flex Web Service 常需轮询几十秒～两分钟以上（尤其经代理），放宽到 3 分钟
   return req(u.toString(), { method: 'POST' }, 180_000)
@@ -287,17 +293,17 @@ export interface TwsLiveSnapshot {
 
 /** 启动持久实时推送（连接保持，价格一动即刷新）。 */
 export function startLive(): Promise<{ running: boolean; accountId: string; source: 'TWS' | 'Gateway'; connectedPort: number; positionCount: number }> {
-  return req(new URL('/api/tws/live/start', API_BASE).toString(), { method: 'POST' })
+  return req(apiUrl('/api/tws/live/start').toString(), { method: 'POST' })
 }
 
 /** 停止实时推送。 */
 export function stopLive(): Promise<{ running: boolean }> {
-  return req(new URL('/api/tws/live/stop', API_BASE).toString(), { method: 'POST' })
+  return req(apiUrl('/api/tws/live/stop').toString(), { method: 'POST' })
 }
 
 /** 读取当前实时快照（高频轮询）。 */
 export function getLive(): Promise<TwsLiveSnapshot> {
-  return req(new URL('/api/tws/live', API_BASE).toString())
+  return req(apiUrl('/api/tws/live').toString())
 }
 
 // ---- 回测（与看板独立，调 /api/backtest）----
@@ -362,7 +368,7 @@ export interface BacktestRequest {
 
 /** 运行一次回测：拉历史数据 → 跑策略 → 输出绩效。 */
 export async function runBacktest(body: BacktestRequest): Promise<BacktestResult> {
-  return req<BacktestResult>(new URL('/api/backtest/run', API_BASE).toString(), {
+  return req<BacktestResult>(apiUrl('/api/backtest/run').toString(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
@@ -388,7 +394,7 @@ export interface StrategyDef {
 
 /** 列出可用策略（含参数元数据，用于动态渲染参数输入框）。 */
 export function listStrategies(): Promise<StrategyDef[]> {
-  return getJson<StrategyDef[]>(new URL('/api/backtest/strategies', API_BASE).toString())
+  return getJson<StrategyDef[]>(apiUrl('/api/backtest/strategies').toString())
 }
 
 // ---- AI 策略闭环（白名单策略 + 强制演练部署）----
@@ -469,7 +475,7 @@ export type DeployPreflightBody = {
 /** 部署前检查清单（不改配置）。 */
 export function deployPreflight(body: DeployPreflightBody): Promise<DeployPreflightResult> {
   return req<DeployPreflightResult>(
-    new URL('/api/ai/strategy/deploy-preflight', API_BASE).toString(),
+    apiUrl('/api/ai/strategy/deploy-preflight').toString(),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -496,7 +502,7 @@ export interface LlmCatalog {
 
 /** 列出 AI 厂商/模型占位配置。 */
 export function listAiProviders(): Promise<LlmCatalog> {
-  return getJson<LlmCatalog>(new URL('/api/ai/providers', API_BASE).toString())
+  return getJson<LlmCatalog>(apiUrl('/api/ai/providers').toString())
 }
 
 /** 切换当前厂商和/或模型。 */
@@ -504,7 +510,7 @@ export function selectAiProvider(body: {
   providerId?: string
   model?: string
 }): Promise<LlmCatalog> {
-  return req<LlmCatalog>(new URL('/api/ai/providers/select', API_BASE).toString(), {
+  return req<LlmCatalog>(apiUrl('/api/ai/providers/select').toString(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
@@ -518,7 +524,7 @@ export function refreshAiModels(providerId: string): Promise<{
   catalog: LlmCatalog
 }> {
   return req(
-    new URL(`/api/ai/providers/${encodeURIComponent(providerId)}/refresh-models`, API_BASE).toString(),
+    apiUrl(`/api/ai/providers/${encodeURIComponent(providerId)}/refresh-models`).toString(),
     { method: 'POST' },
     60000
   )
@@ -536,7 +542,7 @@ export function aiSuggestAndRun(body: {
   commissionPerTrade?: number
 }): Promise<AiSuggestAndRunResult> {
   return req<AiSuggestAndRunResult>(
-    new URL('/api/ai/strategy/suggest-and-run', API_BASE).toString(),
+    apiUrl('/api/ai/strategy/suggest-and-run').toString(),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -552,7 +558,7 @@ export function deployDryRun(body: DeployPreflightBody & {
   acknowledgeWarnings?: boolean
 }): Promise<DeployDryRunResult> {
   return req<DeployDryRunResult>(
-    new URL('/api/ai/strategy/deploy-dry-run', API_BASE).toString(),
+    apiUrl('/api/ai/strategy/deploy-dry-run').toString(),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -581,7 +587,7 @@ export interface PlaceOrderRequest {
 
 /** 列出全部订单（状态为实时合并，已持久化）。 */
 export function listOrders(): Promise<OrderDto[]> {
-  return getJson<OrderDto[]>(new URL('/api/orders', API_BASE).toString())
+  return getJson<OrderDto[]>(apiUrl('/api/orders').toString())
 }
 
 export interface OrderReconcileRow {
@@ -604,12 +610,12 @@ export interface OrderReconcileResult {
 
 /** 本地成交净额 vs DB 持仓对账（只读）。 */
 export function reconcileOrders(): Promise<OrderReconcileResult> {
-  return getJson<OrderReconcileResult>(new URL('/api/orders/reconcile', API_BASE).toString())
+  return getJson<OrderReconcileResult>(apiUrl('/api/orders/reconcile').toString())
 }
 
 /** 下限价/市价单。风控拦截或 Gateway 未连会抛错。 */
 export function placeOrder(body: PlaceOrderRequest): Promise<OrderDto> {
-  return req<OrderDto>(new URL('/api/orders', API_BASE).toString(), {
+  return req<OrderDto>(apiUrl('/api/orders').toString(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
@@ -619,7 +625,7 @@ export function placeOrder(body: PlaceOrderRequest): Promise<OrderDto> {
 /** 撤单（仅对活动订单有效）。 */
 export function cancelOrder(id: string): Promise<void> {
   return req<void>(
-    new URL(`/api/orders/${encodeURIComponent(id)}`, API_BASE).toString(),
+    apiUrl(`/api/orders/${encodeURIComponent(id)}`).toString(),
     { method: 'DELETE' },
     ORDER_TIMEOUT
   )
@@ -627,12 +633,12 @@ export function cancelOrder(id: string): Promise<void> {
 
 /** 读取风控配置。 */
 export function getRiskSettings(): Promise<RiskSettings> {
-  return getJson<RiskSettings>(new URL('/api/orders/risk-settings', API_BASE).toString())
+  return getJson<RiskSettings>(apiUrl('/api/orders/risk-settings').toString())
 }
 
 /** 更新风控配置（关闭总开关 / 设模拟盘 / 调上限等）。 */
 export function updateRiskSettings(s: RiskSettings): Promise<RiskSettings> {
-  return req<RiskSettings>(new URL('/api/orders/risk-settings', API_BASE).toString(), {
+  return req<RiskSettings>(apiUrl('/api/orders/risk-settings').toString(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(s)
@@ -643,22 +649,22 @@ export function updateRiskSettings(s: RiskSettings): Promise<RiskSettings> {
 
 /** 引擎总览：运行状态 / 全局设置 / 风控 / 各标的订阅+运行时 / 审计日志。 */
 export function getAutoTradeStatus(): Promise<AutoTradeStatus> {
-  return getJson<AutoTradeStatus>(new URL('/api/autotrade/status', API_BASE).toString())
+  return getJson<AutoTradeStatus>(apiUrl('/api/autotrade/status').toString())
 }
 
 /** 启动后台轮询循环。 */
 export function startAutoTrade(): Promise<{ running: boolean }> {
-  return req<{ running: boolean }>(new URL('/api/autotrade/start', API_BASE).toString(), { method: 'POST' })
+  return req<{ running: boolean }>(apiUrl('/api/autotrade/start').toString(), { method: 'POST' })
 }
 
 /** 停止后台轮询循环。 */
 export function stopAutoTrade(): Promise<{ running: boolean }> {
-  return req<{ running: boolean }>(new URL('/api/autotrade/stop', API_BASE).toString(), { method: 'POST' })
+  return req<{ running: boolean }>(apiUrl('/api/autotrade/stop').toString(), { method: 'POST' })
 }
 
 /** 更新全局设置（Enabled / PollIntervalSeconds）。 */
 export function updateAutoTradeSettings(s: AutoTradeSettings): Promise<AutoTradeSettings> {
-  return req<AutoTradeSettings>(new URL('/api/autotrade/settings', API_BASE).toString(), {
+  return req<AutoTradeSettings>(apiUrl('/api/autotrade/settings').toString(), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(s)
@@ -667,7 +673,7 @@ export function updateAutoTradeSettings(s: AutoTradeSettings): Promise<AutoTrade
 
 /** 新增或更新一个标的的订阅（按 symbol 幂等）。 */
 export function addAutoTradeConfig(cfg: AutoTradeSymbolConfig): Promise<AutoTradeSymbolConfig> {
-  return req<AutoTradeSymbolConfig>(new URL('/api/autotrade/config', API_BASE).toString(), {
+  return req<AutoTradeSymbolConfig>(apiUrl('/api/autotrade/config').toString(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(cfg)
@@ -677,7 +683,7 @@ export function addAutoTradeConfig(cfg: AutoTradeSymbolConfig): Promise<AutoTrad
 /** 移除某个标的的订阅。 */
 export function removeAutoTradeConfig(symbol: string): Promise<void> {
   return req<void>(
-    new URL(`/api/autotrade/config/${encodeURIComponent(symbol)}`, API_BASE).toString(),
+    apiUrl(`/api/autotrade/config/${encodeURIComponent(symbol)}`).toString(),
     { method: 'DELETE' }
   )
 }
@@ -685,7 +691,7 @@ export function removeAutoTradeConfig(symbol: string): Promise<void> {
 /** 立即对单个标的评估一次。 */
 export function evaluateAutoTrade(symbol: string): Promise<{ evaluated: string }> {
   return req<{ evaluated: string }>(
-    new URL(`/api/autotrade/evaluate/${encodeURIComponent(symbol)}`, API_BASE).toString(),
+    apiUrl(`/api/autotrade/evaluate/${encodeURIComponent(symbol)}`).toString(),
     { method: 'POST' },
     EVAL_TIMEOUT
   )
@@ -696,11 +702,11 @@ export function evaluateAutoTrade(symbol: string): Promise<{ evaluated: string }
 const TREND = '/api/trend-scalper'
 
 export function getTrendScalper(): Promise<TrendScalperStatus> {
-  return getJson<TrendScalperStatus>(new URL(TREND, API_BASE).toString())
+  return getJson<TrendScalperStatus>(apiUrl(TREND).toString())
 }
 
 export function updateTrendScalperSettings(s: TrendScalperSettings): Promise<TrendScalperStatus> {
-  return req<TrendScalperStatus>(new URL(`${TREND}/settings`, API_BASE).toString(), {
+  return req<TrendScalperStatus>(apiUrl(`${TREND}/settings`).toString(), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(s)
@@ -709,7 +715,7 @@ export function updateTrendScalperSettings(s: TrendScalperSettings): Promise<Tre
 
 export function trendScalperAction(action: 'start' | 'stop' | 'tick' | 'flatten'): Promise<TrendScalperStatus> {
   return req<TrendScalperStatus>(
-    new URL(`${TREND}/${action}`, API_BASE).toString(),
+    apiUrl(`${TREND}/${action}`).toString(),
     { method: 'POST' },
     action === 'stop' ? 20000 : EVAL_TIMEOUT
   )
@@ -718,11 +724,11 @@ export function trendScalperAction(action: 'start' | 'stop' | 'tick' | 'flatten'
 const DISCIPLINE = '/api/discipline'
 
 export function getDiscipline(): Promise<DisciplineStatus> {
-  return getJson<DisciplineStatus>(new URL(DISCIPLINE, API_BASE).toString())
+  return getJson<DisciplineStatus>(apiUrl(DISCIPLINE).toString())
 }
 
 export function updateDisciplineSettings(s: DisciplineSettings): Promise<DisciplineStatus> {
-  return req<DisciplineStatus>(new URL(`${DISCIPLINE}/settings`, API_BASE).toString(), {
+  return req<DisciplineStatus>(apiUrl(`${DISCIPLINE}/settings`).toString(), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(s)
@@ -731,7 +737,7 @@ export function updateDisciplineSettings(s: DisciplineSettings): Promise<Discipl
 
 /** 纪律预检（不下单）：顺势项要拉分钟线，放宽超时。 */
 export function checkDiscipline(body: PlaceOrderRequest): Promise<DisciplineCheckResult> {
-  return req<DisciplineCheckResult>(new URL(`${DISCIPLINE}/check`, API_BASE).toString(), {
+  return req<DisciplineCheckResult>(apiUrl(`${DISCIPLINE}/check`).toString(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
@@ -739,7 +745,7 @@ export function checkDiscipline(body: PlaceOrderRequest): Promise<DisciplineChec
 }
 
 export function getWeeklyReview(accountId?: string, env?: TradeEnvFilter, weeks = 8): Promise<WeeklyReview> {
-  const url = new URL('/api/portfolio/weekly-review', API_BASE)
+  const url = apiUrl('/api/portfolio/weekly-review')
   if (accountId) url.searchParams.set('accountId', accountId)
   if (env) url.searchParams.set('env', env)
   url.searchParams.set('weeks', String(weeks))
@@ -747,7 +753,7 @@ export function getWeeklyReview(accountId?: string, env?: TradeEnvFilter, weeks 
 }
 
 export function getMarketNews(symbol = 'QQQ'): Promise<MarketNewsFeed> {
-  const url = new URL('/api/market-news', API_BASE)
+  const url = apiUrl('/api/market-news')
   url.searchParams.set('symbol', symbol)
   return req<MarketNewsFeed>(url.toString(), undefined, EVAL_TIMEOUT)
 }
@@ -755,5 +761,5 @@ export function getMarketNews(symbol = 'QQQ'): Promise<MarketNewsFeed> {
 
 /** Trigger finance-brief generation through the configured backend. */
 export function refreshFinanceBrief(): Promise<void> {
-  return req<void>(new URL('/api/news/refresh', API_BASE).toString(), { method: 'POST' })
+  return req<void>(apiUrl('/api/news/refresh').toString(), { method: 'POST' })
 }

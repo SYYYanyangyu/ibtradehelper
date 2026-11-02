@@ -1,0 +1,14 @@
+.git
+**/.DS_Store
+**/bin
+**/obj
+**/node_modules
+frontend/dist
+**/appsettings.Secrets.json
+**/.env
+deploy/.env
+deploy/.secrets.env
+deploy/htpasswd
+tests
+**/*.md
+**/*.log

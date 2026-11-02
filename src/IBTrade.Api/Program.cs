@@ -114,13 +114,18 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// 启动期安全自检：未配置 ApiKey 时明确告警（开发放行，生产拒绝匿名写操作）
+// 启动期安全自检：生产环境没有 ApiKey 就拒绝启动，避免持仓和下单接口被匿名访问。
 if (string.IsNullOrWhiteSpace(builder.Configuration["ApiKey"]) &&
     string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("IBTRADE_API_KEY")))
 {
+    if (app.Environment.IsProduction())
+    {
+        throw new InvalidOperationException(
+            "生产环境必须配置 IBTRADE_API_KEY（或 appsettings.ApiKey）。交易引擎拒绝以匿名方式启动。");
+    }
+
     app.Logger.LogWarning(
-        "⚠️ 交易引擎未配置 ApiKey：开发环境放行全部请求；生产环境将拒绝匿名写操作（下单/启停/改配置）。" +
-        "建议通过 appsettings.ApiKey 或环境变量 IBTRADE_API_KEY 配置，并在前端设置 VITE_IBTRADE_API_KEY。");
+        "交易引擎未配置 ApiKey：当前是开发环境，请求暂时放行。生产环境将拒绝启动。");
 }
 
 // ---- 中间件管道 ----

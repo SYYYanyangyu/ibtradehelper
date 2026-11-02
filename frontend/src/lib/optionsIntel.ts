@@ -1,5 +1,4 @@
-const API_BASE: string =
-  (import.meta.env.VITE_API_BASE as string | undefined) ?? 'http://localhost:8090'
+import { apiUrl } from './api'
 
 const API_KEY: string =
   ((import.meta.env.VITE_IBTRADE_API_KEY as string | undefined) ?? '').trim()
@@ -227,13 +226,13 @@ async function req<T>(url: string, init?: RequestInit, timeoutMs = 45000): Promi
 }
 
 export function getHotOptions(symbol?: string): Promise<HotUniverse> {
-  const url = new URL('/api/options/hot', API_BASE)
+  const url = apiUrl('/api/options/hot')
   if (symbol) url.searchParams.set('symbol', symbol)
   return req<HotUniverse>(url.toString(), undefined, 15000)
 }
 
 export function getOptionsContext(symbol: string, expiry?: string): Promise<OptionsContext> {
-  const url = new URL('/api/options/context', API_BASE)
+  const url = apiUrl('/api/options/context')
   url.searchParams.set('symbol', symbol)
   if (expiry) url.searchParams.set('expiry', expiry)
   return req<OptionsContext>(url.toString(), undefined, 40000)
@@ -245,7 +244,7 @@ export function analyzeOptions(body: {
   prompt?: string
 }): Promise<OptionsAnalyzeResult> {
   return req<OptionsAnalyzeResult>(
-    new URL('/api/options/analyze', API_BASE).toString(),
+    apiUrl('/api/options/analyze').toString(),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -256,11 +255,11 @@ export function analyzeOptions(body: {
 }
 
 export function getOptionsPaper(): Promise<OptionsPaperStatus> {
-  return req<OptionsPaperStatus>(new URL('/api/options/paper', API_BASE).toString())
+  return req<OptionsPaperStatus>(apiUrl('/api/options/paper').toString())
 }
 
 export function updateOptionsPaperSettings(settings: OptionsPaperSettings): Promise<OptionsPaperStatus> {
-  return req<OptionsPaperStatus>(new URL('/api/options/paper/settings', API_BASE).toString(), {
+  return req<OptionsPaperStatus>(apiUrl('/api/options/paper/settings').toString(), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(settings)
@@ -268,20 +267,20 @@ export function updateOptionsPaperSettings(settings: OptionsPaperSettings): Prom
 }
 
 export function startOptionsPaper(): Promise<OptionsPaperStatus> {
-  return req<OptionsPaperStatus>(new URL('/api/options/paper/start', API_BASE).toString(), {
+  return req<OptionsPaperStatus>(apiUrl('/api/options/paper/start').toString(), {
     method: 'POST'
   })
 }
 
 export function stopOptionsPaper(): Promise<OptionsPaperStatus> {
-  return req<OptionsPaperStatus>(new URL('/api/options/paper/stop', API_BASE).toString(), {
+  return req<OptionsPaperStatus>(apiUrl('/api/options/paper/stop').toString(), {
     method: 'POST'
   })
 }
 
 export function tickOptionsPaper(): Promise<OptionsPaperStatus> {
   return req<OptionsPaperStatus>(
-    new URL('/api/options/paper/tick', API_BASE).toString(),
+    apiUrl('/api/options/paper/tick').toString(),
     { method: 'POST' },
     45000
   )

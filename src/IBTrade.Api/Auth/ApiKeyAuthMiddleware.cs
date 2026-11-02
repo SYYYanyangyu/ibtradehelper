@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
@@ -10,9 +12,8 @@ namespace IBTrade.Api.Auth;
 ///  - 已配置 ApiKey：所有请求必须携带正确 <c>X-Api-Key</c>（或 <c>Authorization: Bearer</c>）头，否则返回 401。
 ///  - 未配置 ApiKey：
 ///       · 开发环境：放行（保持本地联调便利），启动时已输出告警。
-///       · 生产环境：拒绝匿名“写操作”（POST/PUT/DELETE/PATCH），阻止未授权真实下单/启停/改配置；
-///         只读看板（GET）仍可用，不影响查看。
-/// 白名单（任何环境均放行）：<c>/health</c>、<c>/</c>、<c>/swagger*</c>。
+///       · 生产环境：拒绝全部业务请求（含只读持仓），进程在启动时也会直接失败。
+/// 白名单：任何环境放行 <c>/health</c>。开发环境另放行 <c>/</c> 与 <c>/swagger*</c>。
 ///
 /// Key 来源（优先级）：appsettings <c>ApiKey</c> 段 → 环境变量 <c>IBTRADE_API_KEY</c>。
 /// </summary>
@@ -35,8 +36,15 @@ public sealed class ApiKeyAuthMiddleware
     {
         var path = context.Request.Path.Value ?? string.Empty;
 
-        // 健康检查 / 根 / Swagger 文档永远放行（便于探针与本地调试文档）
-        if (path == "/health" || path == "/" || path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase))
+        // 健康检查永远放行，供本机探针使用。根路径与 Swagger 只在开发环境放行。
+        if (path == "/health")
+        {
+            await _next(context);
+            return;
+        }
+
+        if (_env.IsDevelopment() &&
+            (path == "/" || path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase)))
         {
             await _next(context);
             return;
@@ -47,15 +55,15 @@ public sealed class ApiKeyAuthMiddleware
 
         if (string.IsNullOrWhiteSpace(configuredKey))
         {
-            // 未配置 ApiKey：生产环境禁止匿名写操作——最高风险是真实下单/启停/改配置被任意调用
-            if (!_env.IsDevelopment() && IsWriteMethod(context.Request.Method))
+            // 未配置 ApiKey：生产环境拒绝全部业务请求。持仓和订单都是敏感数据，不能匿名读取。
+            if (!_env.IsDevelopment())
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsJsonAsync(new
                 {
-                    error = "引擎未启用鉴权，已拒绝匿名写操作（下单/启停/改配置）。请配置 ApiKey（appsettings.ApiKey 或环境变量 IBTRADE_API_KEY）并在请求头携带 X-Api-Key 后重试。",
-                    hint = "生产环境真实资金接口必须鉴权；仅只读看板(GET)可在未鉴权下访问。"
+                    error = "引擎未启用鉴权，已拒绝匿名访问。请配置 IBTRADE_API_KEY 并在请求头携带 X-Api-Key。",
+                    hint = "生产环境持仓、订单和下单接口都必须鉴权。仅 /health 可匿名访问。"
                 });
                 return;
             }
@@ -73,7 +81,7 @@ public sealed class ApiKeyAuthMiddleware
                 provided = auth["Bearer ".Length..].Trim();
         }
 
-        if (!string.Equals(provided, configuredKey, StringComparison.Ordinal))
+        if (!FixedTimeEquals(provided, configuredKey))
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             context.Response.ContentType = "application/json";
@@ -87,6 +95,16 @@ public sealed class ApiKeyAuthMiddleware
         await _next(context);
     }
 
-    private static bool IsWriteMethod(string method) =>
-        !HttpMethods.IsGet(method) && !HttpMethods.IsHead(method) && !HttpMethods.IsOptions(method);
+    private static bool FixedTimeEquals(string provided, string configured)
+    {
+        var left = Encoding.UTF8.GetBytes(provided);
+        var right = Encoding.UTF8.GetBytes(configured);
+        if (left.Length != right.Length)
+        {
+            CryptographicOperations.FixedTimeEquals(left, left);
+            return false;
+        }
+
+        return CryptographicOperations.FixedTimeEquals(left, right);
+    }
 }
