@@ -751,3 +751,9 @@ export function getMarketNews(symbol = 'QQQ'): Promise<MarketNewsFeed> {
   url.searchParams.set('symbol', symbol)
   return req<MarketNewsFeed>(url.toString(), undefined, EVAL_TIMEOUT)
 }
+
+
+/** Trigger finance-brief generation through the configured backend. */
+export function refreshFinanceBrief(): Promise<void> {
+  return req<void>(new URL('/api/news/refresh', API_BASE).toString(), { method: 'POST' })
+}

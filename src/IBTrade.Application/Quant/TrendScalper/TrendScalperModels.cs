@@ -6,6 +6,15 @@ namespace IBTrade.Application.Quant.TrendScalper;
 /// </summary>
 public class TrendScalperSettings
 {
+    // Opt-in candidates; false preserves the baseline signal and exits.
+    public bool RequireRetest { get; set; }
+    public int RetestLookback { get; set; } = 10;
+    public decimal RetestTolerancePct { get; set; } = 0.03m;
+    public bool UseAtrExits { get; set; }
+    public int AtrPeriod { get; set; } = 14;
+    public decimal AtrStopMultiple { get; set; } = 1m;
+    public decimal AtrTargetMultiple { get; set; } = 1.5m;
+    public decimal EstimatedCommissionPerContractSide { get; set; } = 0.65m;
     public string Underlying { get; set; } = "QQQ";
     /// <summary>单笔权利金上限（美元，按 限价 × 100 × 张数）。</summary>
     public decimal BudgetPerTrade { get; set; } = 350m;
@@ -43,6 +52,10 @@ public class TrendScalperSettings
 
 public class TrendScalperPosition
 {
+    // Captured at entry; later settings changes do not move ATR risk boundaries.
+    public decimal? EntryStopPct { get; set; }
+    public decimal? EntryTargetPct { get; set; }
+    public decimal? CommissionPerContractSide { get; set; }
     public string Occ { get; set; } = "";
     public string Expiry { get; set; } = "";
     public decimal Strike { get; set; }
@@ -69,6 +82,8 @@ public class TrendScalperPosition
 
 public class TrendScalperTrade
 {
+    public decimal? EstimatedCommission { get; set; }
+    public decimal? EstimatedNetPnl => EstimatedCommission is { } cost ? Pnl - cost : null;
     public string Id { get; set; } = Guid.NewGuid().ToString("N")[..10];
     public string DateEt { get; set; } = "";
     public string Occ { get; set; } = "";
@@ -81,7 +96,7 @@ public class TrendScalperTrade
     public DateTime ExitAtUtc { get; set; }
     public decimal ExitPrice { get; set; }
     public decimal ExitUnderlying { get; set; }
-    /// <summary>tp / sl / time / eod / manual</summary>
+    /// <summary>tp / sl / time / eod / manual / data</summary>
     public string ExitReason { get; set; } = "";
     public string EntryReason { get; set; } = "";
     /// <summary>(平仓价 − 开仓价) × 张数 × 100，不含佣金。</summary>
@@ -119,6 +134,9 @@ public class TrendScalperSnapshot
 
 public class TrendScalperStats
 {
+    public int CostedTrades { get; set; }
+    public decimal? EstimatedNetExpectancy { get; set; }
+
     public int Trades { get; set; }
     public int Wins { get; set; }
     public decimal WinRate { get; set; }

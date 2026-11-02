@@ -171,3 +171,8 @@ curl -X POST http://localhost:8090/api/news/refresh
 ### 手动更新 JSON（无 Grok Bot 时）
 
 直接编辑 `frontend/public/feeds/finance-brief.json`，前端会在下次刷新时加载新内容。
+
+
+## 中文内容约定
+
+更新请求附带 `language: "zh-CN"`。Webhook 接收端须据此使用简体中文生成栏目名称、新闻标题和摘要，保留公司名称、股票代码、数字及原文链接。前端不会将英文原文伪装成已翻译内容；此参数需要接收端支持。摘要应忠实来源，不添加未经来源支持的结论。

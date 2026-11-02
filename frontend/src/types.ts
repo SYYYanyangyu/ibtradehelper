@@ -333,6 +333,14 @@ export interface AutoTradeStatus {
 // ---- QQQ 0DTE 顺势短线（Paper）----
 
 export interface TrendScalperSettings {
+  requireRetest: boolean
+  retestLookback: number
+  retestTolerancePct: number
+  useAtrExits: boolean
+  atrPeriod: number
+  atrStopMultiple: number
+  atrTargetMultiple: number
+  estimatedCommissionPerContractSide: number
   underlying: string
   budgetPerTrade: number
   dailyLossLimit: number
@@ -382,7 +390,7 @@ export interface TrendScalperTrade {
   exitAtUtc: string
   exitPrice: number
   exitUnderlying: number
-  exitReason: 'tp' | 'sl' | 'time' | 'eod' | 'manual'
+  exitReason: 'tp' | 'sl' | 'time' | 'eod' | 'manual' | 'data'
   entryReason: string
   pnl: number
   entryMid?: number | null
@@ -423,6 +431,8 @@ export interface TrendScalperStatus {
   }
   today: { dateEt: string; trades: number; wins: number; losses: number; consecutiveLosses: number; realized: number }
   total: {
+    costedTrades: number
+    estimatedNetExpectancy: number | null
     trades: number
     wins: number
     winRate: number

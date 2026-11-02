@@ -42,7 +42,8 @@ public class NewsController(
 
             var payload = new
             {
-                action = "refresh_finance_brief"
+                action = "refresh_finance_brief",
+                language = "zh-CN"
             };
 
             var response = await client.PostAsJsonAsync(_grokOptions.WebhookUrl, payload, ct);

@@ -108,7 +108,9 @@ public static class TrendSignal
             if (right == "C" && !s.AllowCalls) continue;
             if (right == "P" && !s.AllowPuts) continue;
             var label = right == "C" ? "Call" : "Put";
-            if (m.OrbBroken && m.VwapPct >= s.VwapMinPct && m.RangePos >= s.RangePosMin)
+            var retest = !s.RequireRetest || TrendResearch.Retest(bars, right,
+                right == "C" ? m.OrbHigh : m.OrbLow, s.RetestLookback, s.RetestTolerancePct);
+            if (retest && m.OrbBroken && m.VwapPct >= s.VwapMinPct && m.RangePos >= s.RangePosMin)
             {
                 snap.Decision = right == "C" ? "buy-call" : "buy-put";
                 snap.Reason = $"{label}：突破开盘区间{(right == "C" ? $"高点 {m.OrbHigh}" : $"低点 {m.OrbLow}")}，" +
@@ -116,6 +118,7 @@ public static class TrendSignal
                 return (right, snap);
             }
             var miss = new List<string>();
+            if (!retest) miss.Add("等待突破后回踩确认");
             if (!m.OrbBroken) miss.Add("未突破开盘区间");
             if (m.VwapPct < s.VwapMinPct) miss.Add($"VWAP {m.VwapPct:+0.00;-0.00}%");
             if (m.RangePos < s.RangePosMin) miss.Add($"区间位置 {m.RangePos:0.00}");

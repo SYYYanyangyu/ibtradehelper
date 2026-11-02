@@ -15,6 +15,7 @@ const EXIT_LABEL: Record<TrendScalperTrade['exitReason'], string> = {
   time: '超时',
   eod: '收盘前',
   manual: '手动',
+  data: '行情故障保护',
 }
 
 const DECISION_LABEL: Record<string, string> = {
@@ -115,7 +116,8 @@ export function TrendScalperCard() {
           <CardTitle>QQQ 0DTE Trend Scalper · Paper</CardTitle>
           <p className="mt-0.5 text-xs text-muted-2">
             开盘区间同向突破 + VWAP 同侧 ≥{s.vwapMinPct}% + 区间位置 ≥{s.rangePosMin} · 美东 {s.entryStart}–{s.entryEnd} 开仓 ·
-            止盈 +{s.takeProfitPct}% / 止损 −{s.stopLossPct}%（按 QQQ）· 最长 {s.maxHoldMinutes} 分钟 · 单笔 ≤ ${s.budgetPerTrade} ·
+            {s.requireRetest ? '回踩确认开启 · ' : '直接突破 · '}{s.useAtrExits ? 'ATR 退出开启 · ' : '固定退出 · '}
+            {s.useAtrExits ? `止盈 ${s.atrTargetMultiple}×ATR / 止损 ${s.atrStopMultiple}×ATR` : `止盈 +${s.takeProfitPct}% / 止损 −${s.stopLossPct}%`}（按 QQQ）· 最长 {s.maxHoldMinutes} 分钟 · 单笔 ≤ ${s.budgetPerTrade} ·
             {s.useLimitOrders ? `限价单（mid ±${s.limitBufferPct}%，未成交撤单）` : '市价单'} ·
             连亏 {s.stopAfterLosses} 停 · 日 ≤{s.maxTradesPerDay} 笔
             {s.dailyLossLimit > 0 && ` · 日亏 ≤ $${s.dailyLossLimit}`}
@@ -184,6 +186,7 @@ export function TrendScalperCard() {
         )}
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <Stat label="预估净期望 / 笔" value={st.total.estimatedNetExpectancy == null ? '—' : fmtMoney(st.total.estimatedNetExpectancy)} sub={`含预估佣金 · ${st.total.costedTrades ?? 0} 笔；非盈利预测`} />
           <Stat label="累计笔数" value={String(st.total.trades)} sub={`胜 ${st.total.wins}`} />
           <Stat label="胜率" value={st.total.trades ? `${(st.total.winRate * 100).toFixed(0)}%` : '—'} />
           <Stat label="累计盈亏" value={fmtMoney(st.total.pnl)} cls={pnlCls(st.total.pnl)} sub="不含佣金" />
@@ -265,6 +268,12 @@ export function TrendScalperCard() {
         {showSettings && (
           <div className="rounded-xl border border-border/60 p-3">
             <div className="grid grid-cols-2 gap-3 text-xs text-muted sm:grid-cols-4 lg:grid-cols-6">
+              <Field label="回踩窗口 根">{num('retestLookback')}</Field>
+              <Field label="回踩容差 %">{num('retestTolerancePct', 0.01)}</Field>
+              <Field label="ATR 周期">{num('atrPeriod')}</Field>
+              <Field label="ATR 止损倍数">{num('atrStopMultiple', 0.1)}</Field>
+              <Field label="ATR 止盈倍数">{num('atrTargetMultiple', 0.1)}</Field>
+              <Field label="预估每张单边佣金 $">{num('estimatedCommissionPerContractSide', 0.05)}</Field>
               <Field label="单笔预算 $">{num('budgetPerTrade', 10)}</Field>
               <Field label="当日亏损上限 $（0=关）">{num('dailyLossLimit', 50)}</Field>
               <Field label="限价缓冲 %">{num('limitBufferPct', 0.5)}</Field>
@@ -281,7 +290,10 @@ export function TrendScalperCard() {
               <Field label="连亏几笔停">{num('stopAfterLosses')}</Field>
               <Field label="前日 VIX 上限（0=关）">{num('maxPrevVix', 0.5)}</Field>
             </div>
+            <p className="mt-2 text-xs text-muted">候选规则默认关闭。ATR 距离在开仓时锁定；佣金仅为可调整估计，历史无成本记录不计入净期望。成交盈亏已包含实际成交滑点。</p>
             <div className="mt-3 flex flex-wrap items-center gap-4 text-xs">
+              <label className="inline-flex items-center gap-1.5"><input type="checkbox" checked={draft.requireRetest ?? false} onChange={e => setDraft({ ...draft, requireRetest: e.target.checked })} />突破后回踩确认</label>
+              <label className="inline-flex items-center gap-1.5"><input type="checkbox" checked={draft.useAtrExits ?? false} onChange={e => setDraft({ ...draft, useAtrExits: e.target.checked })} />ATR 自适应退出</label>
               <label className="inline-flex items-center gap-1.5">
                 <input type="checkbox" checked={draft.allowCalls} onChange={(e) => setDraft({ ...draft, allowCalls: e.target.checked })} />
                 做 Call

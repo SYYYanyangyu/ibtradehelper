@@ -38,6 +38,7 @@ public class TrendScalperEngine : ITrendScalperEngine
         Converters = { new JsonStringEnumConverter() }
     };
 
+    private readonly TimeProvider _clock;
     private readonly IHistoricalDataService _hist;
     private readonly IOrderService _orders;
     private readonly MarketContextProvider _market;
@@ -65,8 +66,9 @@ public class TrendScalperEngine : ITrendScalperEngine
     private CancellationTokenSource? _cts;
 
     public TrendScalperEngine(IHistoricalDataService hist, IOrderService orders, MarketContextProvider market,
-        ILogger<TrendScalperEngine>? logger = null)
+        ILogger<TrendScalperEngine>? logger = null, TimeProvider? clock = null)
     {
+        _clock = clock ?? TimeProvider.System;
         _hist = hist;
         _orders = orders;
         _market = market;
@@ -102,6 +104,12 @@ public class TrendScalperEngine : ITrendScalperEngine
 
     public void UpdateSettings(TrendScalperSettings s)
     {
+        if (s.RetestLookback is < 1 or > 60 || s.RetestTolerancePct is < 0 or > 0.5m)
+            throw new ArgumentException("回踩窗口须为 1–60 根，容差为 0–0.5%");
+        if (s.AtrPeriod is < 2 or > 60 || s.AtrStopMultiple is <= 0 or > 10 || s.AtrTargetMultiple is <= 0 or > 20)
+            throw new ArgumentException("ATR 周期须为 2–60，止损倍数 (0,10]，止盈倍数 (0,20]");
+        if (s.EstimatedCommissionPerContractSide is < 0 or > 20)
+            throw new ArgumentException("每张单边预估佣金须为 0–20 美元");
         if (s.BudgetPerTrade is < 20m or > 2000m) throw new ArgumentException("单笔预算须在 $20–$2,000");
         if (s.MaxContracts is < 1 or > 10) throw new ArgumentException("张数上限须在 1–10");
         if (s.TakeProfitPct <= 0 || s.StopLossPct <= 0) throw new ArgumentException("止盈止损须为正");
@@ -219,8 +227,6 @@ public class TrendScalperEngine : ITrendScalperEngine
 
         var nowEt = NowEt();
         RollDay(nowEt);
-        var ctx = await _market.ForDayAsync(DateOnly.FromDateTime(nowEt), ct);
-        lock (_gate) _ctx = ctx;
         var tod = nowEt.TimeOfDay;
         var weekend = nowEt.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
         if (weekend || tod < Open || tod >= Close)
@@ -234,7 +240,35 @@ public class TrendScalperEngine : ITrendScalperEngine
             return;
         }
 
-        var raw = await _hist.GetBarsAsync(s.Underlying, null, "USD", "1 D", "1 min", ct);
+        TrendScalperPosition? existingPosition;
+        lock (_gate) existingPosition = _position;
+        if (existingPosition is not null)
+        {
+            // Time exits and pending orders must not depend on market-context or quote availability.
+            var fallback = _lastUnderlying ?? existingPosition.EntryUnderlying;
+            if (existingPosition.PendingExitOrderId is not null || existingPosition.ExitAttempts > 0
+                || UtcNow - existingPosition.OpenedAtUtc >= TimeSpan.FromMinutes(s.MaxHoldMinutes)
+                || nowEt.TimeOfDay >= ParseHm(s.FlatBy, ""))
+            {
+                await ManagePositionAsync(s, existingPosition, fallback, nowEt, ct);
+                return;
+            }
+        }
+
+        IReadOnlyList<MarketData.Dtos.CandleDto> raw;
+        try
+        {
+            using var quoteTimeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            quoteTimeout.CancelAfter(TimeSpan.FromSeconds(8));
+            raw = await _hist.GetBarsAsync(s.Underlying, null, "USD", "1 D", "1 min", quoteTimeout.Token);
+        }
+        catch (Exception ex) when (!ct.IsCancellationRequested)
+        {
+            if (existingPosition is null) throw;
+            lock (_gate) _lastError = $"持仓行情不可用，保护性退出：{ex.GetBaseException().Message}";
+            await ExitAsync(s, existingPosition, "data", _lastUnderlying ?? existingPosition.EntryUnderlying, nowEt, ct);
+            return;
+        }
         if (!TrendSignal.TryMapToEt(raw, nowEt, out var bars, out var offset, out var why))
         {
             lock (_gate)
@@ -242,6 +276,8 @@ public class TrendScalperEngine : ITrendScalperEngine
                 _session = "行情未就绪";
                 _lastError = why;
             }
+            if (existingPosition is not null)
+                await ExitAsync(s, existingPosition, "data", _lastUnderlying ?? existingPosition.EntryUnderlying, nowEt, ct);
             return;
         }
 
@@ -263,6 +299,9 @@ public class TrendScalperEngine : ITrendScalperEngine
             return;
         }
 
+        // External calendar / VIX services are entry filters only.
+        var ctx = await _market.ForDayAsync(DateOnly.FromDateTime(nowEt), ct);
+        lock (_gate) _ctx = ctx;
         var barKey = completed.Count > 0 ? completed[^1].StartEt.ToString("HH:mm") : null;
         var gate = EntryBlockReason(s, nowEt);
         var (right, snap) = TrendSignal.Evaluate(completed, s);
@@ -282,7 +321,13 @@ public class TrendScalperEngine : ITrendScalperEngine
             _lastSignalBar = barKey;
         }
 
-        await EnterAsync(s, right, lastPx, snap.Reason, nowEt, offset, ct);
+        var atr = s.UseAtrExits ? TrendResearch.Atr(completed, s.AtrPeriod) : null;
+        if (s.UseAtrExits && atr is null)
+        {
+            Remember(new TrendScalperSnapshot { Decision = "hold", Reason = "ATR 样本不足，不开仓" });
+            return;
+        }
+        await EnterAsync(s, right, lastPx, snap.Reason, nowEt, offset, ct, atr);
     }
 
     private string? EntryBlockReason(TrendScalperSettings s, DateTime nowEt)
@@ -331,7 +376,7 @@ public class TrendScalperEngine : ITrendScalperEngine
         Math.Max(0.01m, decimal.Round(mid - Buffer(s, mid), 2, MidpointRounding.AwayFromZero));
 
     private async Task EnterAsync(TrendScalperSettings s, string right, decimal px, string reason,
-        DateTime nowEt, TimeSpan offset, CancellationToken ct)
+        DateTime nowEt, TimeSpan offset, CancellationToken ct, decimal? atr = null)
     {
         var expiry = nowEt.ToString("yyyyMMdd");
         decimal budget;
@@ -394,6 +439,9 @@ public class TrendScalperEngine : ITrendScalperEngine
                 _position = new TrendScalperPosition
                 {
                     Occ = occ, Expiry = expiry, Strike = strike, Right = right, Quantity = filledQty,
+                    EntryStopPct = atr is { } a ? a * s.AtrStopMultiple / px * 100m : null,
+                    EntryTargetPct = atr is { } b ? b * s.AtrTargetMultiple / px * 100m : null,
+                    CommissionPerContractSide = s.EstimatedCommissionPerContractSide,
                     EntryPrice = fill, EntryMid = mid,
                     EntryUnderlying = px, OpenedAtUtc = DateTime.UtcNow,
                     EntryReason = reason, EntryOrderId = dto.Id
@@ -448,11 +496,11 @@ public class TrendScalperEngine : ITrendScalperEngine
 
         var sgn = pos.Right == "C" ? 1m : -1m;
         var move = sgn * (px / pos.EntryUnderlying - 1m) * 100m;
-        var held = DateTime.UtcNow - pos.OpenedAtUtc;
+        var held = UtcNow - pos.OpenedAtUtc;
         string? reason = null;
         if (pos.ExitAttempts > 0) reason = pos.PendingExitReason ?? "manual";
-        else if (move >= s.TakeProfitPct) reason = "tp";
-        else if (move <= -s.StopLossPct) reason = "sl";
+        else if (move >= (pos.EntryTargetPct ?? s.TakeProfitPct)) reason = "tp";
+        else if (move <= -(pos.EntryStopPct ?? s.StopLossPct)) reason = "sl";
         else if (held >= TimeSpan.FromMinutes(s.MaxHoldMinutes)) reason = "time";
         else if (nowEt.TimeOfDay >= ParseHm(s.FlatBy, "")) reason = "eod";
 
@@ -462,7 +510,7 @@ public class TrendScalperEngine : ITrendScalperEngine
             {
                 Price = px,
                 Decision = reason is null ? "hold" : "exit",
-                Reason = $"持仓 {pos.Occ}：QQQ 同向 {move:+0.000;-0.000}%（止盈 +{s.TakeProfitPct}% / 止损 −{s.StopLossPct}%），已持 {held.TotalMinutes:0.0} 分钟"
+                Reason = $"持仓 {pos.Occ}：QQQ 同向 {move:+0.000;-0.000}%（止盈 +{pos.EntryTargetPct ?? s.TakeProfitPct:0.000}% / 止损 −{pos.EntryStopPct ?? s.StopLossPct:0.000}%），已持 {held.TotalMinutes:0.0} 分钟"
             };
         }
         if (reason is not null)
@@ -473,7 +521,8 @@ public class TrendScalperEngine : ITrendScalperEngine
     {
         TimeSpan? offset;
         lock (_gate) offset = _barOffset;
-        var midQ = await OptionMidAsync(pos.Occ, offset, nowEt, ct);
+        var urgent = reason is "time" or "eod" or "manual" or "data" || pos.ExitAttempts > 0;
+        var midQ = urgent ? null : await OptionMidAsync(pos.Occ, offset, nowEt, ct);
         lock (_gate)
         {
             pos.ExitMid ??= midQ;
@@ -555,6 +604,7 @@ public class TrendScalperEngine : ITrendScalperEngine
             Occ = pos.Occ, Right = pos.Right, Strike = pos.Strike, Quantity = totalQty,
             EntryAtUtc = pos.OpenedAtUtc, EntryPrice = pos.EntryPrice, EntryUnderlying = pos.EntryUnderlying,
             ExitAtUtc = DateTime.UtcNow, ExitPrice = avgExit, ExitUnderlying = exitUnderlying,
+            EstimatedCommission = pos.CommissionPerContractSide is { } fee ? decimal.Round(fee * totalQty * 2m, 2) : null,
             ExitReason = reason, EntryReason = pos.EntryReason, Pnl = pnl,
             EntryMid = pos.EntryMid, ExitMid = pos.ExitMid, Slippage = slip
         };
@@ -588,15 +638,19 @@ public class TrendScalperEngine : ITrendScalperEngine
         return dto;
     }
 
-    /// <summary>期权最近一分钟的 MIDPOINT 收盘价；数据须是当前 15 分钟内的。</summary>
+    /// <summary>期权最近一分钟的 MIDPOINT 收盘价；数据须是当前 2 分钟内的。</summary>
     private async Task<decimal?> OptionMidAsync(string occ, TimeSpan? offset, DateTime nowEt, CancellationToken ct)
     {
         try
         {
-            var bars = await _hist.GetBarsAsync(occ, null, "USD", "1800 S", "1 min", ct, "OPT", "MIDPOINT");
+            if (offset is null) return null;
+            using var quoteTimeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            quoteTimeout.CancelAfter(TimeSpan.FromSeconds(8));
+            var bars = await _hist.GetBarsAsync(occ, null, "USD", "1800 S", "1 min", quoteTimeout.Token, "OPT", "MIDPOINT");
             if (bars.Count == 0) return null;
             var last = bars[^1];
-            if (offset is { } off && nowEt - (last.Time - off) > TimeSpan.FromMinutes(15)) return null;
+            var age = nowEt - (last.Time - offset.Value);
+            if (age > TimeSpan.FromMinutes(2) || age < TimeSpan.Zero) return null;
             return last.Close > 0 ? last.Close : null;
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
@@ -659,6 +713,9 @@ public class TrendScalperEngine : ITrendScalperEngine
     {
         var st = new TrendScalperStats { Trades = trades.Count };
         if (trades.Count == 0) return st;
+        var costed = trades.Where(t => t.EstimatedNetPnl is not null).ToList();
+        st.CostedTrades = costed.Count;
+        st.EstimatedNetExpectancy = costed.Count > 0 ? decimal.Round(costed.Average(t => t.EstimatedNetPnl!.Value), 2) : null;
         var wins = trades.Where(t => t.Pnl > 0).ToList();
         var losses = trades.Where(t => t.Pnl <= 0).ToList();
         st.Wins = wins.Count;
@@ -683,6 +740,7 @@ public class TrendScalperEngine : ITrendScalperEngine
         "tp" => "止盈",
         "sl" => "止损",
         "time" => "超时",
+        "data" => "行情故障保护退出",
         "eod" => "收盘前强平",
         _ => "手动"
     };
@@ -695,7 +753,8 @@ public class TrendScalperEngine : ITrendScalperEngine
         throw new ArgumentException($"{label} 格式须为 HH:mm");
     }
 
-    private static DateTime NowEt() => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Ny);
+    private DateTime UtcNow => _clock.GetUtcNow().UtcDateTime;
+    private DateTime NowEt() => TimeZoneInfo.ConvertTimeFromUtc(UtcNow, Ny);
 
     private static TrendScalperSettings Clone(TrendScalperSettings s) =>
         JsonSerializer.Deserialize<TrendScalperSettings>(JsonSerializer.Serialize(s))!;
