@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-03T01:16:31Z",
+  "updatedAt": "2026-11-04T00:00:00Z",
   "source": "scheduled",
   "sections": [
     {
@@ -7,16 +7,16 @@
       "title": "万亿/超大市值",
       "items": [
         {
-          "headline": "AAPL Ternus首份财报：营收EPS超预期，毛利率指引与内存成本拖累盘后",
-          "summary": "财政Q4营收约1145亿美元（+12% YoY）超预期，稀释EPS 2.10美元；iPhone约576亿（+17%）、Services创纪录约316亿。12月季营收指引增长7%–10%，但毛利率指引45%–46%低于街预期；Ternus称内存成本「前所未有」且本季及之后仍升。盘后约跌2%–3%。周一晚间股指期货小幅反弹（纳指期货约+0.3%）受苹果压制。",
-          "url": "https://www.apple.com/newsroom/2026/11/apple-reports-fourth-quarter-results/",
-          "tickers": ["AAPL"]
+          "headline": "AMD Q3营收与指引双超：数据中心近翻倍，盘后大涨",
+          "summary": "Q3营收133.8亿美元（+45% YoY），non-GAAP EPS 2.09美元；数据中心营收创纪录约85.5亿美元（+97%）。Q4营收指引约170亿美元±3%；电话会称预计2027年整体营收增长超80%、以数据中心为主。美东11/3盘中约涨3.7%后盘后续涨约7%量级。",
+          "url": "https://ir.amd.com/news-events/press-releases/detail/1303/amd-reports-third-quarter-2026-financial-results",
+          "tickers": ["AMD"]
         },
         {
-          "headline": "AMD周一收盘大跌约7.5%，盯今日美东盘后财报",
-          "summary": "AMD周一收约466.84美元、约跌7.5%，跌破关键技术位；Q3财报定于美东11/3盘后。属晚报之后盘中新波动。",
-          "url": "https://www.marketbeat.com/instant-alerts/price-advanced-micro-devices-nasdaq-amd-shares-down-75-heres-why-2026-11-02/",
-          "tickers": ["AMD"]
+          "headline": "美股周二分化：芯片反弹、苹果拖累道指；中期选举日观望",
+          "summary": "标普涨0.36%、纳指涨0.83%、费城半导体涨2.64%；道指跌0.38%受苹果压制。美国中期选举正式投票，资金回补此前遭抛售的芯片股；9月JOLTS职位空缺升至752.3万、高于预期，美债收益率与美元同步走高。",
+          "url": "https://m.163.com/dy/article/LASFJGN405198NMR.html",
+          "tickers": ["AAPL", "NVDA", "AMD"]
         }
       ]
     },
@@ -25,9 +25,9 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "内存股周一回吐，苹果确认内存涨价将延续",
-          "summary": "晚报盘前反弹后，周一交易中MU约跌4%、WDC约跌5%、SNDK约跌3%。盘后苹果明确毛利承压、内存涨价unprecedented且将延续——对供应商基本面偏确认，但对苹果/PC需求侧叙事偏空。",
-          "url": "https://finance.yahoo.com/markets/stocks/articles/micron-falls-4-kioxia-cautious-185355108.html",
+          "headline": "亚太存储与光模块承压：韩股大跌，A股CPO/半导体领跌",
+          "summary": "韩国综指跌约3.6%，存储芯片股领跌；A股半导体、CPO、存储板块深度回调，中际旭创跌约12.7%并澄清绝大部分客户需求未下修、部分1.6T需求增加。苹果侧内存涨价「前所未有」叙事仍在，压制终端毛利预期、支撑供应商定价权。",
+          "url": "https://news.10jqka.com.cn/20261104/c681426373.shtml",
           "tickers": ["MU", "SNDK", "WDC", "SKHY"]
         }
       ]
@@ -37,15 +37,9 @@
       "title": "生物科技",
       "items": [
         {
-          "headline": "VRTX Q3营收超预期并上调全年指引，盘后偏平略升",
-          "summary": "总营收约34.4亿美元（+12% YoY，略超预期）；全年营收指引上调至131.5–132.5亿美元。GAAP净利因Crinetics并购费用同比下滑；盘后约+1%量级。",
-          "url": "https://www.businesswire.com/news/home/20261102902999/en/Vertex-Reports-Third-Quarter-2026-Financial-Results",
-          "tickers": ["VRTX"]
-        },
-        {
-          "headline": "AMGN今日美东盘后财报，市场仍盯MariTide",
-          "summary": "Amgen Q3定于美东11/3盘后公布，截至本早报窗口尚无正式结果；焦点仍是MariTide进展。",
-          "url": "https://www.amgen.com/newsroom/press-releases/2026/10/amgen-announces-webcast-of-2026-third-quarter-financial-results",
+          "headline": "AMGN Q3营收EPS超预期并上调全年指引，MariTide数据仍待明年",
+          "summary": "Q3营收104亿美元（+8%），non-GAAP EPS 6.45美元超预期；全年营收指引上调至389–397亿美元、调整EPS 22.90–23.70美元。MariTide多项III期推进中，公司称初步结果预计明年；盘后股价偏弱约2%。",
+          "url": "https://investors.amgen.com/news-releases/news-release-details/amgen-reports-third-quarter-2026-financial-results",
           "tickers": ["AMGN"]
         }
       ]
@@ -55,16 +49,16 @@
       "title": "半导体与制造相关",
       "items": [
         {
-          "headline": "PLTR爆量超预期并上调指引，盘后仍约跌3%",
-          "summary": "Q3营收约23.13亿美元（+96% YoY），调整EPS 0.44美元；美国商业营收约9.84亿（+148%）首次超过美国政府约9.53亿。上调全年营收至约85.30–85.34亿美元。盘后约跌3%（估值/获利了结）。",
-          "url": "https://investors.palantir.com/news-details/2026/Palantir-Reports-Q3-2026-U-S--Comm-Revenue-Growth-of-148-YY-and-Revenue-Growth-of-96-YY-Raises-FY-2026-Revenue-Guidance-to-91-YY-Growth-and-U-S--Comm-Revenue-Guidance-to-143-YY-Crushing-Consensus-Expectations",
-          "tickers": ["PLTR"]
+          "headline": "A股算力硬件深度回调：上证跌0.82%，创业板跌2.73%",
+          "summary": "11/3沪指收3608.10（-0.82%）、深成指-1.21%、创业板-2.73%，两市成交约1.72万亿元。半导体/CPO领跌；电池与中船系相对抗跌，宁德时代向澳洲交付首批8小时长时储能系统。央行宣布自11/15起上调外汇存款准备金率至6%。",
+          "url": "https://finance.eastmoney.com/news/11158,202611033920646880.html",
+          "tickers": ["SMCI"]
         },
         {
-          "headline": "MRVL宣布约1150亿美元全股票收购Lumentum，股价重挫",
-          "summary": "11/2宣布与Lumentum（LITE）合并，作价约1150亿美元全股票（LITE股东约获4.5股MRVL），意在AI光互连。市场担忧稀释与AI开支，MRVL/LITE均大幅下跌。",
-          "url": "https://investor.marvell.com/news-events/press-releases/detail/1040/marvell-and-lumentum-to-combine-creating-a-category-leader-in-ai-connectivity",
-          "tickers": ["MRVL"]
+          "headline": "地缘：伊朗坚持七项条件才开霍尔木兹，特朗普称发动小规模打击",
+          "summary": "伊朗称美方须完整回应七项条件并落实后才开放霍尔木兹海峡；特朗普承认美军对伊朗一处防空设施发动「小规模攻击」。油价连续第二日下跌后尾盘收复大部分跌幅；卡塔尔称仍在调解。",
+          "url": "https://finance.eastmoney.com/news/11158,202611033920646880.html",
+          "tickers": []
         }
       ]
     }
