@@ -1,70 +1,28 @@
 {
-  "updatedAt": "2026-11-02T14:12:00+08:00",
-  "source": "manual",
+  "updatedAt": "2026-11-02T20:48:00+08:00",
+  "source": "scheduled",
   "sections": [
-    {
-      "id": "trump",
-      "title": "特朗普动态",
-      "items": [
-        {
-          "headline": "外交预期升温：油价跌超3%，鲁比奥称特朗普更倾向和平解决伊朗冲突",
-          "summary": "周一布伦特跌约3.3%至约109.7美元、WTI跌约3.3%至约100.6美元。国务卿鲁比奥称特朗普尚未决定是否再发动军事打击，更希望以外交方式结束伊朗战争；卡塔尔斡旋下伊朗亦释放仍可谈妥信号。市场交易「去升级」预期，但霍尔木兹航运风险与中期选举后可能再升级仍在。",
-          "url": "https://www.cnbc.com/2026/11/02/oil-prices-fall-as-iran-us-pursue-diplomacy.html",
-          "tickers": []
-        },
-        {
-          "headline": "爱荷华集会再称伊朗冲突将很快结束，油价与股指期货同步交易缓和叙事",
-          "summary": "特朗普在中期选举前集会上称战争将「很快以某种方式结束」（谈妥或结束），并称油价回落、安全成本相对可控。此前已推过同类表态；本轮结合鲁比奥外交口径与油价实质下跌，市场反馈更清晰。其本人X在约08:33（上海时区）后多为助选帖，无新增政策实质。",
-          "url": "https://www.aljazeera.com/news/liveblog/2026/11/02/iran-war-live-tankers-hit-in-hormuz-trump-again-says-conflict-to-end-soon",
-          "tickers": []
-        }
-      ]
-    },
-    {
-      "id": "fed",
-      "title": "美联储",
-      "items": [
-        {
-          "headline": "FOMC 10月按兵不动维持3.75%–4.00%，Cook与Hammack投下加息反对票",
-          "summary": "10月28日以10-2票维持联邦基金利率目标区间不变；声明称经济活动强劲、就业平稳，但通胀仍偏高。Cook与Hammack倾向当场加息25个基点。下一场为12月8–9日（含点阵图/SEP），11月无议息会；10月会议纪要预计11月18日公布。",
-          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm",
-          "tickers": []
-        },
-        {
-          "headline": "主席沃什称增长与投资强劲，市场仍高概率定价12月加息",
-          "summary": "沃什记者会强调上半年GDP上修、三季度消费与企业投资偏强，高科技投资领跑，同时通胀持续高于2%目标。多名官员暗示需进一步收紧；交易员将12月加息概率抬至七成以上，关注就业与CPI路径。",
-          "url": "https://www.federalreserve.gov/mediacenter/files/FOMCpresconf20261028.pdf",
-          "tickers": []
-        },
-        {
-          "headline": "美国I债券新利率升至5.51%（2026年11月–2027年4月）",
-          "summary": "财政部公布新一期Series I综合年化5.51%，固定利率1.40%为2006年以来最高，叠加通胀调整；对偏好抗通胀现金类配置的投资者有吸引力，亦侧面反映近期通胀预期。",
-          "url": "https://x.com/i/trending/2116239773798993999",
-          "tickers": []
-        }
-      ]
-    },
     {
       "id": "mega_cap",
       "title": "超大市值",
       "items": [
         {
-          "headline": "苹果市值约5.03万亿美元再超英伟达，周一盘后公布财报",
-          "summary": "上周五苹果跌幅小于英伟达，市值反超约1000亿美元登顶；市场对比苹果相对克制的资本开支与超大盘AI巨头高额CapEx。周一美东盘后财报与电话会或决定能否守住领先。",
-          "url": "https://x.com/i/trending/2116621594412093648",
+          "headline": "美股期货反弹：纳指约+0.8%、标普/道约+0.5%，消化上周五科技重挫",
+          "summary": "周一美东盘前，纳指100期货约涨0.8%，标普500与道指期货约涨0.5%。上周五标普跌约2%、纳指100跌约3.5%，10月纳指约跌6.5%（约2025年3月以来最差月）。本周焦点含苹果/Palantir盘后财报、11月3日中期选举与就业数据。",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-futures-rise-101832709.html",
+          "tickers": ["AAPL", "NVDA", "MSFT", "GOOGL", "AMZN", "META"]
+        },
+        {
+          "headline": "苹果盘前约跌0.5%，盘后交出新CEO Ternus首份财报；关注利润率与存储成本",
+          "summary": "AAPL盘前约跌0.5%。财报为新任CEO John Ternus上任后首份；市场盯iPhone（含折叠机）需求、触控MacBook反馈、更高存储成本能否不伤需求/毛利，以及交付周期偏长暗示的需求线索。上周五苹果市值约5.03万亿美元一度反超英伟达。",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-futures-rise-101832709.html",
           "tickers": ["AAPL", "NVDA"]
         },
         {
-          "headline": "Alphabet、亚马逊财报冲击AI开支叙事，科技股周线承压",
-          "summary": "Alphabet搜索连续两个季度不及预期，单周跌约12.6%；亚马逊AWS增速约39%略逊买方预期，过去12个月自由现金流烧约424亿美元并安排约800亿美元供应商融资。微软被视为相对更偏现金流正向的超大盘对照。",
-          "url": "https://finance.yahoo.com/markets/stocks/articles/intc-amzn-googl-stocks-rise-035913446.html",
-          "tickers": ["GOOGL", "AMZN", "MSFT", "META"]
-        },
-        {
-          "headline": "本周日程：苹果/Palantir周一、AMD周二，叠加中期选举与就业数据",
-          "summary": "上周五纳指大跌后周一股指期货温和反弹；短线焦点为超大盘与AI相关财报、11月3日中期选举及周五非农，波动可能放大对利率路径与科技估值的再定价。",
-          "url": "https://movertape.com/news/earnings-week-ahead-2026-11-02",
-          "tickers": ["AAPL", "AMD", "PLTR"]
+          "headline": "Alphabet盘前约+1.3%，试图收复上周约12.6%跌幅",
+          "summary": "GOOGL盘前约涨1.3%。上周因搜索收入连续不及预期等录得约2008年以来最差周跌幅；盘前反弹仍处修复阶段，AI开支与核心业务扰动叙事未消。",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-futures-rise-101832709.html",
+          "tickers": ["GOOGL"]
         }
       ]
     },
@@ -73,46 +31,16 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "闪迪业绩与指引双超仍大跌，铠侠展望拖累NAND定价预期",
-          "summary": "SNDK财季营收约110.3亿美元、非GAAP EPS超预期并上调下季指引，同时宣布8拆1（约11月20日生效），但股价周五跌逾13%。合作方铠侠经营利润展望逊预期，并称AI驱动的闪存涨价动能减弱；连带拖累MU、WDC、STX等存储链。",
-          "url": "https://finance.yahoo.com/markets/stocks/articles/sandisk-sinks-13-last-friday-161406084.html",
-          "tickers": ["SNDK", "MU", "WDC", "STX"]
+          "headline": "存储盘前反弹：SK海力士近+5%，美光约+2.7%，闪迪约+3%；东京铠侠大跌约16%未拖垮美股",
+          "summary": "周五科技/存储大跌后，周一美东盘前SKHY近涨5%，MU约涨2.7%，SNDK约涨3%。东京铠侠因下季指引偏弱约跌15.8%，美股存储与日股背离。反弹更多来自超跌回补与AI服务器存储长逻辑，而非单一公司新公告。",
+          "url": "https://www.tipranks.com/news/why-are-micron-sandisk-and-sk-hynix-stocks-rising-in-premarket-today-after-fridays-chip-rout",
+          "tickers": ["SKHY", "MU", "SNDK", "WDC", "STX"]
         },
         {
-          "headline": "对冲基金去杠杆冲击存储：美光/闪迪/SK海力士等一周大幅回撤",
-          "summary": "高盛等经纪数据显示10月对冲基金大幅减持科技与半导体多头，存储链市值一周蒸发约数千亿美元。市场一边交易AI数据中心长约需求，一边担忧NAND/DRAM涨价周期见顶与PC端需求受挤压。",
-          "url": "https://x.com/i/trending/2116316817648173406",
-          "tickers": ["MU", "SNDK", "SSNLF"]
-        },
-        {
-          "headline": "周末存储股夜盘小幅反弹，市场消化铠侠谨慎指引",
-          "summary": "MU、SNDK夜盘约涨2%一线，DRAM相关ETF跟涨；铠侠将部分出货时点调整归因于客户提前/延后，并称明年产能已基本售罄、AI数据中心需求仍强。短线仍围绕「涨价动能放缓 vs 长约锁定」博弈。",
-          "url": "https://finance.yahoo.com/markets/stocks/articles/mu-sndk-dram-inch-higher-020908862.html",
-          "tickers": ["MU", "SNDK"]
-        }
-      ]
-    },
-    {
-      "id": "robotics",
-      "title": "机器人",
-      "items": [
-        {
-          "headline": "沃尔玛与Symbotic扩大仓储自动化合作，初始承诺约60亿美元",
-          "summary": "双方扩大商业协议，拟在约25个美国区域配送中心加码自动化，并支持全球供应链改造；初始约60亿美元多年期承诺，可能显著抬升SYM未来积压订单。仓储机器人主题获实质订单催化。",
-          "url": "https://www.symbotic.com/news/walmart-and-symbotic-expand-commercial-agreement-to-support-supply-chain-transformation/",
-          "tickers": ["SYM", "WMT"]
-        },
-        {
-          "headline": "直觉外科Q3营收与手术量双增，GAAP受和解金拖累",
-          "summary": "ISRG三季度营收同比约+22%、手术量约+15%；非GAAP利润稳健，但约4.5亿美元和解相关费用压低GAAP EPS。达芬奇与Ion等手术机器人安装与耗材仍是核心跟踪指标。",
-          "url": "https://stocknote.co/a/intuitive-surgical-isrg-non-gaap-eps-up-25-gaap-eps-down-24-and-a-450m-settlement-explains-two-thirds-of-the-gap",
-          "tickers": ["ISRG"]
-        },
-        {
-          "headline": "特斯拉Optimus进入早期量产叙事，市场盯2027客户交付",
-          "summary": "产业跟踪显示Optimus在弗里蒙特进入早期产线建设，远期产能目标极高但尚未披露具体产量与定价；人形机器人主题与NVDA算力、工业自动化链条交叉定价。",
-          "url": "https://mekawire.com/news/q3-2026-robotics-earnings-scorecard-intuitive-tesla-fanuc-unitree-teradyne-doosan-agibot-filings-20261030",
-          "tickers": ["TSLA", "NVDA"]
+          "headline": "美银点名美光为头号荐股，目标价1550美元；海力士长约锁定叙事仍在",
+          "summary": "Bank of America将MU列为top stock pick并维持买入、目标价约1550美元，称存储供需或在2027–2028进一步趋紧。SK海力士此前披露与主要客户长约覆盖2027–2028过半规划产能；短线仍博弈「涨价动能放缓 vs AI/HBM长约」。",
+          "url": "https://www.tipranks.com/news/why-are-micron-sandisk-and-sk-hynix-stocks-rising-in-premarket-today-after-fridays-chip-rout",
+          "tickers": ["MU", "SKHY", "SNDK"]
         }
       ]
     },
@@ -121,22 +49,16 @@
       "title": "生物科技",
       "items": [
         {
-          "headline": "艾伯维Q3超预期并上调全年指引，Skyrizi/Rinvoq继续驱动",
-          "summary": "ABBV调整后EPS约3.82美元、营收约174亿美元均略超预期，并将2026年调整EPS指引中枢上修约0.11美元、营收约至678亿美元；同时上调季度分红，股价贴近高位区间。",
-          "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-abbvie-beats-q3-2026-estimates-and-raises-outlook-93CH-4989444",
-          "tickers": ["ABBV"]
+          "headline": "Vertex周一盘后财报：共识营收约34亿美元级，关注疼痛/基因治疗贡献",
+          "summary": "VRTX将于美东周一盘后公布三季报并召开电话会（约16:30 ET）。市场共识营收约34亿美元量级、EPS约4.8美元一线（各源略有差异）；跟踪Journavx、Casgevy及囊性纤维化以外管线进展。",
+          "url": "https://vertexpharmanewsroom.gcs-web.com/news-releases/news-release-details/vertex-announce-third-quarter-2026-financial-results-november",
+          "tickers": ["VRTX"]
         },
         {
-          "headline": "安进押注MariTide冲击超1200亿美元肥胖药市场，周二财报成焦点",
-          "summary": "AMGN将于11月3日盘后公布业绩，市场高度关注肥胖药MariTide的Phase 3进度、给药间隔（八周/季度）与心血管等适应症布局；对标礼来、诺和诺德已建立的GLP-1格局。",
-          "url": "https://www.bloomberg.com/news/features/2026-11-02/amgen-amgn-bets-on-maritide-to-crack-120-billion-obesity-market",
+          "headline": "安进周二盘后财报在即，盘前基本持平；盯MariTide肥胖药与给药间隔",
+          "summary": "AMGN盘前几乎持平，三季报定于周二盘后。市场聚焦肥胖药MariTide的Phase 3（体重管理及心血管等适应症）与八周/季度给药试验；对标礼来等已建立的GLP-1格局。",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-futures-rise-101832709.html",
           "tickers": ["AMGN", "LLY"]
-        },
-        {
-          "headline": "本周生科催化剂密集：Vertex周一、Moderna周五等财报扎堆",
-          "summary": "VRTX关注Journavx/Casgevy贡献与Crinetics收购整合；BNTX、MRNA等后续跟进疫苗与肿瘤管线；板块上周相对大盘抗跌，短线事件驱动强。",
-          "url": "https://finance.yahoo.com/healthcare/articles/stocktwits-pharma-pulse-biotech-beats-035237536.html",
-          "tickers": ["VRTX", "MRNA", "BNTX", "AMGN"]
         }
       ]
     },
@@ -145,22 +67,16 @@
       "title": "半导体与制造",
       "items": [
         {
-          "headline": "英特尔单日暴跌约29%，Q4指引大幅低于预期拖累同业",
-          "summary": "INTC三季度营收约165亿美元、数据中心与AI收入大增，但Q4收入与EPS指引远逊预期，归因PC疲软、产能切换与以色列工厂事故等；盘中市值蒸发逾千亿美元，AMD等亦承压。周二AMD财报将检验是个股还是行业问题。",
-          "url": "https://x.com/i/trending/2116644676329406627",
-          "tickers": ["INTC", "AMD"]
+          "headline": "AMD/英伟达/博通盘前反弹，英特尔仍承压；巴克莱将英特尔目标价降至75美元",
+          "summary": "周五科技抛售后，AMD、NVDA、AVGO盘前上涨；INTC盘前小幅反弹但上周五因Q4指引逊预期大跌。Barclays分析师将英特尔目标价自100美元下调至75美元。周二AMD财报被视作检验PC需求是个股还是行业问题的关键节点。",
+          "url": "https://www.tipranks.com/news/why-are-amd-nvidia-and-broadcom-stocks-rising-in-premarket-today-november-2",
+          "tickers": ["AMD", "NVDA", "AVGO", "INTC"]
         },
         {
-          "headline": "对冲基金10月抛售约200亿美元美股科技仓，半导体首当其冲",
-          "summary": "经纪数据显示对冲基金在约两周内大幅削减科技多头，半导体敞口回撤最猛，抹去自2025年初以来部分AI相关增持。短线与超大盘财报、存储定价叙事共振。",
-          "url": "https://x.com/i/trending/2117113744266535101",
-          "tickers": ["NVDA", "AMD", "AVGO", "TSM"]
-        },
-        {
-          "headline": "本周半导体与软件财报密集：苹果、AMD、高通等",
-          "summary": "周一苹果与Palantir，周二AMD等，周三前后高通；叠加中期选举，市场重新定价AI资本开支、PC/手机需求与代工/设备链条（TSM、ASML、AVGO等）的景气持续性。",
-          "url": "https://movertape.com/news/earnings-week-ahead-2026-11-02",
-          "tickers": ["AAPL", "AMD", "QCOM", "PLTR", "AVGO", "TSM"]
+          "headline": "Palantir盘前约+1.3%，盘后财报；预期营收同比约+85%至21.8亿美元",
+          "summary": "PLTR盘前约涨1.3%。分析师预期三季度营收约21.8亿美元（同比约+85%，增速低于上季约93%），调整EPS约0.41美元（约+94%）。10月AI股回调中PLTR相对抗跌，本季将检验AI增长持续性。",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/p-500-nasdaq-futures-rise-101832709.html",
+          "tickers": ["PLTR"]
         }
       ]
     }
