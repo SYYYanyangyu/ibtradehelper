@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-03T01:16:31Z",
+  "updatedAt": "2026-11-04T01:20:00.000Z",
   "source": "scheduled",
   "sections": [
     {
@@ -7,15 +7,15 @@
       "title": "万亿/超大市值",
       "items": [
         {
-          "headline": "AAPL Ternus首份财报：营收EPS超预期，毛利率指引与内存成本拖累盘后",
-          "summary": "财政Q4营收约1145亿美元（+12% YoY）超预期，稀释EPS 2.10美元；iPhone约576亿（+17%）、Services创纪录约316亿。12月季营收指引增长7%–10%，但毛利率指引45%–46%低于街预期；Ternus称内存成本「前所未有」且本季及之后仍升。盘后约跌2%–3%。周一晚间股指期货小幅反弹（纳指期货约+0.3%）受苹果压制。",
-          "url": "https://www.apple.com/newsroom/2026/11/apple-reports-fourth-quarter-results/",
-          "tickers": ["AAPL"]
+          "headline": "苹果财后承压收跌近2%，英伟达重夺全球市值第一",
+          "summary": "11/3美股：AAPL收跌约1.9%，因假日季收入增速指引逊于预期，并警示AI带动的内存涨价将继续压制毛利率；NVDA涨约2.3%重夺全球最高市值，MSFT/AMZN/META同日各涨约2%–2.7%，AMD盘中涨约3.7%。",
+          "url": "https://en.sedaily.com/international/2026/11/04/us-stocks-mixed-before-midterms-as-nvidia-retakes-top-spot",
+          "tickers": ["AAPL", "NVDA", "MSFT", "AMZN", "META", "AMD"]
         },
         {
-          "headline": "AMD周一收盘大跌约7.5%，盯今日美东盘后财报",
-          "summary": "AMD周一收约466.84美元、约跌7.5%，跌破关键技术位；Q3财报定于美东11/3盘后。属晚报之后盘中新波动。",
-          "url": "https://www.marketbeat.com/instant-alerts/price-advanced-micro-devices-nasdaq-amd-shares-down-75-heres-why-2026-11-02/",
+          "headline": "AMD三季报超预期，数据中心收入近翻倍，盘后大涨",
+          "summary": "AMD公布Q3营收133.8亿美元（同比+45%），非GAAP EPS 2.09美元，均超预期；数据中心收入创纪录85.5亿美元（同比+97%）。Q4营收指引约170亿美元（±3%），高于华尔街约162亿美元预期；CEO苏姿丰称预期2027年整体收入增超80%。盘后股价一度涨约8%–9%。",
+          "url": "https://ir.amd.com/news-events/press-releases/detail/1303/amd-reports-third-quarter-2026-financial-results",
           "tickers": ["AMD"]
         }
       ]
@@ -25,10 +25,10 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "内存股周一回吐，苹果确认内存涨价将延续",
-          "summary": "晚报盘前反弹后，周一交易中MU约跌4%、WDC约跌5%、SNDK约跌3%。盘后苹果明确毛利承压、内存涨价unprecedented且将延续——对供应商基本面偏确认，但对苹果/PC需求侧叙事偏空。",
-          "url": "https://finance.yahoo.com/markets/stocks/articles/micron-falls-4-kioxia-cautious-185355108.html",
-          "tickers": ["MU", "SNDK", "WDC", "SKHY"]
+          "headline": "苹果确认内存持续涨价，存储股反弹",
+          "summary": "苹果在财报沟通中确认内存价格将继续上行并压制自身假日季毛利率，市场解读利好供应商议价能力。11/3美光收涨约2.6%，SK海力士ADR涨约2.1%；盘中Sandisk、希捷、西数等存储股普遍反弹数个百分点，扭转此前受铠侠谨慎展望拖累的抛售。",
+          "url": "https://www.benzinga.com/markets/tech/26/11/62828023/memory-stocks-apple-margin-micron-sandisk-pricing-power",
+          "tickers": ["MU", "SNDK", "STX", "WDC", "SKHY", "AAPL"]
         }
       ]
     },
@@ -37,15 +37,9 @@
       "title": "生物科技",
       "items": [
         {
-          "headline": "VRTX Q3营收超预期并上调全年指引，盘后偏平略升",
-          "summary": "总营收约34.4亿美元（+12% YoY，略超预期）；全年营收指引上调至131.5–132.5亿美元。GAAP净利因Crinetics并购费用同比下滑；盘后约+1%量级。",
-          "url": "https://www.businesswire.com/news/home/20261102902999/en/Vertex-Reports-Third-Quarter-2026-Financial-Results",
-          "tickers": ["VRTX"]
-        },
-        {
-          "headline": "AMGN今日美东盘后财报，市场仍盯MariTide",
-          "summary": "Amgen Q3定于美东11/3盘后公布，截至本早报窗口尚无正式结果；焦点仍是MariTide进展。",
-          "url": "https://www.amgen.com/newsroom/press-releases/2026/10/amgen-announces-webcast-of-2026-third-quarter-financial-results",
+          "headline": "安进三季报超预期并上调指引，盘后因生物类似药承压",
+          "summary": "Amgen Q3营收104亿美元（同比+8%），非GAAP EPS 6.45美元，均超预期，并上调全年营收至389–397亿美元、非GAAP EPS至22.90–23.70美元。但Prolia同比降约45%、XGEVA降约47%，生物类似药冲击引发担忧，盘后股价跌约1.5%。",
+          "url": "https://investors.amgen.com/news-releases/news-release-details/amgen-reports-third-quarter-2026-financial-results",
           "tickers": ["AMGN"]
         }
       ]
@@ -55,16 +49,10 @@
       "title": "半导体与制造相关",
       "items": [
         {
-          "headline": "PLTR爆量超预期并上调指引，盘后仍约跌3%",
-          "summary": "Q3营收约23.13亿美元（+96% YoY），调整EPS 0.44美元；美国商业营收约9.84亿（+148%）首次超过美国政府约9.53亿。上调全年营收至约85.30–85.34亿美元。盘后约跌3%（估值/获利了结）。",
-          "url": "https://investors.palantir.com/news-details/2026/Palantir-Reports-Q3-2026-U-S--Comm-Revenue-Growth-of-148-YY-and-Revenue-Growth-of-96-YY-Raises-FY-2026-Revenue-Guidance-to-91-YY-Growth-and-U-S--Comm-Revenue-Guidance-to-143-YY-Crushing-Consensus-Expectations",
-          "tickers": ["PLTR"]
-        },
-        {
-          "headline": "MRVL宣布约1150亿美元全股票收购Lumentum，股价重挫",
-          "summary": "11/2宣布与Lumentum（LITE）合并，作价约1150亿美元全股票（LITE股东约获4.5股MRVL），意在AI光互连。市场担忧稀释与AI开支，MRVL/LITE均大幅下跌。",
-          "url": "https://investor.marvell.com/news-events/press-releases/detail/1040/marvell-and-lumentum-to-combine-creating-a-category-leader-in-ai-connectivity",
-          "tickers": ["MRVL"]
+          "headline": "费城半导体指数大涨，Palantir财报后仍收跌",
+          "summary": "11/3费城半导体指数涨约2.6%，SOXL涨超7%；ASML美股涨约1.7%。Palantir虽Q3营收超预期（约23.1亿美元），但美私营合同总价值增速从Q2约153%骤降至Q3约11%，市场担忧估值与增速，股价收跌约1.7%。",
+          "url": "https://en.fnnews.com/news/202611040621220252",
+          "tickers": ["ASML", "PLTR", "AMD", "NVDA"]
         }
       ]
     }
