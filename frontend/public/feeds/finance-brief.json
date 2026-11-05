@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-03T01:16:31Z",
+  "updatedAt": "2026-11-05T01:20:00.000Z",
   "source": "scheduled",
   "sections": [
     {
@@ -7,16 +7,10 @@
       "title": "万亿/超大市值",
       "items": [
         {
-          "headline": "AAPL Ternus首份财报：营收EPS超预期，毛利率指引与内存成本拖累盘后",
-          "summary": "财政Q4营收约1145亿美元（+12% YoY）超预期，稀释EPS 2.10美元；iPhone约576亿（+17%）、Services创纪录约316亿。12月季营收指引增长7%–10%，但毛利率指引45%–46%低于街预期；Ternus称内存成本「前所未有」且本季及之后仍升。盘后约跌2%–3%。周一晚间股指期货小幅反弹（纳指期货约+0.3%）受苹果压制。",
-          "url": "https://www.apple.com/newsroom/2026/11/apple-reports-fourth-quarter-results/",
-          "tickers": ["AAPL"]
-        },
-        {
-          "headline": "AMD周一收盘大跌约7.5%，盯今日美东盘后财报",
-          "summary": "AMD周一收约466.84美元、约跌7.5%，跌破关键技术位；Q3财报定于美东11/3盘后。属晚报之后盘中新波动。",
-          "url": "https://www.marketbeat.com/instant-alerts/price-advanced-micro-devices-nasdaq-amd-shares-down-75-heres-why-2026-11-02/",
-          "tickers": ["AMD"]
+          "headline": "选后超大盘分化：AAPL/MSFT/AMZN等大涨，NVDA/TSLA承压",
+          "summary": "11月4日美股收盘，民主党中期胜选后超大规模云与苹果集体走强：苹果涨约5%–7%、市值重回约5.1万亿美元一线，微软涨约7%、亚马逊涨约8%、谷歌涨超6%、Meta涨约3%。分析指分裂政府降低政策不确定性，且数据中心监管趋严反而巩固超大规模云地位。同日英伟达收跌约3%至约200美元，特斯拉收跌约3%。",
+          "url": "https://www.cnbc.com/2026/11/04/apple-and-other-big-tech-stocks-surge-after-2026-midterm-elections.html",
+          "tickers": ["AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA", "TSLA"]
         }
       ]
     },
@@ -25,28 +19,22 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "内存股周一回吐，苹果确认内存涨价将延续",
-          "summary": "晚报盘前反弹后，周一交易中MU约跌4%、WDC约跌5%、SNDK约跌3%。盘后苹果明确毛利承压、内存涨价unprecedented且将延续——对供应商基本面偏确认，但对苹果/PC需求侧叙事偏空。",
-          "url": "https://finance.yahoo.com/markets/stocks/articles/micron-falls-4-kioxia-cautious-185355108.html",
-          "tickers": ["MU", "SNDK", "WDC", "SKHY"]
+          "headline": "存储板块集体回撤：SNDK约跌9%，MU/WDC约跌7%，STX约跌8%",
+          "summary": "11月4日盘中存储链大幅跑输大盘：SanDisk领跌约9%，美光与西数各约跌7%，希捷约跌8%。市场担忧中期选情后得州等地数据中心限制升温，叠加消费端存储涨价抑制需求、以及合资伙伴Kioxia偏谨慎的展望，AI存储高估值情绪回吐。",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/sandisk-retreats-9-micron-western-160259339.html",
+          "tickers": ["SNDK", "MU", "WDC", "STX"]
         }
       ]
     },
     {
-      "id": "biotech",
-      "title": "生物科技",
+      "id": "robotics",
+      "title": "机器人",
       "items": [
         {
-          "headline": "VRTX Q3营收超预期并上调全年指引，盘后偏平略升",
-          "summary": "总营收约34.4亿美元（+12% YoY，略超预期）；全年营收指引上调至131.5–132.5亿美元。GAAP净利因Crinetics并购费用同比下滑；盘后约+1%量级。",
-          "url": "https://www.businesswire.com/news/home/20261102902999/en/Vertex-Reports-Third-Quarter-2026-Financial-Results",
-          "tickers": ["VRTX"]
-        },
-        {
-          "headline": "AMGN今日美东盘后财报，市场仍盯MariTide",
-          "summary": "Amgen Q3定于美东11/3盘后公布，截至本早报窗口尚无正式结果；焦点仍是MariTide进展。",
-          "url": "https://www.amgen.com/newsroom/press-releases/2026/10/amgen-announces-webcast-of-2026-third-quarter-financial-results",
-          "tickers": ["AMGN"]
+          "headline": "特斯拉选后收跌约3%，数据中心与监管情绪拖累",
+          "summary": "11月4日特斯拉收跌约3%（盘前一度更深），市场将民主党国会换手与多地数据中心限制公投结果，解读为对马斯克关联资产与AI算力扩张叙事的近端压力；SpaceX相关报价亦同步走弱。",
+          "url": "https://www.cnbc.com/2026/11/04/stocks-making-the-biggest-moves-premarket-djt-tsla-crwv-nvo.html",
+          "tickers": ["TSLA"]
         }
       ]
     },
@@ -55,16 +43,16 @@
       "title": "半导体与制造相关",
       "items": [
         {
-          "headline": "PLTR爆量超预期并上调指引，盘后仍约跌3%",
-          "summary": "Q3营收约23.13亿美元（+96% YoY），调整EPS 0.44美元；美国商业营收约9.84亿（+148%）首次超过美国政府约9.53亿。上调全年营收至约85.30–85.34亿美元。盘后约跌3%（估值/获利了结）。",
-          "url": "https://investors.palantir.com/news-details/2026/Palantir-Reports-Q3-2026-U-S--Comm-Revenue-Growth-of-148-YY-and-Revenue-Growth-of-96-YY-Raises-FY-2026-Revenue-Guidance-to-91-YY-Growth-and-U-S--Comm-Revenue-Guidance-to-143-YY-Crushing-Consensus-Expectations",
-          "tickers": ["PLTR"]
+          "headline": "高通财报超预期但指引偏弱，盘后跌约7%",
+          "summary": "高通公布财季调整后EPS 2.17美元、营收104.4亿美元，均略超预期；但下季EPS指引2.15–2.35美元低于华尔街预期中枢。手机芯片收入同比下滑26%至51.4亿美元，受存储涨价推高手机售价拖累；汽车业务收入同比大增89%。CEO称数据中心更多是供给而非需求问题，并给出2027财年数据中心约50亿美元收入目标。",
+          "url": "https://www.cnbc.com/2026/11/04/qualcomm-qcom-earnings-report-q4-2026.html",
+          "tickers": ["QCOM"]
         },
         {
-          "headline": "MRVL宣布约1150亿美元全股票收购Lumentum，股价重挫",
-          "summary": "11/2宣布与Lumentum（LITE）合并，作价约1150亿美元全股票（LITE股东约获4.5股MRVL），意在AI光互连。市场担忧稀释与AI开支，MRVL/LITE均大幅下跌。",
-          "url": "https://investor.marvell.com/news-events/press-releases/detail/1040/marvell-and-lumentum-to-combine-creating-a-category-leader-in-ai-connectivity",
-          "tickers": ["MRVL"]
+          "headline": "英特尔CEO家族信托增持约970万美元股票",
+          "summary": "SEC披露：CEO Lip-Bu Tan于11月2日通过家族信托买入15万股，均价约64.73美元，合计约970万美元；11月4日披露时股价已较买入价回落。此举被视为对近期大幅回调后的内部信心信号。",
+          "url": "https://www.investing.com/news/insider-trading-news/intel-ceo-lip-bu-tan-acquires-97m-in-intel-stock-93CH-5000859",
+          "tickers": ["INTC"]
         }
       ]
     }
