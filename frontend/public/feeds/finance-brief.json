@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-05T01:20:00.000Z",
+  "updatedAt": "2026-11-05T01:22:00.000Z",
   "source": "scheduled",
   "sections": [
     {
@@ -39,6 +39,24 @@
       ]
     },
     {
+      "id": "biotech",
+      "title": "生物科技",
+      "items": [
+        {
+          "headline": "阿尔尼拉姆宣布最高10亿美元回购，并更换商务负责人",
+          "summary": "Alnylam于11月4日美股收盘后宣布最高10亿美元股票回购计划，预计约5亿美元在2026年底前执行、其余视市况在2027年推进；同时商务负责人Tolga Tanguler将离职，公司正物色继任者。",
+          "url": "https://www.stocktitan.net/news/ALNY/alnylam-announces-1-billion-share-repurchase-program-and-change-in-zeq785nxku7g.html",
+          "tickers": ["ALNY"]
+        },
+        {
+          "headline": "艾伯维获Nxera口服IBD候选药全球授权，预付款1亿美元",
+          "summary": "AbbVie与Nxera就口服EP4激动剂NXE0033744（炎症性肠病）达成全球授权：预付款1亿美元，里程碑最高约13.7亿美元，另加销售分成；该候选药已完成I期，交易尚需反垄断等审批。",
+          "url": "https://www.globenewswire.com/news-release/2026/11/04/3395033/0/en/nxera-pharma-enters-into-global-license-agreement-with-abbvie-for-nxe0033744-a-novel-ep4-receptor-agonist-for-inflammatory-bowel-disease.html",
+          "tickers": ["ABBV"]
+        }
+      ]
+    },
+    {
       "id": "semiconductor",
       "title": "半导体与制造相关",
       "items": [
@@ -47,6 +65,12 @@
           "summary": "高通公布财季调整后EPS 2.17美元、营收104.4亿美元，均略超预期；但下季EPS指引2.15–2.35美元低于华尔街预期中枢。手机芯片收入同比下滑26%至51.4亿美元，受存储涨价推高手机售价拖累；汽车业务收入同比大增89%。CEO称数据中心更多是供给而非需求问题，并给出2027财年数据中心约50亿美元收入目标。",
           "url": "https://www.cnbc.com/2026/11/04/qualcomm-qcom-earnings-report-q4-2026.html",
           "tickers": ["QCOM"]
+        },
+        {
+          "headline": "美满科技收跌约7%，全股票收购Lumentum稀释担忧持续",
+          "summary": "Marvell拟以全股票约1150亿美元收购Lumentum（换股比例约4.5股MRVL兑1股LITE、约24%溢价）后，11月4日MRVL收跌约7.1%至159.80美元；投行下调目标价并担忧稀释、估值与审批/中国审查风险。",
+          "url": "https://www.streetinsider.com/Investing/Marvell+Technology+falls+as+Lumentum+deal+concerns+persist/27287592.html",
+          "tickers": ["MRVL"]
         },
         {
           "headline": "英特尔CEO家族信托增持约970万美元股票",
