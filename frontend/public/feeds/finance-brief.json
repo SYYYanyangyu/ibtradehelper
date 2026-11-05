@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-03T01:16:31Z",
+  "updatedAt": "2026-11-05T12:55:00.000Z",
   "source": "scheduled",
   "sections": [
     {
@@ -7,16 +7,16 @@
       "title": "万亿/超大市值",
       "items": [
         {
-          "headline": "AAPL Ternus首份财报：营收EPS超预期，毛利率指引与内存成本拖累盘后",
-          "summary": "财政Q4营收约1145亿美元（+12% YoY）超预期，稀释EPS 2.10美元；iPhone约576亿（+17%）、Services创纪录约316亿。12月季营收指引增长7%–10%，但毛利率指引45%–46%低于街预期；Ternus称内存成本「前所未有」且本季及之后仍升。盘后约跌2%–3%。周一晚间股指期货小幅反弹（纳指期货约+0.3%）受苹果压制。",
-          "url": "https://www.apple.com/newsroom/2026/11/apple-reports-fourth-quarter-results/",
-          "tickers": ["AAPL"]
+          "headline": "盘前分化：AMZN/GOOGL/META偏强，NVDA与AMD回吐、纳指期货承压",
+          "summary": "11月5日美股盘前，标普期货基本持平、道指期货偏强，纳指期货约跌0.7%，芯片与数据中心链继续承压。亚马逊盘前约涨1.7%、谷歌约涨1.3%、Meta约涨1.1%，微软大致持平；苹果前日冲上约5万亿美元市值与52周高后盘前略回吐。英伟达盘前约跌1%，AMD在前日财报后大涨后盘前回吐约3%–4%。市场仍盯选后数据中心监管收紧与AI开支回报疑虑。",
+          "url": "https://www.investing.com/news/stock-market-news/ai-datacenter-stocks-slip-as-democratic-sweep-clouds-expansion-plans-5003196",
+          "tickers": ["AMZN", "GOOGL", "META", "MSFT", "AAPL", "NVDA", "AMD"]
         },
         {
-          "headline": "AMD周一收盘大跌约7.5%，盯今日美东盘后财报",
-          "summary": "AMD周一收约466.84美元、约跌7.5%，跌破关键技术位；Q3财报定于美东11/3盘后。属晚报之后盘中新波动。",
-          "url": "https://www.marketbeat.com/instant-alerts/price-advanced-micro-devices-nasdaq-amd-shares-down-75-heres-why-2026-11-02/",
-          "tickers": ["AMD"]
+          "headline": "高盛与阿波罗分销SpaceX约400亿美元英伟达GPU融资切片",
+          "summary": "据报道，高盛与阿波罗正向华尔街分销SpaceX规模约400亿美元的AI芯片融资中、单笔最高约5亿美元的份额：经阿波罗SPV采购英伟达Rubin等设备，SpaceX预付约70亿美元租金、五年租用并表外处理。交付拟自2027年初起，用于SpaceX算力；市场同时担忧AI债务扩张，SpaceX相关报价近日偏弱。",
+          "url": "https://x.com/i/trending/2118164369401925725",
+          "tickers": ["NVDA"]
         }
       ]
     },
@@ -25,28 +25,10 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "内存股周一回吐，苹果确认内存涨价将延续",
-          "summary": "晚报盘前反弹后，周一交易中MU约跌4%、WDC约跌5%、SNDK约跌3%。盘后苹果明确毛利承压、内存涨价unprecedented且将延续——对供应商基本面偏确认，但对苹果/PC需求侧叙事偏空。",
-          "url": "https://finance.yahoo.com/markets/stocks/articles/micron-falls-4-kioxia-cautious-185355108.html",
-          "tickers": ["MU", "SNDK", "WDC", "SKHY"]
-        }
-      ]
-    },
-    {
-      "id": "biotech",
-      "title": "生物科技",
-      "items": [
-        {
-          "headline": "VRTX Q3营收超预期并上调全年指引，盘后偏平略升",
-          "summary": "总营收约34.4亿美元（+12% YoY，略超预期）；全年营收指引上调至131.5–132.5亿美元。GAAP净利因Crinetics并购费用同比下滑；盘后约+1%量级。",
-          "url": "https://www.businesswire.com/news/home/20261102902999/en/Vertex-Reports-Third-Quarter-2026-Financial-Results",
-          "tickers": ["VRTX"]
-        },
-        {
-          "headline": "AMGN今日美东盘后财报，市场仍盯MariTide",
-          "summary": "Amgen Q3定于美东11/3盘后公布，截至本早报窗口尚无正式结果；焦点仍是MariTide进展。",
-          "url": "https://www.amgen.com/newsroom/press-releases/2026/10/amgen-announces-webcast-of-2026-third-quarter-financial-results",
-          "tickers": ["AMGN"]
+          "headline": "美光被传暂停台湾约45亿美元新厂建设，盘前续跌",
+          "summary": "彭博报道（路透转述）称，因桃园厂区劳资纠纷拖延，美光暂停规划中约45亿美元的Fab 11E存储厂建设（原拟产DRAM/HBM、约2028年投产）；路透暂未能独立核实，美光未立即回应。盘前美光续跌约4%，西数、希捷盘前亦各跌约4%–5%；韩国KOSPI大跌约5%，三星电子与SK海力士分别重挫约7.6%与9.5%，亚洲存储情绪同步恶化。",
+          "url": "https://www.investing.com/news/stock-market-news/micron-pauses-work-on-45-billion-taiwan-plant-bloomberg-news-reports-5002732",
+          "tickers": ["MU", "WDC", "STX", "SSNLF", "SKHY"]
         }
       ]
     },
@@ -55,16 +37,22 @@
       "title": "半导体与制造相关",
       "items": [
         {
-          "headline": "PLTR爆量超预期并上调指引，盘后仍约跌3%",
-          "summary": "Q3营收约23.13亿美元（+96% YoY），调整EPS 0.44美元；美国商业营收约9.84亿（+148%）首次超过美国政府约9.53亿。上调全年营收至约85.30–85.34亿美元。盘后约跌3%（估值/获利了结）。",
-          "url": "https://investors.palantir.com/news-details/2026/Palantir-Reports-Q3-2026-U-S--Comm-Revenue-Growth-of-148-YY-and-Revenue-Growth-of-96-YY-Raises-FY-2026-Revenue-Guidance-to-91-YY-Growth-and-U-S--Comm-Revenue-Guidance-to-143-YY-Crushing-Consensus-Expectations",
-          "tickers": ["PLTR"]
+          "headline": "高通盘前续跌约9%–10%，手机芯片疲软主导定价",
+          "summary": "继盘后指引偏弱后，11月5日盘前高通再跌约9%–10%。手机芯片收入同比下滑26%至51.4亿美元拖累核心业务；公司同时面临存储涨价抬高手机售价与智能手机需求放缓。汽车业务同比大增约89%至约19.9亿美元，数据中心业务展望未能抵消盘前抛压。",
+          "url": "https://www.investing.com/news/stock-market-news/premarket-movers-qualcomm-snap-slide-premarket-unity-surges-5003847",
+          "tickers": ["QCOM"]
         },
         {
-          "headline": "MRVL宣布约1150亿美元全股票收购Lumentum，股价重挫",
-          "summary": "11/2宣布与Lumentum（LITE）合并，作价约1150亿美元全股票（LITE股东约获4.5股MRVL），意在AI光互连。市场担忧稀释与AI开支，MRVL/LITE均大幅下跌。",
-          "url": "https://investor.marvell.com/news-events/press-releases/detail/1040/marvell-and-lumentum-to-combine-creating-a-category-leader-in-ai-connectivity",
-          "tickers": ["MRVL"]
+          "headline": "高通与SpaceX签约推进Starlink Mobile全国5G网络",
+          "summary": "SpaceX选择高通加速Starlink Mobile地面5G：高通提供Dragonwing射频/基带与Layer-1软件，支持大规模MIMO，计划2027年起部署数万个美国基站。该合作偏长期基础设施利好，但当日股价仍被手机业务与指引主导。",
+          "url": "https://www.qualcomm.com/news/releases/2026/11/spacex-selects-qualcomm-to-accelerate-starlink-mobile-s-nationwi",
+          "tickers": ["QCOM"]
+        },
+        {
+          "headline": "美满盘前续跌约3%，Lumentum全股票收购稀释担忧延续",
+          "summary": "Marvell拟以全股票约1150亿美元收购Lumentum后，股价持续承压，盘前再跌约3%；交易有效作价随MRVL下跌显著缩水，市场仍担忧稀释、审批与交割周期。英特尔盘前约跌2%。",
+          "url": "https://www.investing.com/news/stock-market-news/sp-500-futures-steady-after-midterm-rally-nasdaq-lags-on-chip-weakness-5003237",
+          "tickers": ["MRVL", "INTC"]
         }
       ]
     }
