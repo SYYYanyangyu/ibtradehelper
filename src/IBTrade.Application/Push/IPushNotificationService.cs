@@ -11,6 +11,7 @@ public interface IPushNotificationService
     Task UpdatePreferencesAsync(string endpoint, NotificationPreferences preferences, CancellationToken ct = default);
     Task SendNotificationAsync(SendPushRequest request, CancellationToken ct = default);
     Task SendScheduledBriefAsync(CancellationToken ct = default);
+    Task SendScheduledBriefWithContentAsync(string briefSummary, CancellationToken ct = default);
     Task SendBreakingNewsAsync(string title, string body, string? url = null, CancellationToken ct = default);
     Task<int> GetActiveSubscriptionCountAsync(CancellationToken ct = default);
 }

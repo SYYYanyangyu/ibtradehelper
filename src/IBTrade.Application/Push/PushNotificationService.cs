@@ -7,6 +7,8 @@ using IBTrade.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebPush;
+using DomainPushSubscription = IBTrade.Domain.Entities.PushSubscription;
+using WebPushSubscription = WebPush.PushSubscription;
 
 namespace IBTrade.Application.Push;
 
@@ -59,7 +61,7 @@ public class PushNotificationService : IPushNotificationService
             return;
         }
 
-        var subscription = new PushSubscription
+        var subscription = new DomainPushSubscription
         {
             Endpoint = request.Endpoint,
             P256dh = request.Keys.P256dh,
@@ -217,6 +219,22 @@ public class PushNotificationService : IPushNotificationService
         await SendNotificationAsync(request, ct);
     }
 
+    public async Task SendScheduledBriefWithContentAsync(string briefSummary, CancellationToken ct = default)
+    {
+        _logger.LogInformation("开始发送定时金融简报（带内容摘要）");
+        
+        var request = new SendPushRequest(
+            "金融简报已更新",
+            briefSummary,
+            "/",
+            "scheduled-brief",
+            false,
+            "scheduled_brief"
+        );
+
+        await SendNotificationAsync(request, ct);
+    }
+
     public async Task SendBreakingNewsAsync(string title, string body, string? url = null, CancellationToken ct = default)
     {
         _logger.LogInformation("发送突发新闻: {Title}", title);
@@ -238,14 +256,14 @@ public class PushNotificationService : IPushNotificationService
         return _subscriptionRepo.CountActiveSubscriptionsAsync(ct);
     }
 
-    private async Task SendPushToSubscriptionAsync(PushSubscription subscription, string payload, CancellationToken ct)
+    private async Task SendPushToSubscriptionAsync(DomainPushSubscription subscription, string payload, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(_vapidOptions.PrivateKey))
         {
             throw new InvalidOperationException("VAPID 私钥未配置。请在 appsettings.json 中设置 Vapid:PrivateKey");
         }
 
-        var pushSubscription = new WebPush.PushSubscription(
+        var pushSubscription = new WebPushSubscription(
             subscription.Endpoint,
             subscription.P256dh,
             subscription.Auth

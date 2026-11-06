@@ -36,6 +36,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // 不缓存任何 API 请求（包括持仓、订单、交易等私有数据）
+  // 只允许网络请求，失败时返回错误而不是缓存
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(request).catch(() => {
@@ -48,6 +50,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // 静态资源：优先缓存，然后网络更新
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -56,7 +59,8 @@ self.addEventListener('fetch', (event) => {
 
       return caches.open(RUNTIME_CACHE).then((cache) => {
         return fetch(request).then((response) => {
-          if (response.status === 200) {
+          // 只缓存成功的响应，且不缓存 HTML 页面（避免缓存过期的动态内容）
+          if (response.status === 200 && !url.pathname.endsWith('.html')) {
             cache.put(request, response.clone());
           }
           return response;
