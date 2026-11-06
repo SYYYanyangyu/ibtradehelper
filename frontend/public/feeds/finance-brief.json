@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-06T00:20:00.000Z",
+  "updatedAt": "2026-11-06T13:00:00.000Z",
   "source": "scheduled",
   "sections": [
     {
@@ -7,10 +7,16 @@
       "title": "万亿/超大市值",
       "items": [
         {
-          "headline": "美股科技踩踏：纳指跌5.52%，英伟达约跌9%，特斯拉约跌11%",
-          "summary": "11月5日美股大跌，道指跌3.44%收51523、标普跌4.36%收7353.73、纳指跌5.52%收24315，为2025年4月以来最差单日之一。费城半导体约跌12%。市场担忧民主党中期胜选后数据中心与超级AI监管收紧，叠加高通/Arm指引偏弱。英伟达约跌9%（市值蒸发约4500亿美元量级），特斯拉约跌11%，苹果约跌1.5%，亚马逊约跌2%，微软/Meta约跌3%+。中概金龙指数逆势微涨约0.4%。",
-          "url": "https://apnews.com/article/wall-street-stocks-dow-nasdaq-afe254c608c3d1fe2ea792812ba9765a",
-          "tickers": ["NVDA", "TSLA", "AAPL", "MSFT", "AMZN", "META", "GOOGL"]
+          "headline": "周五盘前科技修复：纳指期货约+1.6%，道指期货仍弱；非农将出",
+          "summary": "周四纳指跌5.52%跌入技术性回调后，周五美股开盘前纳指期货约涨逾1.6%、标普期货约+0.3%、道指期货约-0.9%，呈分化修复。资金回补AI/科技，但宏观上劳工部将于美东8:30公布10月非农（市场预期约增6.5万），开盘前后波动仍大。早报已覆盖周四踩踏，本报侧重盘前修复与当日催化剂。",
+          "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-november-6-dow-sp-500-nasdaq-jobs-report-091927729.html",
+          "tickers": ["NVDA", "MSFT", "AAPL", "AMZN", "META", "GOOGL", "TSLA"]
+        },
+        {
+          "headline": "英伟达接触Apollo：拟改造Brightspeed电信机房做推理数据中心",
+          "summary": "据The Information，英伟达已向Apollo旗下宽带商Brightspeed提交书面方案，拟把逾130处既有电信机房改造成小型AI推理节点，覆盖最多约20个州、合计约1GW可用电力，并讨论2027年一季度起用Vera Rubin机柜改造。动机是绕开选后多地新建数据中心禁令/地方阻力；尚处接洽阶段，买家与落地规模未定。",
+          "url": "https://finance.yahoo.com/technology/ai/articles/nvidia-eyes-apollo-struggling-telecom-213127832.html",
+          "tickers": ["NVDA"]
         }
       ]
     },
@@ -19,22 +25,10 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "存储链崩跌：闪迪约跌22%，美光/西数约跌17%，希捷约跌16%",
-          "summary": "AI存储与硬盘链领跌标普：SanDisk约跌22%，美光与西数各约跌17%，希捷约跌16%。DRAM相关ETF盘中跌近18%。逻辑仍是数据中心建设放缓与选后监管不确定性，资金从AI硬件高估值中撤出。亚太开盘后韩股亦承压，三星与SK海力士跟跌。",
-          "url": "https://www.marketwatch.com/story/micron-sandisk-and-other-ai-stocks-are-falling-hard-investors-dont-like-uncertainty-94d2a3b9",
-          "tickers": ["SNDK", "MU", "WDC", "STX"]
-        }
-      ]
-    },
-    {
-      "id": "robotics",
-      "title": "机器人",
-      "items": [
-        {
-          "headline": "特斯拉约跌11%，马斯克关联资产与AI叙事同遭抛售",
-          "summary": "特斯拉收跌约11%至约344美元一线；报道称SpaceX报价亦接近两位数跌幅。资金将民主党国会换手与多地数据中心限制解读为对马斯克关联资产与AI扩张叙事的近端压力。",
-          "url": "https://www.nbcnews.com/business/markets/tech-stocks-plunge-ai-midterms-rcna607650",
-          "tickers": ["TSLA"]
+          "headline": "亚太存储续杀、美股盘前反弹：MU约+7.5%，SNDK约+8.3%",
+          "summary": "周五亚洲：KOSPI约跌6%（最差日量级，盘中熔断）、日经约跌6%；三星电子约跌逾6%、SK海力士约跌逾10%。美股盘前存储/AI硬件大幅回补：美光约涨7.5%、闪迪约涨8.3%、美股上市SK海力士约涨4%–5%。逻辑仍是周四超跌后的技术性反抽，监管与数据中心叙事未消。",
+          "url": "https://www.investing.com/news/stock-market-news/us-chip-stocks-rebound-sharply-after-thursdays-brutal-selloff-5007137",
+          "tickers": ["MU", "SNDK", "SKHY", "SSNLF", "WDC", "STX"]
         }
       ]
     },
@@ -43,10 +37,10 @@
       "title": "生物科技",
       "items": [
         {
-          "headline": "百济神州Q3亮眼：前三季净利增约4.3倍，年内三度上调指引",
-          "summary": "百济神州（ONC/6160.HK/688235.SH）披露：前三季营收约350亿元（+26.8%），归母净利约60.6亿元（+431.8%）；Q3营收约128亿元、归母净利约27.9亿元。全年营收指引上调至463亿–470亿元（此前449亿–462亿），为年内第三次上调。百悦泽全球销售持续放量。",
-          "url": "https://www.nbd.com.cn/articles/2026-11-05/4640000.html",
-          "tickers": ["ONC", "BGNE"]
+          "headline": "礼来携手Hims & Hers：平台直达Zepbound与口服Foundayo",
+          "summary": "11月6日礼来与Hims & Hers官宣合作：经平台持牌医生开方后，患者可按自付价获得FDA批准的Zepbound（注射，自付起约299美元/月）与Foundayo（口服orforglipron，起约149美元/月）并配送到家。Hims承诺不提供礼来GLP-1复刻制剂。利好肥胖药渠道下沉与口服剂型放量预期。",
+          "url": "https://www.prnewswire.com/news-releases/lilly-and-hims--hers-expand-access-to-fda-approved-lilly-medicines-302931979.html",
+          "tickers": ["LLY", "HIMS"]
         }
       ]
     },
@@ -55,16 +49,10 @@
       "title": "半导体与制造相关",
       "items": [
         {
-          "headline": "费城半导体约跌12%；AMD约跌17%，MRVL约跌16%，LITE约跌19%",
-          "summary": "SOX创2020年3月以来最差单日量级跌幅。AMD约跌17%，迈威尔约跌16%，Lumentum约跌19%，高通、Arm双位数下跌。主因仍是AI基建监管与融资担忧，外加高通指引偏弱。对A股：光模块/算力硬件有低开压力。",
-          "url": "https://www.cnbc.com/2026/11/05/qualcomm-earnings-chip-stocks-election.html",
-          "tickers": ["AMD", "MRVL", "LITE", "QCOM", "ARM"]
-        },
-        {
-          "headline": "宏观与A股盘前：国务院金融报告挺汇金类平准；昨日A股放量普涨",
-          "summary": "国务院金融工作报告提出继续适度宽松、支持中央汇金发挥类平准基金作用、增强资本市场制度包容性。11月5日A股沪指微涨0.1%、深成指涨约1.2%、创业板涨约0.9%，成交约2.1万亿元，风格偏光伏与AI应用。隔夜油价回升（WTI约90.5、布伦特约98.3），金价偏强；英国央行加息25bp至4.00%。商务部称扩大自美农产品采购持开放态度，前提是对等降税落地。",
-          "url": "https://www.cnfin.com/yw-lb/detail/20261106/4491802_1.html",
-          "tickers": []
+          "headline": "芯片盘前普涨：SMH约+5%，AMD约+6%，MRVL约+7%，台积电亚太续弱",
+          "summary": "iShares半导体ETF盘前约涨近5%；AMD、应用材料约涨逾6%，迈威尔约+7%，博通/英特尔约+4%–5%，拉姆研究约+9%，甲骨文约+2.6%，CoreWeave约+6.3%。台股方面台积电约跌4.7%、台指约跌4.5%。盘前修复不等于趋势反转，仍看非农与数据中心政策预期。",
+          "url": "https://www.investing.com/news/stock-market-news/us-chip-stocks-rebound-sharply-after-thursdays-brutal-selloff-5007137",
+          "tickers": ["AMD", "MRVL", "AVGO", "INTC", "TSM", "ORCL", "ASML"]
         }
       ]
     }
