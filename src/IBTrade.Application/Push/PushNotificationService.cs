@@ -52,6 +52,9 @@ public class PushNotificationService : IPushNotificationService
     {
         ValidateTokenSecret();
         
+        // SSRF防护：验证端点白名单
+        PushEndpointValidator.ValidateEndpoint(request.Endpoint);
+        
         var existing = await _subscriptionRepo.GetByEndpointAsync(request.Endpoint, ct);
         if (existing != null)
         {
@@ -176,6 +179,17 @@ public class PushNotificationService : IPushNotificationService
 
         foreach (var subscription in subscriptions)
         {
+            // 发送前重新验证端点（防止已存储的恶意端点）
+            if (!PushEndpointValidator.IsValidEndpoint(subscription.Endpoint))
+            {
+                failureCount++;
+                subscription.IsActive = false;
+                subscription.LastErrorMessage = "端点未通过SSRF验证";
+                await _subscriptionRepo.UpdateAsync(subscription, ct);
+                _logger.LogWarning("跳过无效端点: {Endpoint}", subscription.Endpoint);
+                continue;
+            }
+
             try
             {
                 await SendPushToSubscriptionAsync(subscription, payload, ct);
