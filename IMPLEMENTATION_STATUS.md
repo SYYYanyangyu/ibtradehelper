@@ -1,7 +1,8 @@
 # PWA/Push Implementation Status
 
 **PR**: #15 (cursor/pwa-web-push-bb24)  
-**Date**: 2026-11-06 03:04 UTC
+**Date**: 2026-11-06 03:08 UTC  
+**Last Update**: 2026-11-06 03:08 UTC
 
 ---
 
@@ -11,7 +12,7 @@
 - .NET 8 SDK installed and verified
 - Backend builds: 0 warnings, 0 errors
 - Frontend builds successfully
-- 10 device-detection unit tests pass
+- **25 backend tests pass** (订阅所有权/调度/突发新闻)
 
 ### Security - Subscription Ownership
 - **Server-issued ownership tokens**: HMAC-SHA256 signed, 32-byte random
@@ -33,32 +34,31 @@
 - `/api/push/preferences PUT`: Requires ownership token  
 - `/api/push/send`: Requires X-Api-Key (ApiKeyAuthMiddleware)
 - `/api/push/admin/*`: Requires X-Api-Key
+- **ApiKeyAuthMiddleware updated**: Public push endpoints exempt from ApiKey
+
+### Breaking News Integration ✅
+- **NewsController.Ingest**: Automatic detection on Grok Bot webhook
+- **Detection criteria**: `breaking: true`, `important: true`, or `importance >= 8`
+- **Timestamp validation**: Only process briefs < 1 hour old
+- **Deduplication**: SHA256 content hash with 24-hour window
+- **No historical replay**: Freshness check prevents old brief reprocessing
+
+### Backend Tests ✅
+- **25 tests pass**: SubscriptionOwnership (7), Scheduling (11), BreakingNews (7)
+- **Ownership validation**: Token generation/verification, cross-subscription attack prevention
+- **Scheduling logic**: Weekday 08:00/21:00 Asia/Shanghai, timezone conversion
+- **Breaking news detection**: JSON criteria validation, old brief filtering
 
 ---
 
 ## ❌ Not Implemented
 
-### Backend Tests
-- **Weekday scheduling**: No executable test for 08:00/21:00 Asia/Shanghai logic
-- **Restart durability**: No test for idempotency after service restart
-- **410 Gone handling**: No test for expired subscription cleanup
-- **Preference filtering**: No test for opt-out respecting
+### PostgreSQL Integration Tests
+- **410 Gone handling**: No test with real HTTP client (requires mock push service)
+- **Restart durability**: No test validating idempotency after process restart
+- **Preference filtering**: No integration test with actual database
 
-**Blocker**: Requires PostgreSQL + time-based test harness or mocking
-
-### Breaking News Integration
-- **No automatic ingestion**: Manual trigger endpoint `/api/push/admin/trigger-breaking-news` exists
-- **No Grok Bot integration**: NewsController exists but no breaking news webhook/criteria
-- **No event deduplication**: No stable event IDs from upstream
-- **No timestamp freshness**: No validation against historical replay
-
-**Status**: Requires upstream Grok Bot to supply breaking news events with:
-- Explicit `important: true` flag or severity field
-- Stable event ID for deduplication
-- ISO timestamp for freshness validation (< 1 hour)
-- Webhook authentication
-
-**Current capability**: Admin can manually send via API with auth
+**Status**: Basic logic tested with mocks (25 tests pass). Integration tests need PostgreSQL container or in-memory EF.
 
 ### Rate Limiting
 - **Deduplication only**: SHA256 content hash prevents duplicates in 24h
@@ -118,38 +118,39 @@
 
 ## 🧪 Test Execution Results
 
-### Actually Executed
+### Actually Executed ✅
 ```
-✓ Backend build (0 errors)
-✓ Frontend build (dist generated)  
-✓ Unit tests: 10/10 pass (device detection only)
-✓ PNG icons: 8 files generated (verified file size)
-✓ Ownership token: HMAC-SHA256 logic compiled
+✓ Backend build (0 errors, 0 warnings)
+✓ Frontend build (dist generated)
+✓ Backend tests: 25/25 pass
+  - SubscriptionOwnershipTests: 7/7 (token validation, cross-subscription attacks)
+  - SchedulingTests: 11/11 (weekday 08:00/21:00 Shanghai time)
+  - BreakingNewsIntegrationTests: 7/7 (JSON detection, freshness filtering)
+✓ PNG icons: 8 files generated (1-2KB each, verified)
+✓ Ownership token: HMAC-SHA256 + 32-byte random
+✓ Breaking news integration: NewsController.Ingest wired
+✓ ApiKeyAuthMiddleware: Public endpoints exempt
 ```
 
-### Not Executed
+### Not Executed (Requires Infrastructure)
 ```
-❌ Subscription ownership (requires PostgreSQL)
-❌ Weekday scheduling (requires time-based test)
-❌ 410 Gone handling (requires mock push service)
-❌ Breaking news ingestion (no upstream source)
+❌ 410 Gone handling (needs real push service or mock)
+❌ Multi-instance restart durability (needs distributed lock or test harness)
 ❌ Rate limiting (not implemented)
-❌ Multi-instance safety (not implemented)
 ❌ SSRF validation (not implemented)
-❌ iOS/Android install (no devices)
-❌ Push message delivery (no real subscriptions)
+❌ iOS/Android device install (no physical devices)
+❌ Actual push delivery (no real subscriptions + HTTPS)
 ```
 
 ---
 
 ## 📝 Functional Gaps
 
-1. **Breaking News**: No automatic monitoring, manual trigger only
-2. **SSRF Defense**: No push endpoint validation/allowlist
-3. **Rate Limiting**: Content dedup only, no abuse limits
-4. **Multi-Instance**: Will duplicate pushes, single-instance only
-5. **Backend Tests**: Zero executable tests for scheduling/security/410
-6. **Push Service Validation**: No HTTPS/redirect/host checks on subscription endpoint
+1. **SSRF Defense**: No push endpoint validation/allowlist (FCM, APNS, etc.)
+2. **Rate Limiting**: Content dedup only, no per-IP/per-subscriber abuse limits
+3. **Multi-Instance**: Will duplicate pushes, needs DB unique claim or Redis lock
+4. **410 Gone Test**: Logic exists, no executable test with mock push service
+5. **PostgreSQL Tests**: No integration tests with real database
 
 ---
 
@@ -173,14 +174,14 @@
 
 ## 📊 Completion Summary
 
-**Core PWA**: 100% (manifest, SW, icons)  
-**Subscription Auth**: 100% (ownership tokens implemented)  
-**Push Infrastructure**: 80% (send works, no SSRF/rate limits)  
-**Scheduled Briefs**: 70% (logic exists, no tests/multi-instance safety)  
-**Breaking News**: 20% (manual trigger only, no ingestion)  
-**Testing**: 15% (build + 10 unit tests, zero integration/E2E)
+**Core PWA**: 100% (manifest, SW, PNG icons)  
+**Subscription Auth**: 100% (ownership tokens + tests)  
+**Push Infrastructure**: 85% (send works, no SSRF/rate limits)  
+**Scheduled Briefs**: 80% (logic + tests, no multi-instance lock)  
+**Breaking News**: 75% (integrated + tests, no SSRF)  
+**Testing**: 60% (25 unit tests pass, no integration/E2E)
 
-**Overall**: ~65% production-ready
+**Overall**: ~80% production-ready
 
 ---
 
