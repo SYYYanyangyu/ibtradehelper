@@ -5,10 +5,9 @@ namespace IBTrade.Application.Push;
 public interface IPushNotificationService
 {
     Task<string> GetVapidPublicKeyAsync(CancellationToken ct = default);
-    Task SubscribeAsync(SubscribeRequest request, CancellationToken ct = default);
-    Task UnsubscribeAsync(string endpoint, CancellationToken ct = default);
-    Task<NotificationPreferences> GetPreferencesAsync(string endpoint, CancellationToken ct = default);
-    Task UpdatePreferencesAsync(string endpoint, NotificationPreferences preferences, CancellationToken ct = default);
+    Task<SubscribeResponse> SubscribeAsync(SubscribeRequest request, CancellationToken ct = default);
+    Task UnsubscribeAsync(string endpoint, string ownershipToken, CancellationToken ct = default);
+    Task UpdatePreferencesAsync(string endpoint, string ownershipToken, NotificationPreferences preferences, CancellationToken ct = default);
     Task SendNotificationAsync(SendPushRequest request, CancellationToken ct = default);
     Task SendScheduledBriefAsync(CancellationToken ct = default);
     Task SendScheduledBriefWithContentAsync(string briefSummary, CancellationToken ct = default);

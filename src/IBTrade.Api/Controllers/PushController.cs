@@ -23,13 +23,17 @@ public class PushController(IPushNotificationService pushService, ILogger<PushCo
         }
     }
 
+    /// <summary>
+    /// 订阅推送通知。公开端点，无需认证。
+    /// 返回服务器生成的所有权令牌，客户端必须安全存储此令牌用于后续操作。
+    /// </summary>
     [HttpPost("subscription")]
     public async Task<IActionResult> Subscribe([FromBody] SubscribeRequest request, CancellationToken ct)
     {
         try
         {
-            await pushService.SubscribeAsync(request, ct);
-            return Ok(new { status = "subscribed", endpoint = request.Endpoint });
+            var response = await pushService.SubscribeAsync(request, ct);
+            return Ok(response);
         }
         catch (Exception ex)
         {
@@ -39,20 +43,19 @@ public class PushController(IPushNotificationService pushService, ILogger<PushCo
     }
 
     /// <summary>
-    /// 取消推送订阅。订阅端点作为身份验证 - 只有拥有端点的客户端可以取消订阅。
+    /// 取消推送订阅。需要所有权令牌验证。
     /// </summary>
     [HttpDelete("subscription")]
     public async Task<IActionResult> Unsubscribe([FromBody] UnsubscribeRequest request, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(request.Endpoint) || request.Endpoint.Length < 50)
-        {
-            return BadRequest(new { error = "无效的订阅端点" });
-        }
-
         try
         {
-            await pushService.UnsubscribeAsync(request.Endpoint, ct);
+            await pushService.UnsubscribeAsync(request.Endpoint, request.OwnershipToken, ct);
             return Ok(new { status = "unsubscribed" });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
         }
         catch (Exception ex)
         {
@@ -62,55 +65,21 @@ public class PushController(IPushNotificationService pushService, ILogger<PushCo
     }
 
     /// <summary>
-    /// 获取推送偏好。订阅端点作为身份验证 - 只有拥有端点的客户端可以查询偏好。
-    /// 端点是唯一的长随机字符串，知道端点即拥有该订阅的控制权。
-    /// </summary>
-    [HttpGet("preferences")]
-    public async Task<IActionResult> GetPreferences([FromQuery] string endpoint, CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(endpoint) || endpoint.Length < 50)
-        {
-            return BadRequest(new { error = "无效的订阅端点" });
-        }
-
-        try
-        {
-            var preferences = await pushService.GetPreferencesAsync(endpoint, ct);
-            return Ok(preferences);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return NotFound(new { error = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "获取推送偏好失败");
-            return StatusCode(500, new { error = ex.Message });
-        }
-    }
-
-    /// <summary>
-    /// 更新推送偏好。订阅端点作为身份验证 - 只有拥有端点的客户端可以更新偏好。
+    /// 更新推送偏好。需要所有权令牌验证。
     /// </summary>
     [HttpPut("preferences")]
     public async Task<IActionResult> UpdatePreferences(
-        [FromQuery] string endpoint,
-        [FromBody] NotificationPreferences preferences,
+        [FromBody] UpdatePreferencesRequest request,
         CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(endpoint) || endpoint.Length < 50)
-        {
-            return BadRequest(new { error = "无效的订阅端点" });
-        }
-
         try
         {
-            await pushService.UpdatePreferencesAsync(endpoint, preferences, ct);
+            await pushService.UpdatePreferencesAsync(request.Endpoint, request.OwnershipToken, request.Preferences, ct);
             return Ok(new { status = "updated" });
         }
-        catch (InvalidOperationException ex)
+        catch (UnauthorizedAccessException ex)
         {
-            return NotFound(new { error = ex.Message });
+            return Unauthorized(new { error = ex.Message });
         }
         catch (Exception ex)
         {

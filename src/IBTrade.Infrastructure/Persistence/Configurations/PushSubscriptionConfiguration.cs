@@ -18,6 +18,7 @@ public class PushSubscriptionConfiguration : IEntityTypeConfiguration<PushSubscr
 
         builder.Property(x => x.P256dh).HasColumnName("p256dh").IsRequired().HasMaxLength(128);
         builder.Property(x => x.Auth).HasColumnName("auth").IsRequired().HasMaxLength(64);
+        builder.Property(x => x.OwnershipToken).HasColumnName("ownership_token").IsRequired().HasMaxLength(256);
 
         builder.Property(x => x.EnableScheduledBriefs).HasColumnName("enable_scheduled_briefs");
         builder.Property(x => x.EnableBreakingNews).HasColumnName("enable_breaking_news");

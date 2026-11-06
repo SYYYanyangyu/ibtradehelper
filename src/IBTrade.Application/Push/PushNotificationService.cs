@@ -17,6 +17,7 @@ public class VapidOptions
     public string PublicKey { get; set; } = "";
     public string PrivateKey { get; set; } = "";
     public string Subject { get; set; } = "mailto:admin@example.com";
+    public string TokenSecret { get; set; } = "";
 }
 
 public class PushNotificationService : IPushNotificationService
@@ -47,8 +48,10 @@ public class PushNotificationService : IPushNotificationService
         return Task.FromResult(_vapidOptions.PublicKey);
     }
 
-    public async Task SubscribeAsync(SubscribeRequest request, CancellationToken ct = default)
+    public async Task<SubscribeResponse> SubscribeAsync(SubscribeRequest request, CancellationToken ct = default)
     {
+        ValidateTokenSecret();
+        
         var existing = await _subscriptionRepo.GetByEndpointAsync(request.Endpoint, ct);
         if (existing != null)
         {
@@ -58,50 +61,63 @@ public class PushNotificationService : IPushNotificationService
             existing.UpdatedAtUtc = DateTime.UtcNow;
             await _subscriptionRepo.UpdateAsync(existing, ct);
             _logger.LogInformation("重新激活推送订阅: {Endpoint}", request.Endpoint);
-            return;
+            return new SubscribeResponse(existing.OwnershipToken);
         }
 
+        var ownershipToken = SubscriptionToken.Generate(request.Endpoint, _vapidOptions.TokenSecret);
+        
         var subscription = new DomainPushSubscription
         {
             Endpoint = request.Endpoint,
             P256dh = request.Keys.P256dh,
             Auth = request.Keys.Auth,
+            OwnershipToken = ownershipToken,
             IsActive = true,
             CreatedAtUtc = DateTime.UtcNow
         };
 
         await _subscriptionRepo.AddAsync(subscription, ct);
         _logger.LogInformation("新增推送订阅: {Endpoint}", request.Endpoint);
+        
+        return new SubscribeResponse(ownershipToken);
     }
 
-    public async Task UnsubscribeAsync(string endpoint, CancellationToken ct = default)
+    public async Task UnsubscribeAsync(string endpoint, string ownershipToken, CancellationToken ct = default)
     {
+        ValidateTokenSecret();
+        
+        var subscription = await _subscriptionRepo.GetByEndpointAsync(endpoint, ct);
+        if (subscription == null)
+        {
+            throw new UnauthorizedAccessException("订阅不存在");
+        }
+
+        if (!SubscriptionToken.Verify(endpoint, ownershipToken, _vapidOptions.TokenSecret) ||
+            subscription.OwnershipToken != ownershipToken)
+        {
+            _logger.LogWarning("尝试删除未授权的订阅: {Endpoint}", endpoint);
+            throw new UnauthorizedAccessException("无权删除此订阅");
+        }
+
         await _subscriptionRepo.DeleteAsync(endpoint, ct);
         _logger.LogInformation("删除推送订阅: {Endpoint}", endpoint);
     }
 
-    public async Task<NotificationPreferences> GetPreferencesAsync(string endpoint, CancellationToken ct = default)
+    public async Task UpdatePreferencesAsync(string endpoint, string ownershipToken, NotificationPreferences preferences, CancellationToken ct = default)
     {
+        ValidateTokenSecret();
+        
         var subscription = await _subscriptionRepo.GetByEndpointAsync(endpoint, ct);
         if (subscription == null)
         {
-            throw new InvalidOperationException("订阅不存在");
+            throw new UnauthorizedAccessException("订阅不存在");
         }
 
-        return new NotificationPreferences(
-            subscription.EnableScheduledBriefs,
-            subscription.EnableBreakingNews,
-            subscription.ScheduledBriefTimes.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList(),
-            subscription.Timezone
-        );
-    }
-
-    public async Task UpdatePreferencesAsync(string endpoint, NotificationPreferences preferences, CancellationToken ct = default)
-    {
-        var subscription = await _subscriptionRepo.GetByEndpointAsync(endpoint, ct);
-        if (subscription == null)
+        if (!SubscriptionToken.Verify(endpoint, ownershipToken, _vapidOptions.TokenSecret) ||
+            subscription.OwnershipToken != ownershipToken)
         {
-            throw new InvalidOperationException("订阅不存在");
+            _logger.LogWarning("尝试更新未授权的订阅偏好: {Endpoint}", endpoint);
+            throw new UnauthorizedAccessException("无权更新此订阅偏好");
         }
 
         subscription.EnableScheduledBriefs = preferences.EnableScheduledBriefs;
@@ -112,6 +128,14 @@ public class PushNotificationService : IPushNotificationService
 
         await _subscriptionRepo.UpdateAsync(subscription, ct);
         _logger.LogInformation("更新推送偏好: {Endpoint}", endpoint);
+    }
+
+    private void ValidateTokenSecret()
+    {
+        if (string.IsNullOrWhiteSpace(_vapidOptions.TokenSecret))
+        {
+            throw new InvalidOperationException("订阅令牌密钥未配置。请设置 Vapid:TokenSecret");
+        }
     }
 
     public async Task SendNotificationAsync(SendPushRequest request, CancellationToken ct = default)
