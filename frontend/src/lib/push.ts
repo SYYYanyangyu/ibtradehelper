@@ -48,6 +48,13 @@ export async function subscribeToPush(
     throw new Error('订阅推送失败')
   }
 
+  const result = await response.json()
+  
+  // 存储服务器返回的所有权令牌（用于后续取消订阅/更新偏好）
+  if (result.ownershipToken) {
+    localStorage.setItem(`push_token_${subscription.endpoint}`, result.ownershipToken)
+  }
+
   return subscriptionData
 }
 
@@ -60,6 +67,13 @@ export async function unsubscribeFromPush(
   }
 
   const endpoint = subscription.endpoint
+  const ownershipToken = localStorage.getItem(`push_token_${endpoint}`)
+
+  if (!ownershipToken) {
+    console.warn('未找到所有权令牌，无法取消订阅')
+    await subscription.unsubscribe()
+    return
+  }
 
   await subscription.unsubscribe()
 
@@ -68,8 +82,10 @@ export async function unsubscribeFromPush(
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ endpoint })
+    body: JSON.stringify({ endpoint, ownershipToken })
   })
+
+  localStorage.removeItem(`push_token_${endpoint}`)
 }
 
 export async function getNotificationPreferences(): Promise<NotificationPreferences> {
@@ -81,14 +97,31 @@ export async function getNotificationPreferences(): Promise<NotificationPreferen
 }
 
 export async function updateNotificationPreferences(
+  registration: ServiceWorkerRegistration,
   preferences: NotificationPreferences
 ): Promise<void> {
+  const subscription = await registration.pushManager.getSubscription()
+  if (!subscription) {
+    throw new Error('未找到推送订阅')
+  }
+
+  const endpoint = subscription.endpoint
+  const ownershipToken = localStorage.getItem(`push_token_${endpoint}`)
+
+  if (!ownershipToken) {
+    throw new Error('未找到所有权令牌，无法更新偏好')
+  }
+
   const response = await fetch(apiUrl('/api/push/preferences').toString(), {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(preferences)
+    body: JSON.stringify({
+      endpoint,
+      ownershipToken,
+      preferences
+    })
   })
 
   if (!response.ok) {

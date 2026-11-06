@@ -94,7 +94,7 @@ export function PushNotificationSettings() {
       }
 
       await subscribeToPush(swRegistration)
-      await updateNotificationPreferences(preferences)
+      await updateNotificationPreferences(swRegistration, preferences)
       
       setSubscribed(true)
       showMessage('success', '推送订阅成功')
@@ -132,7 +132,7 @@ export function PushNotificationSettings() {
     setError(null)
 
     try {
-      await updateNotificationPreferences(preferences)
+      await updateNotificationPreferences(swRegistration!, preferences)
       showMessage('success', '偏好设置已保存')
     } catch (err) {
       console.error('保存偏好设置失败:', err)
