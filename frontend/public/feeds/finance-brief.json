@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-03T01:16:31Z",
+  "updatedAt": "2026-11-06T00:20:00.000Z",
   "source": "scheduled",
   "sections": [
     {
@@ -7,16 +7,10 @@
       "title": "万亿/超大市值",
       "items": [
         {
-          "headline": "AAPL Ternus首份财报：营收EPS超预期，毛利率指引与内存成本拖累盘后",
-          "summary": "财政Q4营收约1145亿美元（+12% YoY）超预期，稀释EPS 2.10美元；iPhone约576亿（+17%）、Services创纪录约316亿。12月季营收指引增长7%–10%，但毛利率指引45%–46%低于街预期；Ternus称内存成本「前所未有」且本季及之后仍升。盘后约跌2%–3%。周一晚间股指期货小幅反弹（纳指期货约+0.3%）受苹果压制。",
-          "url": "https://www.apple.com/newsroom/2026/11/apple-reports-fourth-quarter-results/",
-          "tickers": ["AAPL"]
-        },
-        {
-          "headline": "AMD周一收盘大跌约7.5%，盯今日美东盘后财报",
-          "summary": "AMD周一收约466.84美元、约跌7.5%，跌破关键技术位；Q3财报定于美东11/3盘后。属晚报之后盘中新波动。",
-          "url": "https://www.marketbeat.com/instant-alerts/price-advanced-micro-devices-nasdaq-amd-shares-down-75-heres-why-2026-11-02/",
-          "tickers": ["AMD"]
+          "headline": "美股科技踩踏：纳指跌5.52%，英伟达约跌9%，特斯拉约跌11%",
+          "summary": "11月5日美股大跌，道指跌3.44%收51523、标普跌4.36%收7353.73、纳指跌5.52%收24315，为2025年4月以来最差单日之一。费城半导体约跌12%。市场担忧民主党中期胜选后数据中心与超级AI监管收紧，叠加高通/Arm指引偏弱。英伟达约跌9%（市值蒸发约4500亿美元量级），特斯拉约跌11%，苹果约跌1.5%，亚马逊约跌2%，微软/Meta约跌3%+。中概金龙指数逆势微涨约0.4%。",
+          "url": "https://apnews.com/article/wall-street-stocks-dow-nasdaq-afe254c608c3d1fe2ea792812ba9765a",
+          "tickers": ["NVDA", "TSLA", "AAPL", "MSFT", "AMZN", "META", "GOOGL"]
         }
       ]
     },
@@ -25,10 +19,22 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "内存股周一回吐，苹果确认内存涨价将延续",
-          "summary": "晚报盘前反弹后，周一交易中MU约跌4%、WDC约跌5%、SNDK约跌3%。盘后苹果明确毛利承压、内存涨价unprecedented且将延续——对供应商基本面偏确认，但对苹果/PC需求侧叙事偏空。",
-          "url": "https://finance.yahoo.com/markets/stocks/articles/micron-falls-4-kioxia-cautious-185355108.html",
-          "tickers": ["MU", "SNDK", "WDC", "SKHY"]
+          "headline": "存储链崩跌：闪迪约跌22%，美光/西数约跌17%，希捷约跌16%",
+          "summary": "AI存储与硬盘链领跌标普：SanDisk约跌22%，美光与西数各约跌17%，希捷约跌16%。DRAM相关ETF盘中跌近18%。逻辑仍是数据中心建设放缓与选后监管不确定性，资金从AI硬件高估值中撤出。亚太开盘后韩股亦承压，三星与SK海力士跟跌。",
+          "url": "https://www.marketwatch.com/story/micron-sandisk-and-other-ai-stocks-are-falling-hard-investors-dont-like-uncertainty-94d2a3b9",
+          "tickers": ["SNDK", "MU", "WDC", "STX"]
+        }
+      ]
+    },
+    {
+      "id": "robotics",
+      "title": "机器人",
+      "items": [
+        {
+          "headline": "特斯拉约跌11%，马斯克关联资产与AI叙事同遭抛售",
+          "summary": "特斯拉收跌约11%至约344美元一线；报道称SpaceX报价亦接近两位数跌幅。资金将民主党国会换手与多地数据中心限制解读为对马斯克关联资产与AI扩张叙事的近端压力。",
+          "url": "https://www.nbcnews.com/business/markets/tech-stocks-plunge-ai-midterms-rcna607650",
+          "tickers": ["TSLA"]
         }
       ]
     },
@@ -37,16 +43,10 @@
       "title": "生物科技",
       "items": [
         {
-          "headline": "VRTX Q3营收超预期并上调全年指引，盘后偏平略升",
-          "summary": "总营收约34.4亿美元（+12% YoY，略超预期）；全年营收指引上调至131.5–132.5亿美元。GAAP净利因Crinetics并购费用同比下滑；盘后约+1%量级。",
-          "url": "https://www.businesswire.com/news/home/20261102902999/en/Vertex-Reports-Third-Quarter-2026-Financial-Results",
-          "tickers": ["VRTX"]
-        },
-        {
-          "headline": "AMGN今日美东盘后财报，市场仍盯MariTide",
-          "summary": "Amgen Q3定于美东11/3盘后公布，截至本早报窗口尚无正式结果；焦点仍是MariTide进展。",
-          "url": "https://www.amgen.com/newsroom/press-releases/2026/10/amgen-announces-webcast-of-2026-third-quarter-financial-results",
-          "tickers": ["AMGN"]
+          "headline": "百济神州Q3亮眼：前三季净利增约4.3倍，年内三度上调指引",
+          "summary": "百济神州（ONC/6160.HK/688235.SH）披露：前三季营收约350亿元（+26.8%），归母净利约60.6亿元（+431.8%）；Q3营收约128亿元、归母净利约27.9亿元。全年营收指引上调至463亿–470亿元（此前449亿–462亿），为年内第三次上调。百悦泽全球销售持续放量。",
+          "url": "https://www.nbd.com.cn/articles/2026-11-05/4640000.html",
+          "tickers": ["ONC", "BGNE"]
         }
       ]
     },
@@ -55,16 +55,16 @@
       "title": "半导体与制造相关",
       "items": [
         {
-          "headline": "PLTR爆量超预期并上调指引，盘后仍约跌3%",
-          "summary": "Q3营收约23.13亿美元（+96% YoY），调整EPS 0.44美元；美国商业营收约9.84亿（+148%）首次超过美国政府约9.53亿。上调全年营收至约85.30–85.34亿美元。盘后约跌3%（估值/获利了结）。",
-          "url": "https://investors.palantir.com/news-details/2026/Palantir-Reports-Q3-2026-U-S--Comm-Revenue-Growth-of-148-YY-and-Revenue-Growth-of-96-YY-Raises-FY-2026-Revenue-Guidance-to-91-YY-Growth-and-U-S--Comm-Revenue-Guidance-to-143-YY-Crushing-Consensus-Expectations",
-          "tickers": ["PLTR"]
+          "headline": "费城半导体约跌12%；AMD约跌17%，MRVL约跌16%，LITE约跌19%",
+          "summary": "SOX创2020年3月以来最差单日量级跌幅。AMD约跌17%，迈威尔约跌16%，Lumentum约跌19%，高通、Arm双位数下跌。主因仍是AI基建监管与融资担忧，外加高通指引偏弱。对A股：光模块/算力硬件有低开压力。",
+          "url": "https://www.cnbc.com/2026/11/05/qualcomm-earnings-chip-stocks-election.html",
+          "tickers": ["AMD", "MRVL", "LITE", "QCOM", "ARM"]
         },
         {
-          "headline": "MRVL宣布约1150亿美元全股票收购Lumentum，股价重挫",
-          "summary": "11/2宣布与Lumentum（LITE）合并，作价约1150亿美元全股票（LITE股东约获4.5股MRVL），意在AI光互连。市场担忧稀释与AI开支，MRVL/LITE均大幅下跌。",
-          "url": "https://investor.marvell.com/news-events/press-releases/detail/1040/marvell-and-lumentum-to-combine-creating-a-category-leader-in-ai-connectivity",
-          "tickers": ["MRVL"]
+          "headline": "宏观与A股盘前：国务院金融报告挺汇金类平准；昨日A股放量普涨",
+          "summary": "国务院金融工作报告提出继续适度宽松、支持中央汇金发挥类平准基金作用、增强资本市场制度包容性。11月5日A股沪指微涨0.1%、深成指涨约1.2%、创业板涨约0.9%，成交约2.1万亿元，风格偏光伏与AI应用。隔夜油价回升（WTI约90.5、布伦特约98.3），金价偏强；英国央行加息25bp至4.00%。商务部称扩大自美农产品采购持开放态度，前提是对等降税落地。",
+          "url": "https://www.cnfin.com/yw-lb/detail/20261106/4491802_1.html",
+          "tickers": []
         }
       ]
     }
