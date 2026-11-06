@@ -34,6 +34,10 @@ builder.Services.Configure<IBTrade.Api.Controllers.GrokBotOptions>(
 builder.Services.AddSingleton<IBTrade.Api.Controllers.FinanceBriefStore>();
 builder.Services.AddHttpClient();
 
+// VAPID Web Push 配置
+builder.Services.Configure<IBTrade.Application.Push.VapidOptions>(
+    builder.Configuration.GetSection("Vapid"));
+
 // TWS 实时接入配置（appsettings 的 TWS 段或环境变量 TWS__*）
 var twsOptions = new IBTrade.Application.IBKR.TwsOptions
 {
@@ -75,6 +79,7 @@ if (twsOptions.Enabled)
     builder.Services.AddHostedService<TwsSyncHostedService>();
 
 builder.Services.AddHostedService<NewsTapeHostedService>();
+builder.Services.AddHostedService<ScheduledPushHostedService>();
 
 // 跨域：开发环境为本地联调便利放开；生产环境必须显式配置 AllowedOrigins，否则默认拒绝跨域（安全优先）。
 // 配置方式（appsettings 或环境变量）：AllowedOrigins = "https://a.example.com,https://b.example.com"

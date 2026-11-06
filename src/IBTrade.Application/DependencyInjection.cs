@@ -10,6 +10,7 @@ using IBTrade.Application.OptionsIntel;
 using IBTrade.Application.OptionsIntel.OptionsPaper;
 using IBTrade.Application.Portfolio;
 using IBTrade.Application.Positions;
+using IBTrade.Application.Push;
 using IBTrade.Application.Quant.TrendScalper;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -59,6 +60,7 @@ public static class DependencyInjection
         services.AddSingleton<MarketContextProvider>();
         services.AddSingleton<IDisciplineGate, DisciplineGate>();
         services.AddSingleton<ITrendScalperEngine, TrendScalperEngine>();
+        services.AddScoped<IPushNotificationService, PushNotificationService>();
         return services;
     }
 }

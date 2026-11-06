@@ -2,6 +2,27 @@
 
 Interactive Brokers 持仓 / 交易追踪服务，基于 **Clean Architecture（DDD 四层）** 构建。
 
+## 🚀 新功能：PWA 和 Web Push 推送通知
+
+IBTrade 现已支持 PWA（渐进式 Web 应用）和 Web Push 推送通知！
+
+**主要特性**：
+- 📱 可安装到手机主屏幕，像原生应用一样使用
+- 🔔 定时金融简报推送（工作日 08:00 和 21:00 北京时间）
+- ⚡ 重要突发新闻实时推送
+- 🔄 自动去重，避免重复通知
+- 📴 离线访问能力
+- 🍎 支持 iOS 16.4+ 和 Android 全平台
+
+**快速开始**：
+1. 生成 VAPID 密钥：`node scripts/generate-vapid-keys.js`
+2. 配置密钥到 `appsettings.Secrets.json` 或环境变量
+3. 启动服务，访问金融简报页面订阅推送
+
+详细文档：
+- [PWA 设置指南](docs/PWA_SETUP.md)
+- [技术实现说明](docs/PWA_IMPLEMENTATION.md)
+
 ## 项目结构（标准 .NET 布局）
 
 ```
