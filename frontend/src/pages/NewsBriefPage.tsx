@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { RefreshCw, ExternalLink, Clock, AlertTriangle, BookOpen, Sparkles } from 'lucide-react'
+import { RefreshCw, ExternalLink, Clock, AlertTriangle, BookOpen, Sparkles, Bell } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { getLiveFinanceBrief, isFinanceBrief, refreshFinanceBrief } from '../lib/api'
 import { cn } from '../lib/utils'
 import type { FinanceBrief } from '../lib/api'
+import { PushNotificationSettings } from '../components/PushNotificationSettings'
 
 export function NewsBriefPage() {
   const [brief, setBrief] = useState<FinanceBrief | null>(null)
@@ -14,6 +15,7 @@ export function NewsBriefPage() {
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null)
   const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [showPushSettings, setShowPushSettings] = useState(false)
   const pollRef = useRef<number | null>(null)
 
   const showToast = useCallback((kind: 'ok' | 'err', text: string) => {
@@ -198,6 +200,8 @@ export function NewsBriefPage() {
           <span className="min-w-0 flex-1 truncate">{toast.text}</span>
         </div>
       )}
+
+      <PushNotificationSettings />
 
       <Card className="animate-fade-up">
         <CardHeader>

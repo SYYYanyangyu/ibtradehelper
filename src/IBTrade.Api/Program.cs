@@ -3,6 +3,7 @@ using IBTrade.Infrastructure;
 using IBTrade.Api.Auth;
 using IBTrade.Api.HostedServices;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,11 +29,57 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor(); // 供控制器提取来源 IP，用于操作审计
 
+// 速率限制：防止推送订阅/更新滥用
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    
+    // 订阅端点：每IP每分钟5次
+    options.AddPolicy("push_subscribe", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+    
+    // 更新偏好：每IP每分钟10次
+    options.AddPolicy("push_preferences", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+    
+    // 取消订阅：每IP每分钟3次
+    options.AddPolicy("push_unsubscribe", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+});
+
 // Grok Bot webhook 配置
 builder.Services.Configure<IBTrade.Api.Controllers.GrokBotOptions>(
     builder.Configuration.GetSection("GrokBot"));
 builder.Services.AddSingleton<IBTrade.Api.Controllers.FinanceBriefStore>();
 builder.Services.AddHttpClient();
+
+// VAPID Web Push 配置
+builder.Services.Configure<IBTrade.Application.Push.VapidOptions>(
+    builder.Configuration.GetSection("Vapid"));
 
 // TWS 实时接入配置（appsettings 的 TWS 段或环境变量 TWS__*）
 var twsOptions = new IBTrade.Application.IBKR.TwsOptions
@@ -75,6 +122,7 @@ if (twsOptions.Enabled)
     builder.Services.AddHostedService<TwsSyncHostedService>();
 
 builder.Services.AddHostedService<NewsTapeHostedService>();
+builder.Services.AddHostedService<ScheduledPushHostedService>();
 
 // 跨域：开发环境为本地联调便利放开；生产环境必须显式配置 AllowedOrigins，否则默认拒绝跨域（安全优先）。
 // 配置方式（appsettings 或环境变量）：AllowedOrigins = "https://a.example.com,https://b.example.com"
@@ -137,6 +185,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseRateLimiter();
 app.UseMiddleware<ApiKeyAuthMiddleware>();
 app.UseAuthorization();
 
