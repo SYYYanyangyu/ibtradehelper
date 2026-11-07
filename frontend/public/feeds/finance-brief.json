@@ -1,22 +1,22 @@
 {
-  "updatedAt": "2026-11-06T13:00:00.000Z",
+  "updatedAt": "2026-11-07T09:20:00+08:00",
   "source": "scheduled",
   "sections": [
     {
       "id": "mega_cap",
-      "title": "万亿/超大市值",
+      "title": "万亿超大市值",
       "items": [
         {
-          "headline": "周五盘前科技修复：纳指期货约+1.6%，道指期货仍弱；非农将出",
-          "summary": "周四纳指跌5.52%跌入技术性回调后，周五美股开盘前纳指期货约涨逾1.6%、标普期货约+0.3%、道指期货约-0.9%，呈分化修复。资金回补AI/科技，但宏观上劳工部将于美东8:30公布10月非农（市场预期约增6.5万），开盘前后波动仍大。早报已覆盖周四踩踏，本报侧重盘前修复与当日催化剂。",
-          "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-november-6-dow-sp-500-nasdaq-jobs-report-091927729.html",
-          "tickers": ["NVDA", "MSFT", "AAPL", "AMZN", "META", "GOOGL", "TSLA"]
+          "headline": "周五美股收涨跌互现：纳指反弹约1.1%，强非农抬升加息预期",
+          "summary": "11月6日收盘纳指涨1.09%报24579，标普涨0.31%，道指跌0.46%。10月非农大增16.5万（远超约5.9万预期）、失业率降至4.1%，推升美债收益率与12月加息押注（约78%）。全周纳指仍跌约3.4%，连续第四周收跌。",
+          "url": "https://apnews.com/article/wall-street-stocks-dow-nasdaq-806f71d95105bc7efbc760b194dd8cad",
+          "tickers": ["NVDA", "AMD", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "TSLA"]
         },
         {
-          "headline": "英伟达接触Apollo：拟改造Brightspeed电信机房做推理数据中心",
-          "summary": "据The Information，英伟达已向Apollo旗下宽带商Brightspeed提交书面方案，拟把逾130处既有电信机房改造成小型AI推理节点，覆盖最多约20个州、合计约1GW可用电力，并讨论2027年一季度起用Vera Rubin机柜改造。动机是绕开选后多地新建数据中心禁令/地方阻力；尚处接洽阶段，买家与落地规模未定。",
-          "url": "https://finance.yahoo.com/technology/ai/articles/nvidia-eyes-apollo-struggling-telecom-213127832.html",
-          "tickers": ["NVDA"]
+          "headline": "AI/芯片股技术性反弹：AMD约+11%，英伟达约+2.8%",
+          "summary": "周四重挫后周五买盘回补。AMD收涨约11.04%报449.04美元；英伟达收涨约2.78%报186.64美元；英特尔约+7.7%。苹果收跌约0.52%报342.37，并定价约75亿美元七档债券，用途含回购与分红。",
+          "url": "https://finance.yahoo.com/markets/article/nvidia-amd-micron-sandsik-lead-chip-sector-higher-134336542.html",
+          "tickers": ["AMD", "NVDA", "INTC", "AAPL"]
         }
       ]
     },
@@ -25,34 +25,28 @@
       "title": "存储龙头",
       "items": [
         {
-          "headline": "亚太存储续杀、美股盘前反弹：MU约+7.5%，SNDK约+8.3%",
-          "summary": "周五亚洲：KOSPI约跌6%（最差日量级，盘中熔断）、日经约跌6%；三星电子约跌逾6%、SK海力士约跌逾10%。美股盘前存储/AI硬件大幅回补：美光约涨7.5%、闪迪约涨8.3%、美股上市SK海力士约涨4%–5%。逻辑仍是周四超跌后的技术性反抽，监管与数据中心叙事未消。",
-          "url": "https://www.investing.com/news/stock-market-news/us-chip-stocks-rebound-sharply-after-thursdays-brutal-selloff-5007137",
-          "tickers": ["MU", "SNDK", "SKHY", "SSNLF", "WDC", "STX"]
-        }
-      ]
-    },
-    {
-      "id": "biotech",
-      "title": "生物科技",
-      "items": [
-        {
-          "headline": "礼来携手Hims & Hers：平台直达Zepbound与口服Foundayo",
-          "summary": "11月6日礼来与Hims & Hers官宣合作：经平台持牌医生开方后，患者可按自付价获得FDA批准的Zepbound（注射，自付起约299美元/月）与Foundayo（口服orforglipron，起约149美元/月）并配送到家。Hims承诺不提供礼来GLP-1复刻制剂。利好肥胖药渠道下沉与口服剂型放量预期。",
-          "url": "https://www.prnewswire.com/news-releases/lilly-and-hims--hers-expand-access-to-fda-approved-lilly-medicines-302931979.html",
-          "tickers": ["LLY", "HIMS"]
+          "headline": "存储股分化反弹：美光约+5%，闪迪约+3.5%；HDD偏弱",
+          "summary": "美光收涨5.12%报690美元，闪迪收涨3.55%报835.06美元，跟随半导体重挫后的修复；西数约跌1.4%、希捷约跌1.2%。闪迪已宣布8拆1拆股，预计11月20日起按拆股后价格交易。",
+          "url": "https://www.fool.com/coverage/stock-market-today/2026/11/06/stock-market-today-nov-6-micron-technology-jumps-as-chip-stocks-rebound-from-thursday-s-rout/",
+          "tickers": ["MU", "SNDK", "WDC", "STX"]
         }
       ]
     },
     {
       "id": "semiconductor",
-      "title": "半导体与制造相关",
+      "title": "半导体与制造",
       "items": [
         {
-          "headline": "芯片盘前普涨：SMH约+5%，AMD约+6%，MRVL约+7%，台积电亚太续弱",
-          "summary": "iShares半导体ETF盘前约涨近5%；AMD、应用材料约涨逾6%，迈威尔约+7%，博通/英特尔约+4%–5%，拉姆研究约+9%，甲骨文约+2.6%，CoreWeave约+6.3%。台股方面台积电约跌4.7%、台指约跌4.5%。盘前修复不等于趋势反转，仍看非农与数据中心政策预期。",
-          "url": "https://www.investing.com/news/stock-market-news/us-chip-stocks-rebound-sharply-after-thursdays-brutal-selloff-5007137",
-          "tickers": ["AMD", "MRVL", "AVGO", "INTC", "TSM", "ORCL", "ASML"]
+          "headline": "费城半导体指数反弹约4%，部分收复周四约12%跌幅",
+          "summary": "SOX周五反弹约4%，AMD、英特尔、高通等跟涨；全周半导仍处选举后AI监管与数据中心担忧的剧烈波动中。",
+          "url": "https://finance.yahoo.com/markets/article/nvidia-amd-micron-sandsik-lead-chip-sector-higher-134336542.html",
+          "tickers": ["AMD", "INTC", "QCOM", "NVDA"]
+        },
+        {
+          "headline": "传台积电应英伟达要求规划3D DRAM，评估建厂或收购改造",
+          "summary": "The Information报道台积电正规划先进3D DRAM制造，由先进封装相关高管牵头；或新建厂、或收购现有厂改造（类比美光路径），尚无量产时间表与投资额。中央社11/7亦综述该报道。",
+          "url": "https://www.cna.com.tw/news/ait/202611070002.aspx",
+          "tickers": ["TSM", "NVDA", "MU"]
         }
       ]
     }
