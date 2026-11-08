@@ -1,58 +1,16 @@
 {
-  "updatedAt": "2026-11-07T21:00:00+08:00",
+  "updatedAt": "2026-11-08T09:20:00+08:00",
   "source": "scheduled",
   "sections": [
-    {
-      "id": "mega_cap",
-      "title": "万亿超大市值",
-      "items": [
-        {
-          "headline": "伯克希尔公布三季报：经营利润同比略降，现金堆约3523亿美元",
-          "summary": "伯克希尔周六披露2026年三季报与10-Q。经营利润127.05亿美元（去年同期134.85亿）；归母净利221.12亿美元（含投资收益）。截至9/30，保险及其他业务现金+短债美债（扣未交割应付后）约3523亿美元，低于二季度末约3647亿的市场关注水位；三季度回购约96亿美元，前九个月约144亿美元。股权证券持仓约3355亿美元，前五大为Alphabet、美国运通、苹果、美银、可口可乐。",
-          "url": "https://www.berkshirehathaway.com/news/nov0726.pdf",
-          "tickers": ["BRK.B", "AAPL", "GOOGL"]
-        },
-        {
-          "headline": "纽约时报：商务部放行的部分英伟达H200中国承接方疑为空壳办公室",
-          "summary": "时报实地核查称，获批组装/承接H200的New Matrix在北京登记地址为空置厂房，所有者与已列入实体清单的中国私募有关联；另一家Maginfra此前也被指空置。商务部约批准二十余家中方主体购买或处理H200（含百度、比亚迪、特斯拉上海等），配额多未用满。叠加国会要求黄仁勋11/18闭门说明与Alice Huang/Megaspeed相关情报评估，周末强化英伟达对华合规与出口执行争议。英伟达称遵守法规,中国数据中心收入占比仍极低。",
-          "url": "https://dnyuz.com/2026/11/07/u-s-cleared-nvidia-chips-to-chinese-firms-with-empty-offices-and-troubling-ties/",
-          "tickers": ["NVDA"]
-        },
-        {
-          "headline": "Meta在Muse智能体中上线Spaces：提示词生成可持久化工作区",
-          "summary": "Meta于11/6推出Muse Spaces，用户可用自然语言生成可固定、可定时更新的追踪器/看板/轻量应用，并接入第三方数据；多用户协作仍属探索。属产品侧进展，周末无美股盘面定价。",
-          "url": "https://teccurrent.com/articles/daily-brief-2026-11-07/",
-          "tickers": ["META"]
-        }
-      ]
-    },
-    {
-      "id": "robotics",
-      "title": "机器人",
-      "items": [
-        {
-          "headline": "特斯拉：得州超级工厂约2027年中起逐步停产Cybertruck，腾挪Cybercab产能",
-          "summary": "马斯克周五称将在Gigafactory Texas于约2027年中起wind down Cybertruck，以便扩大无人驾驶Cybercab产量。Cybertruck销量远低于早期预期（美媒称2025年约2万辆量级），召回与定位争议并存；公司未明确是否迁至其他工厂。Cybercab已在奥斯汀小范围付费运营，NHTSA仍就自我认证合规提问。Optimus方面马斯克仍强调租赁模式与2027年末前后对外交付愿景。",
-          "url": "https://www.cnbc.com/2026/11/06/tesla-cybertruck-texas-musk.html",
-          "tickers": ["TSLA"]
-        }
-      ]
-    },
     {
       "id": "semiconductor",
       "title": "半导体与制造",
       "items": [
         {
-          "headline": "路透：英伟达据称出资数十亿美元扩ASE旗下SPIL的CoWoS先进封装产能",
-          "summary": "基于行业人士访谈的调查称，英伟达正为台湾日月光体系SPIL的CoWoS类先进封装扩产提供大规模融资；英伟达未置评，ASE拒谈客户传闻。Yole预计2026年先进封装资本开支可近280亿美元。与早报已写的「台积电应英伟达规划3D DRAM」同属供应链瓶颈主题，但封装融资为另一条新增线索，尚未见双方官宣合同。",
-          "url": "https://teccurrent.com/articles/daily-brief-2026-11-07/",
-          "tickers": ["NVDA", "TSM", "ASML"]
-        },
-        {
-          "headline": "英国拟延长Palantir NHS联邦数据平台约3.3亿英镑合同",
-          "summary": "英媒称政府倾向延长Palantir联邦数据平台合约约两年、暂不提前解约，理由是突然切换可能扰乱医院排程与候诊改善；同时筹备更远期英国本土替代采购。属政务/合同进展，非盘中驱动。",
-          "url": "https://www.theguardian.com/politics/live/2026/nov/06/burnham-force-employers-publish-salaries-job-ads-labour-chagos-islands-shabana-mahmood-eu-universities-brexit-kemi-badenoch-tories-uk-politics-latest-news",
-          "tickers": ["PLTR"]
+          "headline": "台积电回应3D DRAM传闻：继续聚焦逻辑代工",
+          "summary": "《The Information》11月6日引述知情人士称，台积电应英伟达要求开始规划3D DRAM制造，可能自建新厂或收购既有厂房改建，由负责先进封装的副总徐国晋主导。台积电发言人随后向Tom's Hardware表示，公司始终聚焦专业晶圆代工核心业务，使命是继续做全球逻辑芯片产业值得信赖的技术与产能供应商，未证实相关投资；英伟达未立即回应。分析认为3D DRAM距成熟商用仍有多年，即使投入也难以缓解眼前存储短缺。",
+          "url": "https://www.tomshardware.com/pc-components/dram/tsmc-denies-exploring-3d-dram-at-nvidias-request-advanced-memory-tech-is-still-years-from-market-viability",
+          "tickers": ["TSM", "NVDA"]
         }
       ]
     }
