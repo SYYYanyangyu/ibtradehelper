@@ -1,16 +1,88 @@
 {
-  "updatedAt": "2026-11-08T09:20:00+08:00",
+  "updatedAt": "2026-11-09T08:00:00+08:00",
   "source": "scheduled",
   "sections": [
     {
-      "id": "semiconductor",
-      "title": "半导体与制造",
+      "id": "macro-mega-cap",
+      "title": "宏观与万亿市值",
       "items": [
         {
-          "headline": "台积电回应3D DRAM传闻：继续聚焦逻辑代工",
-          "summary": "《The Information》11月6日引述知情人士称，台积电应英伟达要求开始规划3D DRAM制造，可能自建新厂或收购既有厂房改建，由负责先进封装的副总徐国晋主导。台积电发言人随后向Tom's Hardware表示，公司始终聚焦专业晶圆代工核心业务，使命是继续做全球逻辑芯片产业值得信赖的技术与产能供应商，未证实相关投资；英伟达未立即回应。分析认为3D DRAM距成熟商用仍有多年，即使投入也难以缓解眼前存储短缺。",
-          "url": "https://www.tomshardware.com/pc-components/dram/tsmc-denies-exploring-3d-dram-at-nvidias-request-advanced-memory-tech-is-still-years-from-market-viability",
+          "headline": "周五美股收盘涨跌互现：纳指技术性反弹1.09%，芯片股修复周四重挫",
+          "summary": "11月6日收盘纳指涨1.09%报24,579.42点，标普涨0.31%报7,376.86点，道指跌0.46%报51,285.73点。芯片股在周四遭遇18个月来最大单日跌幅后出现技术性反弹，费城半导体指数涨约4.21%。全周纳指仍跌3.37%，标普跌2.68%。市场担忧美国中期选举后民主党对AI数据中心建设可能收紧监管。",
+          "url": "https://www.cnbc.com/2026/11/05/stock-market-today-live-updates.html",
+          "tickers": ["NVDA", "AMD", "INTC", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "TSLA"]
+        },
+        {
+          "headline": "伯克希尔三季报：经营利润127亿美元同比降5.8%，现金及短债约3523亿美元",
+          "summary": "伯克希尔11月7日公布三季报。经营利润127.05亿美元（去年同期134.85亿美元）；归母净利润221.12亿美元（含投资收益94.07亿美元）。截至9/30保险及其他业务现金+短期美债约3523亿美元（扣未交割应付后），低于二季末约3592亿美元；全集团含铁路与公用事业现金约3774亿美元。三季度回购约96亿美元。持仓前五大为Alphabet、美国运通、苹果、美银、可口可乐。",
+          "url": "https://www.berkshirehathaway.com/news/nov0726.pdf",
+          "tickers": ["BRK.B", "AAPL", "GOOGL", "AXP", "BAC", "KO"]
+        },
+        {
+          "headline": "美国10月非农就业超预期增16.5万人，交易员将12月加息概率上调至约80%",
+          "summary": "美国10月非农就业增加16.5万人（预期6.5万人），失业率降至4.1%，平均时薪同比涨3.1%（仍低于9月3.7%通胀率）。旧金山联储主席戴利11月6日称预计需进一步收紧政策。市场目前定价12月FOMC加息0.25个百分点概率约80%（周四约67%）。联储10月28日会议维持利率目标3.75%-4.00%不变，强调通胀仍高企。",
+          "url": "https://www.cnbc.com/2026/11/06/fed-daly-interest-rates-inflation.html",
+          "tickers": []
+        }
+      ]
+    },
+    {
+      "id": "semiconductor-ai",
+      "title": "半导体与AI",
+      "items": [
+        {
+          "headline": "AMD三季报创纪录：收入134亿美元增长45%，数据中心收入85亿美元增长97%",
+          "summary": "AMD 11月3日公布三季度收入134亿美元（同比增45%），数据中心收入85亿美元（增97%），占比63.4%；非GAAP毛利率56%，EPS 2.09美元（增74%）。Q4指引约170亿美元（同比增66%），数据中心预计环比增约50%。苏姿丰称Instinct MI450系列GPU及第六代EPYC CPU被Anthropic、Meta、微软、OpenAI、甲骨文云等大规模部署；预计2027年收入增长超80%。",
+          "url": "https://ir.amd.com/news-events/press-releases/detail/1303/amd-reports-third-quarter-2026-financial-results",
+          "tickers": ["AMD"]
+        },
+        {
+          "headline": "Marvell宣布以1150亿美元全股票收购Lumentum，押注AI光互连需求长期增长",
+          "summary": "Marvell与Lumentum 11月2日宣布达成1150亿美元全股票合并协议（企业价值），Lumentum股东每股换4.5股Marvell，按10月28日未受影响收盘价计溢价约23.9%；交易完成后Marvell股东持约67%、Lumentum股东持约33%。合并整合电互连与光互连（激光器、光收发器、光电路交换），扩大TAM至5500亿美元，预计年度协同成本超10亿美元。预计2028上半年完成交易。",
+          "url": "https://investor.marvell.com/news-events/press-releases/detail/1040/marvell-and-lumentum-to-combine-creating-a-category-leader-in-ai-connectivity",
+          "tickers": ["MRVL", "LITE"]
+        },
+        {
+          "headline": "路透：约60万片英伟达H200芯片滞留香港等待中国进口批准，对华合规争议加剧",
+          "summary": "路透11月5日独家报道，约60万片英伟达H200芯片在香港等待运往中国大陆、但北京尚未批准大规模进口，反映中国不愿过度依赖美国技术。同时商务部此前批准约二十余家中方主体（含百度、比亚迪、特斯拉上海）处理H200配额多未用满。国会要求黄仁勋11月18日闭门说明Alice Huang/Megaspeed相关情报评估。英伟达称遵守法规、中国数据中心收入占比极低。",
+          "url": "https://www.tipranks.com/news/why-chip-stocks-intel-nvidia-and-amd-are-sinking-today-nov-5",
+          "tickers": ["NVDA"]
+        },
+        {
+          "headline": "台积电回应3D DRAM传闻：继续聚焦逻辑代工核心业务",
+          "summary": "The Information 11月6日引述知情人士称，台积电应英伟达要求开始规划3D DRAM制造，可能自建新厂或收购既有厂房改建，由负责先进封装的副总徐国晋主导；若成行将令存储供应商从三家（三星、SK海力士、美光）增至四家。台积电随后向Tom's Hardware表示，公司始终聚焦专业晶圆代工核心业务，使命是继续做全球逻辑芯片产业值得信赖的技术与产能供应商，未证实相关投资。",
+          "url": "https://www.vlsi.kr/en/daily-silicon-2026-11-08-en/",
           "tickers": ["TSM", "NVDA"]
+        }
+      ]
+    },
+    {
+      "id": "china-geopolitics",
+      "title": "中国与地缘政治",
+      "items": [
+        {
+          "headline": "国常会：完善资本市场稳市机制，增强股市内在稳定性",
+          "summary": "国务院总理李强11月6日主持召开国常会，要求持续化解地方政府债务、中小金融机构等领域风险，完善资本市场稳市机制，增强股市内在稳定性，促进资本市场平稳健康发展。会议还要求加强保供稳价和困难群众帮扶，加快受灾地区恢复重建，认真研究明年经济工作思路。同日多家券商（中信、国泰海通、中金、银河、招商）披露已开展互换便利回购融资并完成首批股票买入。",
+          "url": "https://finance.eastmoney.com/news/1345,202611083925610461.html",
+          "tickers": []
+        },
+        {
+          "headline": "何立峰与美国财政部长贝森特、贸易代表格里尔举行视频通话，中方表达严正关切",
+          "summary": "北京时间11月6日晚，国务院副总理何立峰与美国财政部长贝森特、贸易代表格里尔视频通话，围绕落实中美元首重要共识和经贸磋商成果，就彼此关心的重要经贸问题进行坦诚、深入、建设性交流。中方就近期美对华经贸限制措施表达严正关切。双方同意继续发挥好中美经贸磋商机制作用。通话后商务部称，美国东时间11月5日美国务院制裁两家中国企业（涉古巴），中方坚决反对。",
+          "url": "https://finance.eastmoney.com/news/1345,202611083925610461.html",
+          "tickers": []
+        },
+        {
+          "headline": "日经：美国延长对中国企业出口限制暂停至2027年1月10日，中美贸易休战期延长",
+          "summary": "日经亚洲11月6日报道，美国将扩大对中国企业技术准入限制的规则实施暂停期延长至2027年1月10日（此前已多次延长），华盛顿与北京延长贸易休战期。报道称双方将于本月晚些时候在深圳举行新一轮贸易谈判，何立峰与贝森特将在APEC峰会前会晤。此前路透报道，中美经贸限制措施互惠降税协议中，中方对自美国扩大采购农产品持开放态度，但前提是双方落实此前商定的300亿美元互惠降税协议。",
+          "url": "https://asia.nikkei.com/politics/international-relations/us-china-tensions/us-extends-suspension-of-export-restrictions-on-chinese-firms",
+          "tickers": []
+        },
+        {
+          "headline": "中国央行黄金储备"24连增"：10月末7830万盎司，较9月末增加83万盎司",
+          "summary": "中国央行11月7日公布官方储备资产数据显示，10月末黄金储备7830万盎司，较9月末7747万盎司增加83万盎司。这是央行连续第24个月增持黄金。分析认为央行增持黄金有三重考虑：分散外汇储备、对冲美元波动风险、增强储备资产安全性与保值增值能力。同期全球央行黄金需求持续高位。",
+          "url": "https://finance.eastmoney.com/news/1345,202611083925610461.html",
+          "tickers": []
         }
       ]
     }
