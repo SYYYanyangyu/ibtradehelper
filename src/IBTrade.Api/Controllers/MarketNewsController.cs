@@ -1,5 +1,6 @@
 using System.Text.Json;
 using IBTrade.Application.MarketData;
+using IBTrade.Application.Push;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -36,6 +37,7 @@ public class NewsController(
     IOptions<GrokBotOptions> grokOptions,
     IHttpClientFactory httpClientFactory,
     FinanceBriefStore store,
+    IPushNotificationService pushService,
     ILogger<NewsController> logger) : ControllerBase
 {
     private readonly GrokBotOptions _grokOptions = grokOptions.Value;
@@ -52,6 +54,7 @@ public class NewsController(
     /// <summary>
     /// Grok Bot 读完 X 后，把整理好的简报 JSON POST 回来。
     /// 鉴权与触发 webhook 相同：Authorization: Bearer &lt;GrokBot:WebhookKey&gt;。
+    /// 自动检测突发新闻并触发推送通知。
     /// </summary>
     [HttpPost("brief")]
     public async Task<IActionResult> Ingest(CancellationToken ct)
@@ -66,7 +69,82 @@ public class NewsController(
 
         store.Set(body);
         logger.LogInformation("Stored finance brief pushed by Grok Bot");
+
+        // 检测突发新闻并触发推送
+        try
+        {
+            await DetectAndPushBreakingNews(body, ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "检测突发新闻失败，但简报已存储");
+        }
+
         return Ok(new { status = "stored" });
+    }
+
+    private async Task DetectAndPushBreakingNews(string briefJson, CancellationToken ct)
+    {
+        try
+        {
+            var brief = JsonSerializer.Deserialize<JsonDocument>(briefJson);
+            if (brief == null) return;
+
+            var root = brief.RootElement;
+            
+            // 检查更新时间，仅处理1小时内的新鲜内容
+            if (root.TryGetProperty("updatedAt", out var updatedAtProp))
+            {
+                if (DateTime.TryParse(updatedAtProp.GetString(), out var updatedAt))
+                {
+                    if ((DateTime.UtcNow - updatedAt.ToUniversalTime()).TotalHours > 1)
+                    {
+                        logger.LogDebug("简报时间戳过旧，跳过突发新闻检测: {UpdatedAt}", updatedAt);
+                        return;
+                    }
+                }
+            }
+
+            // 扫描sections中的突发新闻标记
+            if (!root.TryGetProperty("sections", out var sections) || sections.ValueKind != JsonValueKind.Array)
+                return;
+
+            foreach (var section in sections.EnumerateArray())
+            {
+                // 检查是否标记为重要/突发
+                var isBreaking = false;
+                var importance = 0;
+
+                if (section.TryGetProperty("breaking", out var breakingProp) && breakingProp.ValueKind == JsonValueKind.True)
+                    isBreaking = true;
+
+                if (section.TryGetProperty("important", out var importantProp) && importantProp.ValueKind == JsonValueKind.True)
+                    isBreaking = true;
+
+                if (section.TryGetProperty("importance", out var importanceProp) && importanceProp.TryGetInt32(out importance) && importance >= 8)
+                    isBreaking = true;
+
+                if (!isBreaking) continue;
+
+                // 提取标题和内容
+                var title = section.TryGetProperty("title", out var titleProp) ? titleProp.GetString() : null;
+                var content = section.TryGetProperty("content", out var contentProp) ? contentProp.GetString() : null;
+                
+                if (string.IsNullOrWhiteSpace(title)) continue;
+
+                var body = !string.IsNullOrWhiteSpace(content) 
+                    ? (content.Length > 200 ? content[..200] + "..." : content)
+                    : "查看详情";
+
+                logger.LogInformation("检测到突发新闻: {Title}", title);
+                
+                await pushService.SendBreakingNewsAsync(title, body, null, ct);
+            }
+        }
+        catch (JsonException ex)
+        {
+            logger.LogWarning(ex, "解析简报JSON失败");
+        }
     }
 
     [HttpPost("refresh")]

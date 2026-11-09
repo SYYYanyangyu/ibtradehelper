@@ -17,6 +17,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<RealizedPnl> RealizedPnls => Set<RealizedPnl>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<DataFeedStatus> DataFeedStatuses => Set<DataFeedStatus>();
+    public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
+    public DbSet<NotificationHistory> NotificationHistories => Set<NotificationHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

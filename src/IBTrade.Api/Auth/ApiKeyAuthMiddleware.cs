@@ -59,6 +59,22 @@ public sealed class ApiKeyAuthMiddleware
             return;
         }
 
+        // 公共推送端点：订阅和VAPID公钥无需鉴权，订阅所有权通过令牌验证。
+        if (path.StartsWith("/api/push", StringComparison.OrdinalIgnoreCase))
+        {
+            // 公开端点（无需ApiKey）
+            if (path.Equals("/api/push/vapid-public-key", StringComparison.OrdinalIgnoreCase) ||
+                (HttpMethods.IsPost(context.Request.Method) && path.Equals("/api/push/subscription", StringComparison.OrdinalIgnoreCase)) ||
+                (HttpMethods.IsDelete(context.Request.Method) && path.Equals("/api/push/subscription", StringComparison.OrdinalIgnoreCase)) ||
+                (HttpMethods.IsPut(context.Request.Method) && path.Equals("/api/push/preferences", StringComparison.OrdinalIgnoreCase)))
+            {
+                await _next(context);
+                return;
+            }
+            // 管理端点（需要ApiKey）：/api/push/send, /api/push/admin/*
+            // 继续下方ApiKey验证
+        }
+
         var configuredKey = _configuration["ApiKey"]
             ?? Environment.GetEnvironmentVariable(EnvVarName);
 

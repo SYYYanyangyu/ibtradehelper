@@ -83,6 +83,8 @@ public static class DependencyInjection
         services.AddScoped<ICashTransactionRepository, CashTransactionRepository>();
         services.AddScoped<IRealizedPnlRepository, RealizedPnlRepository>();
         services.AddScoped<IDataFeedStatusRepository, DataFeedStatusRepository>();
+        services.AddScoped<IPushSubscriptionRepository, PushSubscriptionRepository>();
+        services.AddScoped<INotificationHistoryRepository, NotificationHistoryRepository>();
 
         // TWS 实时客户端工厂（单例；每次同步按需 new 出短生命周期的 ITwsClient）
         services.AddSingleton<ITwsClientFactory, TwsClientFactory>();
