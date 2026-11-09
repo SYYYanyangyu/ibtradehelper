@@ -1,16 +1,82 @@
 {
-  "updatedAt": "2026-11-09T01:20:00.000Z",
+  "updatedAt": "2026-11-09T20:25:00.000Z",
   "source": "scheduled",
   "sections": [
+    {
+      "id": "macro",
+      "title": "宏观市场",
+      "items": [
+        {
+          "headline": "【盘中·约美东15:15】道指约+2.45%、标普约+2.5%、纳指约+2.8%；油价回落、美元走软、美债收益率小幅上行",
+          "summary": "北京时间11月10日约04:15（美东冬令时11月9日约15:15）美股仍开市，距常规16:00收盘约45分钟，以下为盘中快照而非收盘。雅虎财经直播美东15:15:39：道指52542.27（+1256.54，+2.45%），标普约+2.5%，纳指约+2.8%，页面标注Market Open。更早路透约14:24点位为标普7554.67（+2.41%）、纳指25235.49（+2.67%）、道指52417.54（+2.21%），午后涨幅较午盘扩大。反弹发生在上周因中期选举后AI/数据中心监管担忧出现2025年4月以来最大周跌之后；路透称标普11个行业全涨，工业与可选消费领涨逾3%。油价方向确认回落但不同稿件时点有落差：路透较早报WTI约87.53美元（-3.63%）、布伦特约93.50（-4.9%）；雅虎15:13称布伦特约91；CNBC午后称WTI 12月合约跌逾5%至约86。美债CNBC午后：2年期约4.564%（+逾4bp）、10年期约4.876%（+近2bp）、30年期约5.264%。美元路透：美元指数约101.84（-0.37%）。未获VIX一线同步权威点位故不写。下一验证：北京时间今晚21:30的10月CPI（多数分项因上年停摆缺同比，重在环比）。",
+          "url": "https://finance.yahoo.com/markets/live/stock-market-today-monday-november-9-dow-sp-500-nasdaq-nvidia-090535419.html",
+          "tickers": ["SPY", "QQQ", "DIA", "NVDA", "AMD", "AVGO"]
+        },
+        {
+          "headline": "纽联储10月SCE：通胀预期持平3.9%/3.3%/3.0%；一年失业上升概率45.3%为2020年4月以来最高",
+          "summary": "纽联储11月9日发布10月消费者预期调查（实地10/1–10/31）：一年、三年、五年中位通胀预期分别持平于3.9%、3.3%、3.0%。劳动市场预期分化——认为一年后失业率更高的平均概率升至45.3%（+1.4个百分点，2020年4月以来最高）；未来12个月失业概率13.9%；若失业后找到新工作的概率升至46.5%。拖欠最低还款概率升至13.8%。通胀粘性预期未松动叠加就业担忧上升，与Barkin「方向清晰但须谨慎」相互印证。期权提醒：明日CPI是离散时点，方向与隐含波动是两回事，本报不提供IV或交易建议。",
+          "url": "https://www.newyorkfed.org/newsevents/news/research/2026/20261109",
+          "tickers": []
+        },
+        {
+          "headline": "花旗将美股与全球科技从超配下调至中性，上调除英国外欧股；属策略配置观点",
+          "summary": "花旗策略团队（Beata Manthey等）把美股、全球科技及欧洲科技从超配下调至中性，并将除英国外欧洲股票上调至超配；称仍中期看好AI，但希望仓位更干净、情绪与盈利预测修订更扎实后再恢复超配，并担心纳指仓位可能进一步回落至净空。上调欧股理由包括科技敞口更低、更能受益油价回落；同时上调全球医疗。这是战术配置观点，不是单一公司新公告，也不等于否定AI长期逻辑。对美股科技β构成情绪与再平衡压力，但周一盘中科技/半导大幅反弹显示「监管摧毁AI」叙事已部分纠偏。",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/citi-strategists-cut-us-stocks-095547644.html",
+          "tickers": ["SPY", "XLK"]
+        },
+        {
+          "headline": "【持续影响】Barkin：通胀是双使命主要风险，政策方向straightforward但须with care（无新结论）",
+          "summary": "里士满联储主席Barkin美东11月9日Greer讲话（官网全文）：需求健康、通胀顽固偏高，政策方向相对明确；但需求前景仍有可见风险（尤其AI投资/资产价格双向情景），应「with care」推进。已发快讯，本条仅持续影响、无新政策结论。",
+          "url": "https://www.richmondfed.org/press_room/speeches/thomas_i_barkin/2026/barkin_speech_20261109",
+          "tickers": []
+        }
+      ]
+    },
     {
       "id": "mega_cap",
       "title": "万亿/超大市值",
       "items": [
         {
-          "headline": "英伟达董事会就黄仁勋遭外国情报机构针对的报道启动独立调查",
-          "summary": "英伟达董事会11月8日（周日）声明，因近期报道称创始人兼CEO黄仁勋遭外国情报机构针对，已启动由独立董事委员会主导、并聘请外部独立律师协助的调查。董事会表示目前没有理由认为国家安全或英伟达机密已遭泄露，但仍将审查所有可得信息；黄仁勋支持并配合调查，董事会对其及管理团队表示有信心。黄仁勋同日致信员工，承认对妻子不忠并道歉，称将全力配合调查，并强调致力于保护公司与美国国家安全。公司发言人表示他将继续担任CEO、不中断履职。据纽约时报与金融时报报道，美情报机构担心与黄仁勋有过关系、并与英伟达客户云公司Megaspeed有关联的商界人士Alice Huang向北京传递信息；Megaspeed此前已被指协助受限中国公司获取英伟达AI芯片，英伟达曾称已对相关出口管制规避做过调查。美国众议院三名共和党委员会主席已要求他于11月18日闭门汇报。公司将于11月17日公布三季报。CNBC称加密衍生品平台Hyperliquid上的英伟达代理合约过去24小时约跌2%；周日晚美股期货开盘时纳指期货一度跌约0.8%，随后回升，CNBC约美东19:27更新为标普期货约+0.1%、纳指期货约+0.3%、道指期货约+0.2%。",
+          "headline": "【盘中】超大盘分化：除NVDA外七巨头回补；META午后仍涨逾5%，AMD/AVGO领涨半导",
+          "summary": "周一超大市值走出「NVDA特异承压、其余AI链回补」结构。福布斯/雅虎约美东12:49：AAPL约+2.2%、MSFT约+2.6%、GOOGL约+1.9%、AMZN约+3.6%、META约+5.2%、TSLA约+5.5%，NVDA约-5%（盘中最多曾跌约8%后收窄）。半导约中午：AVGO约+9%、AMD约+11%、TSM约+4%。MarketScreener美东15:17录得META约645.78美元（+5.84%），与指数快照接近同时。除META 15:17外多数为午盘百分比，不能当作收盘。含义：市场将黄仁勋调查视为公司特异冲击，同时用油价回落与超跌反弹回补其他核心资产。观察收盘结构能否维持，以及CPI是否重定价成长股。",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/tech-stocks-continue-rebound-midterms-174930824.html",
+          "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "TSLA", "NVDA", "AMD", "AVGO"]
+        },
+        {
+          "headline": "英伟达董事会独立调查仍无结论：官方称无已知泄密，周一股价单独承压；调查≠违法",
+          "summary": "英伟达董事会11月8日声明：因报道称CEO黄仁勋遭外国情报机构针对，启动独立董事委员会+外部律师的独立调查；称目前没有理由认为国家安全或公司机密已受损，黄仁勋配合调查并将继续履职，董事会对其及团队有信心。已确认的是「在查」，不是「已认定违法/泄密/离职」。媒体关于Alice Huang/Megaspeed等指控未能被路透独立核实，属报道层。周一NVDA单独承压而大盘与多数AI股未崩。NYT关于H200对华审批/空壳公司报道约11月7日，属旧闻再扩散。下一节点：调查正式更新、约11月18日国会闭门通报口径、11月17日三季报指引与合规表述。",
           "url": "https://nvidianews.nvidia.com/news/statement-from-nvidia-board-of-directors",
           "tickers": ["NVDA"]
+        },
+        {
+          "headline": "Oppenheimer上调AMD至Outperform、目标价600美元（分析师观点）；盘中与NVDA走势明显分化",
+          "summary": "Oppenheimer的Rick Schafer将AMD由Perform上调至Outperform，目标价600美元（CNBC称较周五收盘约隐含34%上行空间）。该行模型看好数据中心扩大：称三季度数据中心收入约翻倍，并预计2027年数据中心收入增约135%、占总营收约85%。评级上调≠公司新指引。盘面AMD与NVDA分化，午盘报道AMD涨约9%–13%。下一验证：客户爬坡是否可量化、供应约束下管理层「明年营收仍可高增」口径能否兑现。",
+          "url": "https://www.cnbc.com/2026/11/09/amd-oppenheimer-upgrade-outperform.html",
+          "tickers": ["AMD"]
+        }
+      ]
+    },
+    {
+      "id": "storage",
+      "title": "存储",
+      "items": [
+        {
+          "headline": "【盘中】美股存储股反弹：MU约+6%，STX/WDC约+11%；台积电淡化进军DRAM传闻",
+          "summary": "11月9日美东午盘前后（尚未收盘），存储股自上周AI抛售后反弹：媒体约12:52快照称美光约+6%，希捷与西部数据均约+11%，SanDisk同步跟涨。韩国9日收盘较温和：三星约+0.64%、SK海力士约+0.35%。台积电约11月8日回应报道，强调专注晶圆代工与逻辑、淡化「应英伟达要求做3D DRAM」传闻，缓解对存储竞争格局的担忧。硬盘涨幅大于内存，更多反映AI存储需求情绪修复，而非新的公司订单或指引。未收盘，收盘涨跌可能偏离盘中快照。",
+          "url": "https://247wallst.com/investing/2026/11/09/micron-rises-6-as-bulls-tout-its-bargain-valuation-and-buyback-firepower-seagate-and-western-digital-jump-11/",
+          "tickers": ["MU", "SNDK", "WDC", "STX", "SKHY", "SSNLF"]
+        }
+      ]
+    },
+    {
+      "id": "robotics",
+      "title": "机器人/自动驾驶",
+      "items": [
+        {
+          "headline": "机器人分组：过去24小时无公司公告级实质进展（低影响开源/扩城已排除）",
+          "summary": "系统检索DE、SYM、AUR、GOOGL、ROK、EMR、NOVT、ISRG、CGNX、TER等近24小时未见新的公司公告级实质。Skild开源仿真、Nominal非自选融资、TSLA Robotaxi小规模扩城等属低影响或旧闻，不独立成条。若TSLA随大盘波动，归入超大市值β而非机器人基本面更新。本栏如实说明不足，避免凑数。",
+          "url": "https://finance.yahoo.com/markets/live/stock-market-today-monday-november-9-dow-sp-500-nasdaq-nvidia-090535419.html",
+          "tickers": ["TSLA", "NVDA"]
         }
       ]
     },
@@ -19,10 +85,64 @@
       "title": "生物科技",
       "items": [
         {
-          "headline": "再生元CIDEB siRNA首次人体试验：单剂36周肝脏脂肪最多降80%，结果同期发表于NEJM",
-          "summary": "再生元11月8日公布与Alnylam合作开发的CIDEB siRNA（再生元拥有独家开发与商业化权，Alnylam收取里程碑和特许权使用费）首次人体试验结果，并同期发表于《新英格兰医学杂志》、在AASLD肝病年会上作口头报告。这项1/2期试验在MASLD患者中比较单次皮下给药（四个剂量组共30人）与安慰剂（10人）：给药组36周肝脏脂肪剂量依赖性下降58%–80%（第6周为49%–72%），安慰剂组36周仅下降2.9%；62%给药组受试者肝脏脂肪恢复正常（MRI-PDFF低于5%），安慰剂组为0；93%给药组肝脏脂肪降幅至少30%。安全性总体与安慰剂相近，给药组未报告恶心或呕吐。公司称36周持续效果支持有望半年给药一次；更长期安全性与组织学结果的2a/2b/3期试验正在入组，并将于美东11月10日上午8:30举行投资者交流会讨论MASH管线。该候选药尚未获任何监管机构批准。",
-          "url": "https://investor.regeneron.com/news-releases/news-release-details/cideb-sirna-normalizes-liver-fat-and-improves-liver-injury/",
-          "tickers": ["REGN", "ALNY"]
+          "headline": "礼来口服Foundayo III期ATTAIN-OSA达主要终点，拟2026年底前提交FDA OSA适应症",
+          "summary": "礼来11月9日IR（AHA同步、《JAMA》发表）：ATTAIN-OSA达主要终点。未用PAP组：基线AHI约50.7次/小时，52周减21.1次（-43.8%），约31.5%达缓解或轻度；用PAP组基线约57.6，减18.3次（-27.5%）。缺氧负担分别约-55.9%/-45.8%；体重约-11.5%/-11.2%。安全性与既往GLP-1一致，胃肠道不良事件为主。公司拟2026年底前向FDA提交中重度OSA（Foundayo已获批减重）。对LLY强化口服GLP-1在心血管-代谢并发症叙事；获批前不能计入收入。已发快讯，晚报展开数字口径。",
+          "url": "https://investor.lilly.com/news-releases/news-release-details/lillys-foundayo-orforglipron-significantly-reduced-obstructive",
+          "tickers": ["LLY"]
+        },
+        {
+          "headline": "FDA要求全部GLP-1标签增加罕见眼病NAION潜在风险警示",
+          "summary": "FDA 11月9日要求所有GLP-1受体激动剂（含Mounjaro/Zepbound/Foundayo及Ozempic/Wegovy等）在Warnings and Precautions增加NAION潜在风险。汇总126项随机试验：GLP-1组约6.4例/10万人年，对照约3.8例；FDA表述为「潜在增加」而非已证实因果。症状为单眼突发无痛视力下降等，应立即就医。标签更新而非撤市：绝对风险仍低，对处方教育与情绪有边际影响。已发快讯。",
+          "url": "https://www.fda.gov/drugs/drug-safety-communications/fda-requires-safety-labeling-changes-glucagon-peptide-1-receptor-agonists-glp-1-ras-due-potential",
+          "tickers": ["LLY", "NVO"]
+        },
+        {
+          "headline": "Ionis下调TRYNGOLZA 2026销售指引至约5000万美元（原1.00–1.10亿），总收入等指引维持",
+          "summary": "Ionis 11月9日：因sHTG新范式爬坡慢于预期，TRYNGOLZA全年产品销售指引由1.00–1.10亿美元下调至约5000万美元；Q3美国净销售900万美元，前九个月4100万美元。DAWNZERA指引1.10–1.20亿维持；总收入8.75–9.00亿及经营亏损、现金指引维持。现金约19亿美元。欧洲sHTG已获CHMP积极意见。媒体称股价当天大跌约27%。属近季放量低于预期，长期峰值仍是公司表述。已发快讯。",
+          "url": "https://ir.ionis.com/news-releases/news-release-details/ionis-reports-third-quarter-2026-financial-results-and",
+          "tickers": ["IONS"]
+        },
+        {
+          "headline": "argenx收购Unnatural Products：首付5.5亿美元现金，总对价最高约11.5亿美元",
+          "summary": "argenx 11月9日（欧洲时间上午）达成收购UNP最终协议，补强大环肽发现并拓展口服/长效免疫药可能。首付5.5亿美元现金，另有至多约5.95亿美元研发与监管里程碑；argenx已持少数股权。UNP将继续在加州圣克鲁斯运营。预计年底前交割（常规条件）。平台收购≠管线立刻获批；关注现金使用与后续分子临床进度。已发快讯。",
+          "url": "https://www.globenewswire.com/news-release/2026/11/09/3398049/0/en/argenx-to-acquire-unnatural-products-inc-adding-peptide-discovery-engine-to-broaden-immunology-capabilities.html",
+          "tickers": ["ARGX"]
+        },
+        {
+          "headline": "Alnylam HELIOS-B五年数据：持续AMVUTTRA优于延期启动（已上市药长期强化，非新适应症）",
+          "summary": "Alnylam于AHA公布HELIOS-B五年数据：持续使用AMVUTTRA（vutrisiran）相对约三年后才启动，全因死亡或反复心血管事件风险在单药人群降约48%（HR约0.515）、总体人群约41%；反复心血管事件分别约少50%/41%。60个月无新安全性信号。对照是延期启动而非五年全程安慰剂，部分P值为名义值。已获批ATTR-CM疗法的长期获益强化，不是新适应症获批。",
+          "url": "https://www.businesswire.com/news/home/20261109441010/en/Alnylam-Announces-Five-Year-HELIOS-B-Data-Demonstrating-Sustained-Benefit-of-AMVUTTRA-vutrisiran-in-ATTR-CM",
+          "tickers": ["ALNY"]
+        }
+      ]
+    },
+    {
+      "id": "semiconductor",
+      "title": "半导体与制造",
+      "items": [
+        {
+          "headline": "台股大涨近5%、台积电收涨4.68%，主因国安基金维稳；ADR盘中跟涨（美股未收盘）",
+          "summary": "台湾加权指数11月9日收涨约1960点或4.94%至约41661.70，媒体称史上第二大单日涨点；台积电台股收涨4.68%报2235新台币。主要推力包括国安基金授权维稳、收紧融券及上周五美股科技反弹，并非台积电发布新指引或大单。台积电ADR美东午前曾报约涨4%+量级，两日累计约两位数，但美股当日未收盘。SOXL等杠杆ETF大涨属情绪放大。下一步看CPI及外资是否回补。",
+          "url": "https://focustaiwan.tw/business/202611090017",
+          "tickers": ["TSM"]
+        },
+        {
+          "headline": "【盘中】费城半导大幅反弹：AMD/AVGO领涨、NVDA拖累；与台股风险偏好修复共振",
+          "summary": "路透：费城半导体指数周一盘中涨逾6%，扭转上周超12%周跌。结构上AMD、博通贡献最大，英伟达因调查独跌。亚洲台股/韩系存储同步回升，显示选后AI监管恐慌定价部分回吐。半导β修复与NVDA特异风险并存。下一验证：CPI后资金流、11/17英伟达财报对资本开支链条再定价。",
+          "url": "https://www.streetinsider.com/General+News/Wall+St+roars+back+as+oil+slide+eases+inflation+jitters%3B+Nvidia+drops/27310155.html",
+          "tickers": ["SOX", "AMD", "AVGO", "NVDA", "TSM"]
+        }
+      ]
+    },
+    {
+      "id": "calendar",
+      "title": "后续日程",
+      "items": [
+        {
+          "headline": "未来一周关键节点（北京时间）：CPI多数分项无同比、沃勒讲话、财报、PPI、罗素初榜",
+          "summary": "①北京时间11月10日21:30（美东08:30）：BLS公布10月CPI；因2025年停摆缺上年同期，多数分项不公布同比，市场重在环比（道琼斯调查预期CPI环比约+0.3%、核心约+0.2%，属预期非结果）。②同日约17:00：美联储理事Waller伦敦讲话。③11月11日06:00前后：CoreWeave电话会（美东10日17:00）；11日退伍军人节美股开市、债市休市。④11月13日05:30：Cisco与Applied Materials业绩电话会（美东12日16:30）。⑤11月13日21:30：10月PPI。⑥罗素美国指数初榜：美东11月13日收盘后，约北京14日05:00。⑦英伟达三季报约11月17日；国会关注黄仁勋约11月18日闭门汇报（此前信函口径）。期权：CPI与NVDA财报是离散时点，事件波动与方向下注是不同维度。",
+          "url": "https://www.bls.gov/schedule/2026/11_sched_list.htm",
+          "tickers": ["NVDA", "LLY", "IONS"]
         }
       ]
     }
