@@ -1,34 +1,44 @@
 {
-  "updatedAt": "2026-11-10T01:20:00.000Z",
+  "updatedAt": "2026-11-27T09:20:00+08:00",
   "source": "scheduled",
   "sections": [
     {
       "id": "macro",
-      "title": "宏观市场",
+      "title": "宏观与市场",
       "items": [
         {
-          "headline": "【收盘】道指+2.15%至52389.75、标普+2.35%至7549.94、纳指+2.74%至25253.14；油价大跌、美元走软，静待今晚CPI",
-          "summary": "美东11月9日（北京时间10日凌晨）收盘确认：道指52389.75（+1104.02，+2.15%），标普500报7549.94（+173.08，+2.35%，为4月8日以来最大单日涨幅量级），纳斯达克综合指数25253.14（+673.71，+2.74%）。CNBC/道琼斯市场数据口径。驱动：WTI 12月合约收86.85美元（-4.38%）、布伦特收92.57美元（-5.85%），油价回落缓解通胀预期；科技自上周中期选举后AI/数据中心监管抛售中修复。美债CNBC收盘附近：2年期约4.561%（+逾3bp）、10年期约4.876%（+逾1bp）、30年期约5.264%。美元指数约101.84（-0.37%）。亚太传导：台股9日收涨4.94%至41661.70（国安基金维稳+美股周五反弹）；北京时间10日开盘前后日经225高开约1.02%报59372、韩国综指高开约4.55%报5247（同花顺快讯）。下一验证：北京时间今晚21:30的10月CPI（多数分项因上年停摆缺同比，重在环比；道琼斯调查预期CPI环比约+0.3%、核心约+0.2%，属预期非结果）。",
-          "url": "https://www.cnbc.com/2026/11/08/stock-market-today-live-updates.html",
-          "tickers": ["SPY", "QQQ", "DIA", "USO", "TLT", "UUP"]
+          "headline": "【夜盘已重开，最重要】股指期货已计入周五交易日并小幅高开于假期暂停前的最后报价；这是盘中价，不是结算，也不是美股现货收盘。美股现货仍要到北京22:30才开始短时交易",
+          "summary": "1. 【夜盘已重开，最重要】股指期货已计入周五交易日并小幅高开于假期暂停前的最后报价；这是盘中价，不是结算，也不是美股现货收盘。美股现货仍要到北京22:30才开始短时交易\n\n美股现货周四全日休市的口径没有变化：不能把任何周四或周五凌晨的期货数字写成三大指数或个股的收盘表现。上一轮官方收盘仍是美东11月25日16:00：道琼斯工业平均指数50,182.95，涨0.33%；标普500指数7,182.78，跌0.25%；纳斯达克综合指数23,585.80，跌0.62%；纳斯达克100指数26,046.90，跌0.64%；费城半导体指数8,774.86，跌0.65%；Cboe波动率指数VIX收28.29，涨7.32%。这些点位已在26日早报和27日凌晨版给出，仍是现货定价的基准。截稿时未见可用于引用的周四或周五官方VIX新收盘，不以假期期间的页面数字替代。\n\n凌晨版所引芝加哥商业交易所12月股指期货，在标注为美东12:59:59的感恩节午间暂停前最后报价为：标普500迷你期货7,234.50，涨38.75点或0.54%；纳斯达克100迷你期货26,221.25，涨121.00点或0.46%；道指迷你期货50,443.00，涨215.00点或0.43%；当时页面显示"Pre. Settlement --"，没有与常规交易日同等的官方结算。雅虎显示上述合约在美东20:08前后（北京27日09:08前后，夜盘重开后约两小时）的盘中价为：标普500迷你期货7,250.00，涨54.25点或0.75%；纳斯达克100迷你期货26,313.75，涨213.50点或0.82%，开盘26,068.50，区间25,997.50–26,436.00；道指迷你期货50,537.00，涨309.00点或0.62%，开盘50,236.00，区间50,223.00–50,575.00。页面仍显示"Pre. Settlement --"。与暂停前最后报价相比，三者在夜盘中又上修了一截，但仍是期货盘中价，不能折算成现货已经开涨，也不能外推成周五开盘点位。Investing.com在美东18:39（重开后约39分钟）曾报标普500期货7,243.0（+0.65%）、纳斯达克100期货26,244.745（+0.55%）、道指期货50,523.0（+0.58%），可与之后的雅虎印记交叉对照，两者时点不同。\n\n债券与美元方面，没有11月26日的财政部平价收益率可引用，10年期仍以11月25日官方曲线的4.85%为准；2年期4.61%，5年期4.65%，30年期5.24%。雅虎所示ICE美元指数在美东20:08:21报103.82，较其所列前值103.67上涨0.15点或0.15%，区间103.82–103.86；这是假期夜间报价，不能写成与股指同等的官方结算。美联储在感恩节至截稿未见新的官方讲话或议息决定，12月8–9日FOMC才是下一政策决定窗口。下一验证是北京22:30开始、提前至美东13:00结束的周五现货短时交易，能否把夜盘结构转化为现货价格。\n\n来源：[纳斯达克假期公告](https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-69)、[雅虎标普500迷你期货](https://finance.yahoo.com/quote/ES%3DF/)、[雅虎纳斯达克100迷你期货](https://finance.yahoo.com/quote/NQ%3DF/)、[雅虎道指迷你期货](https://finance.yahoo.com/quote/YM%3DF/)、[雅虎美元指数](https://finance.yahoo.com/quote/DX-Y.NYB/)、[财政部收益率曲线](https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value_month=202611)、[Investing.com期货报道](https://www.investing.com/news/stock-market-news/us-stock-futures-rise-in-holidaythinned-trade-tech-rebound-in-focus-5052775)",
+          "url": "https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-69",
+          "tickers": [
+            "ES=F",
+            "NQ=F",
+            "YM=F",
+            "SPX",
+            "DJI",
+            "IXIC"
+          ]
         },
         {
-          "headline": "纽联储10月SCE：通胀预期持平3.9%/3.3%/3.0%；一年失业上升概率45.3%为2020年4月以来最高",
-          "summary": "纽联储11月9日发布10月消费者预期调查（实地10/1–10/31）：一年、三年、五年中位通胀预期分别持平于3.9%、3.3%、3.0%。劳动市场预期分化——认为一年后失业率更高的平均概率升至45.3%（+1.4个百分点，2020年4月以来最高）；未来12个月失业概率13.9%；若失业后找到新工作的概率升至46.5%。拖欠最低还款概率升至13.8%。通胀粘性预期未松动叠加就业担忧上升，与官员「通胀仍是主要风险」口径相互印证。期权提醒：今晚CPI是离散时点，方向判断与隐含波动是两回事，本报不提供IV或交易建议。",
-          "url": "https://www.newyorkfed.org/newsevents/news/research/2026/20261109",
-          "tickers": []
+          "headline": "【盘中，尚未收盘】日经与韩股周五早盘小幅上涨但仍在交易；台股开盘几乎持平；A股与港股截稿时尚未开盘，不能把期指或周四收盘写成今日开盘",
+          "summary": "2. 【盘中，尚未收盘】日经与韩股周五早盘小幅上涨但仍在交易；台股开盘几乎持平；A股与港股截稿时尚未开盘，不能把期指或周四收盘写成今日开盘\n\n以下除特别注明外，均为周五盘中未收盘报价或开盘价，随后还会变动，不能当成收盘，也不能外推成周五美股开盘点位。周四官方收盘已在凌晨版给出，此处不再当作今日行情：日经225收57,499.16（+0.86%），韩国综指收4,711.21（+0.29%），台湾加权收39,151.81（+2.50%），上证综指收3,476.88（+0.01%），恒生指数收22,226.88（+1.19%）。\n\n雅虎：日经225截至东京10:04:45（北京09:04:45）报57,664.64，涨165.48点或0.29%，前收57,499.16，开盘57,669.79，区间57,447.16–57,994.39。每经网北京08:16称其开盘涨0.3%报57,669.79点，之后一度扩大至约0.75%，与随后雅虎所见回落并不矛盾，因为都是未收盘报价。韩国综指截至首尔09:59:30（北京08:59:30）报4,735.08，涨23.87点或0.51%，前收4,711.21，开盘4,728.80，区间4,682.43–4,755.67。韩联社署期首尔09:03的开盘稿称开盘报4,728.8点，上涨17.59点或0.47%；17.59点相对前收4,711.21约为0.37%，与开盘点位相符，稿件所写0.47%与点差不符，本报以点差为准。\n\n台湾加权的雅虎页面截稿时仍停留在周四收盘39,151.81，不能当作周五盘中价。NOWNews署期北京09:07：台股以39,168.57点开出，较周四收盘上涨16.76点或约0.04%，当时最高、最低均为此价；台积电以平盘2,145新台币开出，与周四收盘相同。开盘之后仍会变化。\n\nA股与港股常规开盘为09:30，截稿时尚未开始。每经网和财联社：富时中国A50指数期货连续合约夜盘收12,511点，跌0.02%；每经网北京09:01称在此基础上高开，当时现涨0.16%，稿件未同步给出点位。这是期指，不是上证或恒生已经开盘。对A股开盘的潜在传导，主要来自周三美股收盘结构、夜盘股指期货、已开盘的日韩台早盘，以及原油上涨，开盘点位需看随后交易所行情。\n\n来源：[雅虎日经](https://finance.yahoo.com/quote/%5EN225/)、[雅虎韩国综指](https://finance.yahoo.com/quote/%5EKS11/)、[韩联社韩股开盘](https://en.yna.co.kr/view/AEN20261127001200320)、[NOWNews台股开盘](https://www.nownews.com/news/6895947)、[每经网日韩开盘](https://www.nbd.com.cn/articles/2026-11-27/4660458.html)、[每经网A50期指](https://www.nbd.com.cn/articles/2026-11-27/4660504.html)",
+          "url": "https://finance.yahoo.com/quote/%5EN225/",
+          "tickers": [
+            "N225",
+            "KS11",
+            "TWII",
+            "000001.SS",
+            "HSI"
+          ]
         },
         {
-          "headline": "Goolsbee：服务业通胀与AI数据中心需求过热迹象；市场计价12月加息概率仍高（已推快讯，持续影响）",
-          "summary": "芝加哥联储主席Goolsbee美东11月9日Leadership Greater Chicago讲话（CNBC引述）：称通胀本应消退却在服务业等领域抬头，AI数据中心建设「看起来更像旧式需求过热」。劳动力市场接近充分就业，问题主要在通胀侧。CME FedWatch（CNBC引述周一）：12月加息约1/4个百分点概率约逾80%。已发快讯，本条为宏观持续影响、无新政策投票结论。下一验证：今晚CPI环比、周五PPI、12/8–9 FOMC（含SEP）。",
-          "url": "https://www.cnbc.com/2026/11/09/october-cpi-report-2026-inflation.html",
-          "tickers": []
-        },
-        {
-          "headline": "花旗将美股与全球科技从超配下调至中性，上调除英国外欧股；属策略配置观点",
-          "summary": "花旗策略团队（Beata Manthey等）把美股、全球科技及欧洲科技从超配下调至中性，并将除英国外欧洲股票上调至超配；称仍中期看好AI，但希望仓位更干净、情绪与盈利预测修订更扎实后再恢复超配。上调欧股理由包括科技敞口更低、更能受益油价回落。这是战术配置观点，不是单一公司新公告。周一收盘科技/半导大幅反弹显示「监管摧毁AI」叙事已部分纠偏，但策略降配可能构成再平衡压力。",
-          "url": "https://www.cnbc.com/2026/11/08/stock-market-today-live-updates.html",
-          "tickers": ["SPY", "XLK"]
+          "headline": "【已报+结算确认，最重要之一】道琼斯市场数据确认周四ICE布伦特结算96.57美元；WTI仍无感恩节官方结算，夜盘重开后雅虎报85.52美元。沙特能源部已确认吉赞炼厂周四遇袭，拉斯塔努拉仍无新的官方评估",
+          "summary": "3. 【已报+结算确认，最重要之一】道琼斯市场数据确认周四ICE布伦特结算96.57美元；WTI仍无感恩节官方结算，夜盘重开后雅虎报85.52美元。沙特能源部已确认吉赞炼厂周四遇袭，拉斯塔努拉仍无新的官方评估\n\n原油必须继续区分官方结算、假期最后报价、夜盘盘中价和已报的地缘事件。周三官方结算仍为：ICE 2027年1月布伦特94.61美元/桶，涨3.51%；纽约商品交易所2027年1月WTI 83.68美元/桶，涨1.99%。凌晨版曾引述媒体报道的周四ICE布伦特结算96.57美元。道琼斯市场数据署期11月26日20:10的稿件现已确认：1月ICE布伦特结算96.57美元/桶，上涨1.96美元或2.07%，连续第三个交易日上涨，三日累计上涨7.20美元或8.06%，为11月6日以来最高结算值。这是对结算价的确认，不是新的涨势。WTI因感恩节没有官方结算：凌晨版所引暂停前最后报价为美东14:29:50的84.91美元，涨1.23美元或1.47%。雅虎显示同一1月合约在美东20:09:03（北京09:09，夜盘重开后）报85.52美元，涨1.84美元或2.20%，开盘84.09，区间83.16–85.54；页面仍为"Pre. Settlement --"，这是盘中价，不是结算。CNBC TV18署期北京07:28的报道称，亚洲早盘1月布伦特仍在96美元上方交易，未给出可与道琼斯结算页对等的精确最后价，本报不以该表述替代结算价。\n\n沙特能源部对吉赞炼厂遇袭的官方确认，已由约北京05:05–05:20的快讯推送，此处补充市场报价与关键限定，不另拆成新事件。沙特通讯社援引能源部官方消息源：吉赞地区炼厂在周四（11月26日）遭敌对空中投射物击中，引发火情，火情已得到控制，部分作业暂时停止；初步信息显示一名尼泊尔籍工作人员死亡，不同国籍若干人受伤；伤者已接受救治，技术团队正在评估损坏并核验设施安全。能源部声明未指认攻击方。半岛电视台援引路透社报道：吉赞炼厂位于红海沿岸、邻近也门边境，设计加工能力约40万桶/日；沙特主导的联军此前已将袭击归因于胡塞武装，联军发言人图尔基·马利基在X上称打击平民和民用基础设施将遭到坚决军事回应；随后联军宣称已摧毁荷台达省一处被用于此次袭击的弹道导弹发射平台。这与已报的周三吉赞港相关事件不是同一件事，也不能自动写成对拉斯塔努拉炼厂的官方确认。对拉斯塔努拉，截稿时仍未核到一份署期为11月25日、26日或27日、由能源部或阿美就此次宣称发布的新官方评估；2026年3月前后"未遂袭击、无损坏、不影响供应"的旧声明不得写成今日表态。CNBC TV18亦写明沙特当局尚未确认胡塞对拉斯塔努拉的宣称。油价同时受到假期流动性偏薄、此前涨势和11月29日欧佩克+讨论2027年产量政策等因素影响，不能把结算或夜盘涨幅全部归因于吉赞一处设施。下一验证是损坏评估与复产说明、拉斯塔努拉是否出现新的官方文本，以及欧佩克+会议是否形成可引用的决议。\n\n来源：[道琼斯布伦特结算](https://www.morningstar.com/news/dow-jones/202611263738/front-month-ice-brent-crude-rose-207-to-settle-at-9657-data-talk)、[雅虎WTI](https://finance.yahoo.com/quote/CL%3DF/)、[沙特通讯社能源部声明](https://www.spa.gov.sa/en/w2737172)、[半岛电视台/路透社报道](https://www.aljazeera.com/news/2026/11/26/attack-on-saudi-aramcos-jazan-refinery-kills-worker-disrupts-operations)、[CNBC TV18油价报道](https://www.cnbctv18.com/market/commodities/crude-oil-prices-today-rise-brent-wti-saudi-aramco-key-facility-attack-jazan-ras-tanura-houthis-strait-of-hormuz-iran-20042528.htm)\n\n二、万亿/超大市值",
+          "url": "https://www.morningstar.com/news/dow-jones/202611263738/front-month-ice-brent-crude-rose-207-to-settle-at-9657-data-talk",
+          "tickers": [
+            "CL=F",
+            "BZ=F"
+          ]
         }
       ]
     },
@@ -37,22 +47,25 @@
       "title": "万亿/超大市值",
       "items": [
         {
-          "headline": "超大盘收盘分化：NVDA独跌4.27%，AMD+13.26%/AVGO+8.78%/META+5.12%/TSLA+5.54%回补",
-          "summary": "美东11月9日收盘（Bullstory/Yahoo核对）：NVDA 178.67美元（-4.27%），成交额居首约806亿美元；AMD 508.58（+13.26%）、AVGO 319.48（+8.78%）、MU 733.15（+6.25%）、META 641.37（+5.12%）、TSLA 378.05（+5.54%）、AMZN 266.93（+2.94%）、MSFT 545.18（+2.75%）、AAPL 350.69（+2.43%）、GOOGL 288.15（+1.18%）。结构清晰：黄仁勋调查被定价为公司特异冲击，其余「七巨头」与半导β自上周抛售中回补。含义：指数反弹并不等于NVDA治理/合规不确定性解除。观察今晚CPI后成长股再定价，以及11/17英伟达三季报指引与合规表述。",
-          "url": "https://www.cnbc.com/2026/11/08/stock-market-today-live-updates.html",
-          "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "TSLA", "NVDA", "AMD", "AVGO", "MU"]
-        },
-        {
-          "headline": "英伟达董事会独立调查仍无结论：官方称无已知泄密，周一股价单独承压；调查≠违法成立",
-          "summary": "英伟达董事会11月8日声明：因报道称CEO黄仁勋遭外国情报机构针对，启动独立董事委员会+外部律师的独立调查；称目前没有理由认为国家安全或公司机密已受损，黄仁勋配合调查并将继续履职。黄仁勋致员工信承认对妻子不忠。媒体将关系指向新加坡云厂商Megaspeed高管Alice Huang，并称美情报机构指其为中方资产；中国外交部称「所谓中国间谍叙事」缺乏依据（路透）。已确认的是「在查」，不是「已认定违法/泄密/离职」。CNBC称Megaspeed曾面临芯片是否转口中国的审查，公司称BIS等检查未发现违规。下一节点：调查正式更新、约11月18日国会闭门通报、11月17日三季报。",
-          "url": "https://www.cnbc.com/2026/11/09/nvidia-jensen-huang-chinese-spy-investigation.html",
-          "tickers": ["NVDA"]
-        },
-        {
-          "headline": "Oppenheimer上调AMD至Outperform、目标价600美元（分析师观点）；收盘与NVDA明显分化",
-          "summary": "Oppenheimer的Rick Schafer将AMD由Perform上调至Outperform，目标价600美元（CNBC称较周五收盘约隐含34%上行空间）。该行看好数据中心：称三季度数据中心收入约翻倍至约85.5亿美元量级，并预计2027年数据中心收入增约135%、占总营收约85%。评级上调≠公司新指引。收盘AMD+13.26%、NVDA-4.27%，市场用「替代供应商」叙事交易治理冲击。下一验证：客户爬坡是否可量化、Helios机架方案与供应约束下指引能否兑现。",
-          "url": "https://www.cnbc.com/2026/11/08/stock-market-today-live-updates.html",
-          "tickers": ["AMD", "NVDA"]
+          "headline": "【持续影响】英伟达相关事项仍未落地，且性质不同：CreditWatch不是降级，《金融时报》东南亚停运仍是未经公司确认的报道，CBS调查未指控违规。周五短时交易是节后首次现货再定价窗口",
+          "summary": "4. 【持续影响】英伟达相关事项仍未落地，且性质不同：CreditWatch不是降级，《金融时报》东南亚停运仍是未经公司确认的报道，CBS调查未指控违规。周五短时交易是节后首次现货再定价窗口\n\n感恩节没有超大市值个股的现货收盘，现货最后官方价格仍是周三收盘，本报不编造周四或周五的美股现货价。标普全球将英伟达发行人评级由AA/稳定展望调整为AA/CreditWatch负面、商业票据A-1+维持，已由25日快讯和此后简报覆盖。这是最多约90天的观察，潜在下调原则上不超过一档，除非调查或披露显示声誉或业务前景受损；观察不等于已经降级。截稿时未见标普新的后续行动，也未见英伟达就该评级行动发布官方新闻稿。\n\n《金融时报》11月26日援引知情人士称，英伟达已要求合作伙伴停止向马来西亚、新加坡、泰国和印度尼西亚出货含其芯片的服务器，已由约北京01:07–01:25的快讯和凌晨版覆盖。截稿时仍未见英伟达、戴尔或美国商务部就此发布官方确认或澄清。CBS News署期美东11月25日的调查报道称，两家具有中资背景的加州公司出现在英伟达合作伙伴名单中；报道本身写明美国政府未指控相关公司违规，调查不等于已经认定违法，该条已在凌晨版展开。这三件事性质不同，不能混成同一条已经落地的处罚或出货禁令。它们大多在周四现货休市期间或之前传出，周五美东09:30–13:00的短时交易，才是节后首次可用的美股现货再定价窗口。截稿时未见苹果、微软、谷歌、亚马逊、特斯拉、Meta、博通、礼来、伯克希尔、沃尔玛、摩根大通或超威发布足以单列的新官方财报或指引修正。美光周三收盘市值仍低于约8,000亿美元的观察线，边界需在有新的官方现货价格后再复核。\n\n来源：[标普全球评级行动](https://www.spglobal.com/ratings/en/regulatory/article/-/view/sourceId/101720856)、[《金融时报》报道](https://www.ft.com/content/7838a715-07d4-4605-aa60-21f5af2b2370)、[CBS调查报道](https://www.cbsnews.com/news/nvidia-china-ai-chips-computing-sales/)\n\n三、存储",
+          "url": "https://www.spglobal.com/ratings/en/regulatory/article/-/view/sourceId/101720856",
+          "tickers": [
+            "NVDA",
+            "AAPL",
+            "MSFT",
+            "GOOGL",
+            "AMZN",
+            "TSLA",
+            "META",
+            "AVGO",
+            "LLY",
+            "BRK.B",
+            "WMT",
+            "JPM",
+            "AMD",
+            "MU"
+          ]
         }
       ]
     },
@@ -61,22 +74,34 @@
       "title": "存储",
       "items": [
         {
-          "headline": "存储股收盘反弹：MU+6.25%、SNDK+6.16%；STX/WDC盘中曾涨约两位数，AI存储情绪修复",
-          "summary": "美东11月9日：MU收733.15美元（+6.25%）、SNDK收886.51（+6.16%，Bullstory）。希捷与西部数据午后报道约+11%量级（247WallSt盘中快照），属硬盘/大容量存储对AI数据中心需求情绪修复，并非新的公司订单或指引。SanDisk 8拆1拆分约11月19–20日生效（媒体口径）。台积电此前淡化「应英伟达要求做3D DRAM」传闻，缓解对存储竞争格局担忧。估值争议仍在：媒体称MU远期市盈率约4倍、350亿美元回购授权约12月9日启动，但低倍数也可解读为周期见顶担忧。下一验证：CPI后风险偏好、12月前后回购执行与下一季指引。",
-          "url": "https://247wallst.com/investing/2026/11/09/micron-rises-6-as-bulls-tout-its-bargain-valuation-and-buyback-firepower-seagate-and-western-digital-jump-11/",
-          "tickers": ["MU", "SNDK", "WDC", "STX", "SKHY", "SSNLF"]
+          "headline": "【盘中+除息】SK海力士今日除息，每股拟派2万韩元；盘中相对周四收盘的下跌含除息因素，不能直接当成基本面杀跌。三星电子小幅低开。美国存储股仍无节后现货价",
+          "summary": "5. 【盘中+除息】SK海力士今日除息，每股拟派2万韩元；盘中相对周四收盘的下跌含除息因素，不能直接当成基本面杀跌。三星电子小幅低开。美国存储股仍无节后现货价\n\n美国存储股没有周四或周五开盘前的现货收盘，美光、Sandisk、希捷和西部数据仍以周三收盘为准，本报不编造其节后现货价。周五韩国市场的新变量是除息，不是新的公司业绩。首尔经济日报署期当地09:36（北京08:36）报道：今日为SK海力士除息日，公司此前将2026年三季度现金股利定为普通股每股2万韩元，其中常规股利1万韩元、与铠侠投资回报相关的特别股利1万韩元，总额约14万亿韩元；股权登记日为11月30日，因结算需三个交易日，11月26日或之前完成买入的股东有权获得该笔股息，计划于12月29日发放。StockAnalysis所列、数据来源标注为标普全球市场财智的股息日历，与上述除息日、每股2万韩元、登记日和发放日一致。这不是今日新宣布的派息决议，而是已定派息在今日从股价中除权。\n\n该报引韩国交易所：当时报104.1万韩元，较前一交易日下跌1.2万韩元或1.14%。按周四官方收盘105.3万韩元计算，1.2万韩元跌幅约为1.14%，与点差相符。若按每股2万韩元的股息调整，理论除息参考价约为103.3万韩元，则当时价格反而高于该参考价。因此，不能把相对未除息收盘的下跌直接写成存储基本面恶化。雅虎截至首尔09:59:56（北京08:59:56）报104.2万韩元，开盘104.0万韩元，区间102.2万–105.6万韩元，仍在交易中；该页把前收列为104.3万韩元并据此显示微跌0.10%，与韩国交易所常用的未调整周四收盘并不一致，本报不以这一百分比作为主要口径。三星电子没有同期同等规模的除息说明：雅虎截至首尔09:59:20报171,000韩元，跌300韩元或0.18%，前收171,300韩元（与周四官方收盘一致），开盘171,200，区间169,000–173,200，同样是未收盘报价。TrendForce等行业展望已在此前简报覆盖，截稿时未见美光、Sandisk、希捷或西部数据发布新的官方财报或指引修正。下一验证是韩国收盘时除息后的定价，以及美光约12月17日的财报。\n\n来源：[首尔经济日报除息报道](https://en.sedaily.com/market/2026/11/27/sk-hynix-slips-on-ex-dividend-day-before-14-trillion-won)、[StockAnalysis股息日历](https://stockanalysis.com/quote/krx/000660/dividend/)、[雅虎SK海力士](https://finance.yahoo.com/quote/000660.KS/)、[雅虎三星电子](https://finance.yahoo.com/quote/005930.KS/)\n\n四、机器人与自动驾驶",
+          "url": "https://en.sedaily.com/market/2026/11/27/sk-hynix-slips-on-ex-dividend-day-before-14-trillion-won",
+          "tickers": [
+            "MU",
+            "SNDK",
+            "STX",
+            "WDC",
+            "000660.KS",
+            "005930.KS"
+          ]
         }
       ]
     },
     {
       "id": "robotics",
-      "title": "机器人/自动驾驶",
+      "title": "机器人与自动驾驶",
       "items": [
         {
-          "headline": "特斯拉Robotaxi落地圣安东尼奥：约274平方英里为迄今最大启动区，股价收涨5.54%",
-          "summary": "特斯拉官方Robotaxi账号宣布，圣安东尼奥自美东/中部时间11月9日清晨约5:00起提供无监督Robotaxi服务，服务区约274平方英里，为启动时最大单城范围（略大于奥斯汀约272）。此前11月2日已落地沃思堡；圣安东尼奥在Q3电话会「下一市场」名单中。现有八城无监督服务覆盖约420万人口量级（媒体估算）。TSLA收378.05美元（+5.54%）。扩城提升商业化叙事，但实际可派单区域常小于广告范围，且收入规模仍待财报验证。下一观察：达拉斯Cybercab投放、拉斯维加斯/凤凰城/杰克逊维尔名单进度，以及监管与事故数据。",
-          "url": "https://www.notateslaapp.com/news/4969/tesla-launches-largest-robotaxi-zone-yet-in-san-antonio",
-          "tickers": ["TSLA"]
+          "headline": "【持续影响】约翰迪尔四季报与欧盟推迟特斯拉辅助驾驶审议均无新的官方进展；截稿时未见新的监管决定或公司修正",
+          "summary": "6. 【持续影响】约翰迪尔四季报与欧盟推迟特斯拉辅助驾驶审议均无新的官方进展；截稿时未见新的监管决定或公司修正\n\n约翰迪尔2026财年四季报及2027财年展望、以及欧盟将特斯拉辅助驾驶技术委员会（TCMV）审议由12月1日推迟至12月15日，已由25日快讯和此后简报覆盖。官方数字与议程延期本身没有新的修正：延期不是批准也不是否决。感恩节美股现货休市，迪尔周三收641.02美元、涨4.44%，特斯拉收380.14美元、跌1.18%，仍是现货最后官方价格。截稿时未见迪尔、特斯拉、Symbotic、Aurora、Intuitive Surgical、Cognex或Teradyne发布足以单列的新官方财报、指引修正或新的监管决定。下一验证仍是12月15日的欧盟审议，以及周五短时交易对已有信息的现货定价。\n\n来源：[迪尔SEC新闻稿](https://www.sec.gov/Archives/edgar/data/315189/000110465926131741/de-ex99d1.htm)、[CNBC/路透特斯拉欧盟延期](https://www.cnbc.com/2026/11/25/eu-postpones-discussion-to-approve-teslas-self-driving-tech.html)\n\n五、生物科技",
+          "url": "https://www.sec.gov/Archives/edgar/data/315189/000110465926131741/de-ex99d1.htm",
+          "tickers": [
+            "DE",
+            "TSLA",
+            "SYM",
+            "ISRG"
+          ]
         }
       ]
     },
@@ -85,58 +110,46 @@
       "title": "生物科技",
       "items": [
         {
-          "headline": "礼来口服Foundayo III期ATTAIN-OSA达主要终点，拟2026年底前提交FDA OSA适应症",
-          "summary": "礼来11月9日IR（AHA同步、《JAMA》发表）：ATTAIN-OSA达主要终点。未用PAP组：基线AHI约50.7次/小时，52周减21.1次（-43.8%），约31.5%达缓解或轻度；用PAP组基线约57.6，减18.3次（-27.5%）。缺氧负担分别约-55.9%/-45.8%；体重约-11.5%/-11.2%。安全性与既往GLP-1一致，胃肠道不良事件为主。公司拟2026年底前向FDA提交中重度OSA（Foundayo已获批减重）。对LLY强化口服GLP-1在心血管-代谢并发症叙事；获批前不能计入收入。已发快讯。",
-          "url": "https://investor.lilly.com/news-releases/news-release-details/lillys-foundayo-orforglipron-significantly-reduced-obstructive",
-          "tickers": ["LLY"]
-        },
-        {
-          "headline": "FDA要求全部GLP-1标签增加罕见眼病NAION潜在风险警示",
-          "summary": "FDA 11月9日要求所有GLP-1受体激动剂（含Mounjaro/Zepbound/Foundayo及Ozempic/Wegovy等）在Warnings and Precautions增加NAION潜在风险。汇总126项随机试验：GLP-1组约6.4例/10万人年，对照约3.8例；FDA表述为「潜在增加」而非已证实因果。绝对风险仍低，标签更新而非撤市。已发快讯。",
-          "url": "https://www.fda.gov/drugs/drug-safety-communications/fda-requires-safety-labeling-changes-glucagon-peptide-1-receptor-agonists-glp-1-ras-due-potential",
-          "tickers": ["LLY", "NVO"]
-        },
-        {
-          "headline": "Ionis下调TRYNGOLZA 2026销售指引至约5000万美元，股价收跌21.36%",
-          "summary": "Ionis 11月9日：因sHTG新范式爬坡慢于预期，TRYNGOLZA全年产品销售指引由1.00–1.10亿美元下调至约5000万美元；Q3美国净销售900万美元，前九个月4100万美元。DAWNZERA指引1.10–1.20亿维持；总收入8.75–9.00亿及经营亏损、现金指引维持。现金约19亿美元。IONS收31.00美元（-21.36%，Bullstory）。属近季放量低于预期，长期峰值仍是公司表述。已发快讯。",
-          "url": "https://ir.ionis.com/news-releases/news-release-details/ionis-reports-third-quarter-2026-financial-results-and",
-          "tickers": ["IONS"]
-        },
-        {
-          "headline": "argenx收购Unnatural Products：首付5.5亿美元现金，总对价最高约11.5亿美元",
-          "summary": "argenx 11月9日达成收购UNP最终协议，补强大环肽发现并拓展口服/长效免疫药可能。首付5.5亿美元现金，另有至多约5.95亿美元研发与监管里程碑；预计年底前交割（常规条件）。平台收购≠管线立刻获批。已发快讯。",
-          "url": "https://www.globenewswire.com/news-release/2026/11/09/3398049/0/en/argenx-to-acquire-unnatural-products-inc-adding-peptide-discovery-engine-to-broaden-immunology-capabilities.html",
-          "tickers": ["ARGX"]
-        },
-        {
-          "headline": "Alnylam HELIOS-B五年数据：持续AMVUTTRA优于延期启动（已上市药长期强化）",
-          "summary": "Alnylam于AHA公布HELIOS-B五年数据：持续使用AMVUTTRA（vutrisiran）相对约三年后才启动，全因死亡或反复心血管事件风险在单药人群降约48%（HR约0.515）、总体人群约41%。60个月无新安全性信号。对照是延期启动而非五年全程安慰剂。已获批ATTR-CM疗法的长期获益强化，不是新适应症获批。",
-          "url": "https://www.businesswire.com/news/home/20261109441010/en/Alnylam-Announces-Five-Year-HELIOS-B-Data-Demonstrating-Sustained-Benefit-of-AMVUTTRA-vutrisiran-in-ATTR-CM",
-          "tickers": ["ALNY"]
+          "headline": "【持续影响】Vertex将povetacicept的PDUFA目标日期延至不晚于2027年2月28日，已由26日早报覆盖；这是重大修正后的审评延期，不是拒绝批准。周五短时交易是盘后跌幅的首次现货再定价窗口",
+          "summary": "7. 【持续影响】Vertex将povetacicept的PDUFA目标日期延至不晚于2027年2月28日，已由26日早报覆盖；这是重大修正后的审评延期，不是拒绝批准。周五短时交易是盘后跌幅的首次现货再定价窗口\n\nVertex于11月25日收盘后宣布，FDA将IgA肾病生物制品许可申请的审评延长最多三个月，目标行动日期改为不晚于2027年2月28日，此前为2026年11月30日。公司称延期与审评周期末期的信息要求有关，材料已被列为重大修正。这不是完整回复函，也不等于获批或被拒。该股周三收564.12美元，几乎持平；盘后美东19:56:16报523.14美元，较收盘跌7.26%。盘后价格不是官方收盘，周四又无法在美股现货中重新定价，因此周五美东09:30–13:00的短时交易，才是这一消息的首次现货再定价窗口。本报检索礼来、安进、艾伯维、吉利德、再生元、Moderna、BioNTech、阿尔尼拉姆等公司与主要监管源，截稿时未见26日早报之后新的FDA批准、失败宣告或大型三期顶线结果足以单列。吉利德anito-cel的PDUFA目标日期为12月23日，以官方日程为准，批准不是默认情形。\n\n来源：[Vertex官方新闻稿](https://www.businesswire.com/news/home/20261125185870/en/Vertex-Announces-Extension-of-PDUFA-Target-Action-Date-by-up-to-Three-Months-as-FDA-Completes-Review-of-the-Biologics-License-Application-for-Povetacicept-in-IgA-Nephropathy)、[路透社经雅虎转发](https://finance.yahoo.com/healthcare/articles/us-fda-extends-review-vertexs-214310966.html)、[雅虎Vertex](https://finance.yahoo.com/quote/VRTX/)\n\n六、半导体与制造/相关科技",
+          "url": "https://www.businesswire.com/news/home/20261125185870/en/Vertex-Announces-Extension-of-PDUFA-Target-Action-Date-by-up-to-Three-Months-as-FDA-Completes-Review-of-the-Biologics-License-Application-for-Povetacicept-in-IgA-Nephropathy",
+          "tickers": [
+            "VRTX",
+            "GILD"
+          ]
         }
       ]
     },
     {
       "id": "semiconductor",
-      "title": "半导体与制造",
+      "title": "半导体与制造/相关科技",
       "items": [
         {
-          "headline": "台股大涨4.94%、台积电收涨4.68%；美股半导反弹、AMD/AVGO领涨NVDA拖累",
-          "summary": "台湾加权指数11月9日收涨1960.06点或4.94%至41661.70（Focus Taiwan/CNA），称史上第二大单日涨点；台积电台股收涨4.68%报2235新台币，贡献指数约800点。主因国安基金授权维稳、收紧融券及美股周五科技反弹，并非台积电发布新指引。美股收盘AMD+13.26%、AVGO+8.78%、INTC+5.49%、NVDA-4.27%；SOXX周一被报道涨逾7%–8%量级。半导β修复与NVDA特异风险并存。下一验证：今晚CPI、11/17英伟达财报、本周CoreWeave/Cisco/AMAT业绩对资本开支链条再定价。",
-          "url": "https://focustaiwan.tw/business/202611090017",
-          "tickers": ["TSM", "AMD", "AVGO", "NVDA", "INTC", "SOX"]
+          "headline": "【开盘，尚未收盘】台积电在台北以平盘2,145新台币开出，台湾加权开盘几乎持平；拟议301关税仍不是已生效税率。美国半导体股仍无节后现货价",
+          "summary": "8. 【开盘，尚未收盘】台积电在台北以平盘2,145新台币开出，台湾加权开盘几乎持平；拟议301关税仍不是已生效税率。美国半导体股仍无节后现货价\n\n台积电台北上市股票周四收2,145新台币，跌0.23%。NOWNews署期北京09:07：该股周五以平盘2,145新台币开出，台湾加权开盘见亚太栏。开盘价不是收盘价，其后仍会变化。其美国存托凭证没有感恩节现货收盘，周三收342.34美元，跌1.96%，仍是ADR最后官方价格。两者不是同一市场、同一时点。USTR11月25日公布的拟议301措施仍处征求意见阶段，对台湾电子、半导体和电信的点名是政策背景，不是已经生效的最终关税；征求意见截止为2027年1月5日，听证会为1月25日。英伟达东南亚停运报道和CBS调查见超大市值栏，同样属于出口管制执行与合规审查，而不是新的法定税率。FCC于11月25日批准SpaceX部署最多100万颗轨道数据中心卫星（Starmind），已在26日早报展开，截稿时未见新的授权文本。截稿时未见台积电、英特尔、高通、Marvell、ASML、甲骨文、Palantir或CrowdStrike发布足以单列的新官方财报或指引修正。CrowdStrike全股票收购Zscaler的交易已在此前简报覆盖，仍须股东和监管批准，截稿时未见新的股东文件或监管决定。Marvell已公告将于12月1日公布2027财年第三季度业绩并召开电话会（美西13:30），以公司安排为准。\n\n来源：[NOWNews台股开盘](https://www.nownews.com/news/6895947)、[雅虎台积电ADR](https://finance.yahoo.com/quote/TSM/)、[USTR新闻稿（已报）](https://ustr.gov/about/policy-offices/press-office/press-releases/2026/november/ustr-makes-determinations-and-proposes-actions-14-section-301-investigations-relating-structural)、[Marvell业绩电话会公告](https://investor.marvell.com/news-events/press-releases/detail/1041/marvell-technology-inc-announces-conference-call-to-review-third-quarter-of-fiscal-year-2027-financial-results)\n\n七、今日与未来一周关键日程（北京时间）",
+          "url": "https://www.nownews.com/news/6895947",
+          "tickers": [
+            "TSM",
+            "MRVL",
+            "INTC",
+            "QCOM",
+            "ASML",
+            "ORCL",
+            "PLTR",
+            "CRWD"
+          ]
         }
       ]
     },
     {
       "id": "calendar",
-      "title": "后续日程",
+      "title": "今日与未来一周关键日程",
       "items": [
         {
-          "headline": "今日与本周关键节点（北京时间）：CPI、Fed讲话、CoreWeave/Cisco/AMAT、PPI、罗素初榜",
-          "summary": "①今晚21:30（美东08:30）：BLS公布10月CPI；因2025年停摆缺上年同期，多数分项不公布同比，市场重在环比（道琼斯调查预期CPI环比约+0.3%、核心约+0.2%，属预期非结果）。②同日约17:00：美联储理事Waller伦敦讲话（此前口径）；Bowman展望预定美东15:30/18:30量级。③今晚约06:00次日清晨：CoreWeave电话会（美东10日17:00盘后）；11日退伍军人节美股开市、债市休市。④REGN Roundtable预定美东11/10 08:30（北京21:30，与CPI重叠时段）。⑤11月13日清晨：Cisco与Applied Materials业绩电话会（美东12日盘后）。⑥11月13日21:30：10月PPI。⑦罗素美国指数初榜：美东11月13日收盘后。⑧英伟达三季报约11月17日；国会关注黄仁勋约11月18日闭门汇报。期权：CPI与NVDA财报是离散时点，事件波动与方向下注是不同维度。",
-          "url": "https://www.bls.gov/schedule/2026/11_sched_list.htm",
-          "tickers": ["NVDA", "LLY", "IONS", "REGN"]
+          "headline": "周五美股将于北京22:30开盘并提前至美东13:00收盘；11月29日欧佩克+讨论2027年产量政策；12月8–9日FOMC。感恩节至截稿美联储无新的官方讲话",
+          "summary": "9. 周五美股将于北京22:30开盘并提前至美东13:00收盘；11月29日欧佩克+讨论2027年产量政策；12月8–9日FOMC。感恩节至截稿美联储无新的官方讲话\n\n11月27日约07:00（已发生）：CME股指期货已重开，交易计入周五交易日，见宏观栏。\n11月27日22:30至28日02:00：周五美股常规交易（美东09:30–13:00提前收盘），符合条件的期权约13:15；纳斯达克延长交易相应提前至美东17:00；SIFMA建议债券市场美东14:00结束。短时交易可能放大价格摆动，尤其是对英伟达相关报道、Vertex盘后跌幅，以及原油官方确认后的现货再定价。\n11月29日：欧佩克+举行会议，讨论2027年产量政策。此前媒体援引知情人士称可能至少将现行目标滚动至2027年第一季度，这不是已经公布的决议。\n11月30日原Vertex povetacicept PDUFA目标日期已改至不晚于2027年2月28日；批准不是默认情形。\n12月1日：众议院外交委员会就英伟达相关事项举行有记录问询（此前已确认）；Marvell公布2027财年第三季度业绩。\n12月3日：媒体称黄仁勋将出席参议院银行委员会公开听证，以国会正式通知为准。\n12月8–9日：FOMC（含SEP与点阵图），当前目标区间3.75%–4.00%。感恩节至本稿截稿，美联储无新的官方讲话。\n12月14日、12月17日：甲骨文、美光财报（雅虎或公司日历所示，以公司公告为准）。\n12月15日：欧盟TCMV推迟后的特斯拉辅助驾驶审议日期；延期本身不等于结果。\n12月23日：BEA公布三季度GDP第三次估计及11月个人收入与支出（含PCE）；吉利德anito-cel的PDUFA目标日期同为12月23日，批准不是默认情形。\n2027年1月5日为USTR拟议301措施征求意见截止，1月25日举行听证会。\n\n来源：[纳斯达克假期公告](https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-69)、[纽交所交易日历](https://www.nyse.com/trade/hours-calendars/)、[SIFMA感恩节债市建议](https://www.sifma.org/news/press-releases/sifma-fixed-income-market-close-recommendations-in-the-u-s-the-u-k-and-japan-for-thanksgiving-day-2026)、[美联储11月日历](https://www.federalreserve.gov/newsevents/2026-november.htm)、[BEA日程](https://www.bea.gov/news/schedule)",
+          "url": "https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-69",
+          "tickers": []
         }
       ]
     }
